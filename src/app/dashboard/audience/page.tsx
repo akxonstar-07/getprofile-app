@@ -16,7 +16,7 @@ export default async function AudiencePage() {
   const totalSubscribers = subscribers.length;
   const lastWeek = new Date();
   lastWeek.setDate(lastWeek.getDate() - 7);
-  const newThisWeek = subscribers.filter(s => s.createdAt >= lastWeek).length;
+  const newThisWeek = subscribers.filter((s: any) => s.createdAt >= lastWeek).length;
 
   return (
     <div className="max-w-5xl">
