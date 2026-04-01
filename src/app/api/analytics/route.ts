@@ -44,11 +44,11 @@ export async function GET(request: Request) {
     orderBy: { createdAt: "desc" },
   });
 
-  const profileViews = events.filter((e) => e.type === "profile_view").length;
-  const linkClicks = events.filter((e) => e.type === "link_click").length;
+  const profileViews = events.filter((e: any) => e.type === "profile_view").length;
+  const linkClicks = events.filter((e: any) => e.type === "link_click").length;
 
   const dailyStats: Record<string, { views: number; clicks: number }> = {};
-  events.forEach((e) => {
+  events.forEach((e: any) => {
     const day = e.createdAt.toISOString().split("T")[0];
     if (!dailyStats[day]) dailyStats[day] = { views: 0, clicks: 0 };
     if (e.type === "profile_view") dailyStats[day].views++;
