@@ -1,0 +1,189 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id             String    @id @default(cuid())
+  name           String?
+  email          String    @unique
+  emailVerified  DateTime?
+  username       String?   @unique
+  hashedPassword String?
+  image          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  accounts       Account[]
+  sessions       Session[]
+  profile        Profile?
+  links          Link[]
+  portfolioItems PortfolioItem[]
+  products       Product[]
+  analyticsEvents AnalyticsEvent[]
+  subscribers    Subscriber[]
+  onboardingCompleted Boolean @default(false)
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Profile {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  bio         String?
+  avatarUrl   String?
+  bannerUrl   String?
+  location    String?
+  theme       String  @default("default")
+  font        String  @default("Inter")
+  bgColor     String  @default("#ffffff")
+  accentColor String  @default("#6366f1")
+  layoutStyle String  @default("minimal")
+  portfolioTheme String @default("default")
+  mobileTheme    String @default("default")
+  monetizationGoals String?
+
+  twitter        String?
+  instagram      String?
+  linkedin       String?
+  youtube        String?
+  github         String?
+  tiktok         String?
+  website        String?
+  facebook       String?
+  snapchat       String?
+  spotify        String?
+  totalFollowers Int?    @default(0)
+
+  // Portfolio / Media Kit fields
+  portfolioTitle    String?    // e.g. "Creator • Model • Brand Ambassador"
+  portfolioBio      String?    // Longer bio for portfolio page
+  skills            String?    // JSON array: ["Photography", "Video Editing"]
+  brandLogos        String?    // JSON array of brand logo URLs for collab section
+  pressLogos        String?    // JSON array of press/publication logo URLs
+  businessEmail     String?    // Public business contact email
+  availableForWork  Boolean    @default(true)
+  statsBrandDeals   Int        @default(0)
+  statsContentCount Int        @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Link {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  url       String
+  icon      String?
+  image     String?
+  highlight Boolean  @default(false)
+  enabled   Boolean  @default(true)
+  order     Int      @default(0)
+  clicks    Int      @default(0)
+  
+  // A/B Testing
+  abTestActive Boolean @default(false)
+  variantBUrl  String?
+  variantBTitle String?
+  clicksA      Int     @default(0)
+  clicksB      Int     @default(0)
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PortfolioItem {
+  id          String  @id @default(cuid())
+  userId      String
+  title       String
+  image       String?
+  description String?
+  link        String?
+  category    String?
+  order       Int     @default(0)
+  createdAt   DateTime @default(now())
+
+  // Influencer media kit fields
+  itemType    String?    // "project" | "collaboration" | "reel" | "press" | "instagram"
+  brandName   String?    // For collaborations: "Nike", "Samsung"
+  videoUrl    String?    // For reels/TikToks: direct video embed URL
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Product {
+  id           String  @id @default(cuid())
+  userId       String
+  name         String
+  description  String?
+  price        Float   @default(0)
+  image        String?
+  checkoutUrl  String?
+  enabled      Boolean @default(true)
+  order        Int     @default(0)
+  isAffiliate  Boolean @default(false)
+  affiliateNote String?
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  metadata  String?
+  referrer  String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Subscriber {
+  id        String   @id @default(cuid())
+  userId    String
+  email     String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, email])
+}
