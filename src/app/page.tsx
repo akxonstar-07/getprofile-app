@@ -2,374 +2,352 @@
 
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ArrowRight, Sparkles, Link2, Palette, ShoppingBag, BarChart3,
-  Globe, Star, CheckCircle2, ChevronDown, ExternalLink, Zap, Tag,
-  Image as ImageIcon, Play,
+  Globe, Star, Play, CheckCircle2, ChevronRight, Zap
 } from "lucide-react";
 
 /* ─── Data ─────────────────────────────────────────────────── */
-const FEATURES = [
-  { icon: Link2, title: "Link in Bio", desc: "Unlimited links with click tracking. Perfect replacement for Linktree.", color: "from-indigo-500 to-indigo-400", bg: "bg-indigo-50" },
-  { icon: ImageIcon, title: "Portfolio Gallery", desc: "Showcase your best work with a beautiful grid. Filter by category.", color: "from-cyan-500 to-cyan-400", bg: "bg-cyan-50" },
-  { icon: ShoppingBag, title: "Creator Store", desc: "Sell ebooks, presets, courses, or any digital product. One link away.", color: "from-emerald-500 to-emerald-400", bg: "bg-emerald-50" },
-  { icon: Tag, title: "Affiliate Links", desc: "Monetize with affiliate links shown transparently on your profile.", color: "from-amber-500 to-amber-400", bg: "bg-amber-50" },
-  { icon: Palette, title: "Custom Themes", desc: "6+ beautiful themes, custom colors, 6 font choices. Fully yours.", color: "from-pink-500 to-pink-400", bg: "bg-pink-50" },
-  { icon: BarChart3, title: "Analytics", desc: "Profile views, link clicks, traffic sources. Know what works.", color: "from-purple-500 to-purple-400", bg: "bg-purple-50" },
-];
-
-const TEMPLATES = [
-  { name: "Minimal Creator", gradient: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)", emoji: "✨", links: ["My Portfolio", "YouTube", "Newsletter"], accent: "#6366f1" },
-  { name: "Influencer",      gradient: "linear-gradient(135deg, #ec4899 0%, #f43f5e 100%)", emoji: "🌟", links: ["Instagram", "Brand Deals", "Shop"],      accent: "#ffffff" },
-  { name: "Photographer",    gradient: "linear-gradient(135deg, #f59e0b 0%, #f97316 100%)", emoji: "📸", links: ["Portfolio", "Book a Shoot", "Prints"],   accent: "#ffffff" },
-  { name: "Developer",       gradient: "linear-gradient(135deg, #6366f1 0%, #06b6d4 100%)", emoji: "⌨️",  links: ["GitHub", "Blog", "Hire Me"],           accent: "#ffffff" },
-  { name: "Coach",           gradient: "linear-gradient(135deg, #10b981 0%, #06b6d4 100%)", emoji: "🎯", links: ["1-on-1 Call", "Course", "Free Guide"],   accent: "#ffffff" },
-];
-
 const PLANS = [
-  { name: "Free", price: "$0", period: "forever", features: ["1 Profile", "5 Links", "3 Portfolio items", "Basic analytics", "GetProfile watermark"], cta: "Get started free", popular: false },
-  { name: "Pro", price: "$9", period: "/month", features: ["Unlimited links", "Unlimited portfolio", "Creator Store + Affiliates", "Custom themes & fonts", "Advanced analytics", "Remove watermark", "Priority support"], cta: "Start 14-day trial", popular: true },
-  { name: "Business", price: "$29", period: "/month", features: ["Everything in Pro", "Custom domain", "Team access (3 seats)", "API access", "Media kit builder", "White-label branding"], cta: "Contact sales", popular: false },
+  { 
+    name: "Free", 
+    price: "$0", 
+    period: "forever", 
+    desc: "Everything you need to build your digital presence.",
+    features: ["1 Profile", "5 Smart Links", "3 Portfolio items", "Basic analytics", "GetProfile watermark"], 
+    cta: "Claim Free Profile", 
+    popular: false 
+  },
+  { 
+    name: "Pro", 
+    price: "$9", 
+    period: "/month", 
+    desc: "For elite creators ready to scale and monetize.",
+    features: ["Unlimited Links & Portfolio", "Creator Store + Affiliates", "Custom Themes & Fonts", "Advanced Analytics", "Remove Watermark"], 
+    cta: "Start 14-day trial", 
+    popular: true 
+  },
 ];
 
 const FAQS = [
-  { q: "What is GetProfile?", a: "GetProfile is an all-in-one creator platform — a link-in-bio page, portfolio website, and digital store combined into one beautiful, shareable profile at getprofile.link/username." },
-  { q: "How is this different from Linktree?", a: "Linktree only does links. GetProfile adds a full portfolio gallery, a creator store to sell digital products, affiliate link management, and deeper customization — all in one place." },
-  { q: "Can I sell digital products?", a: "Yes! Add your own products with checkout links (Gumroad, Lemon Squeezy, Stripe, etc.) or add affiliate links from Amazon, brands, or any platform. Both appear beautifully on your profile." },
-  { q: "Is there a free plan?", a: "Absolutely. The free plan includes a profile with up to 5 links and 3 portfolio items. Upgrade to Pro for unlimited everything." },
-  { q: "Can I use a custom domain?", a: "Custom domains are available on the Business plan. Free and Pro users get a clean getprofile.link/username URL." },
+  { q: "What is GetProfile?", a: "An elite all-in-one creator platform. It acts as your link-in-bio, portfolio, and digital store combined into one beautiful profile." },
+  { q: "How is this different from Linktree?", a: "Linktree only does links. GetProfile adds a high-fidelity portfolio gallery, a creator store to sell digital products, and deep analytics—designed specifically for modern creators." },
+  { q: "Can I sell digital products?", a: "Yes. Add your own products with checkout links or add affiliate links from Amazon, brands, or any platform." },
+  { q: "What is the difference between Free and Pro?", a: "Free gives you a stunning profile with up to 5 links. Pro unlocks unlimited links, the Creator Store, advanced analytics, and removes the watermark forever." },
 ];
 
 /* ─── Profile Phone Mockup ──────────────────────────────────── */
-function PhoneMockup({ template }: { template: typeof TEMPLATES[0] }) {
+function PhoneMockup() {
   return (
-    <div className="relative w-[200px] flex-shrink-0">
-      <div className="phone-frame w-full" style={{ background: template.gradient }}>
-        {/* Status bar */}
-        <div className="flex items-center justify-between px-4 py-2 opacity-60">
-          <span className="text-[9px] text-white font-medium">9:41</span>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-1.5 rounded-sm border border-white/60 relative"><div className="absolute inset-0.5 right-auto w-1.5 bg-white/60 rounded-sm" /></div>
+    <div className="relative w-[280px] h-[580px] rounded-[40px] border-[8px] border-slate-900 bg-black shadow-2xl shadow-indigo-500/20 overflow-hidden flex-shrink-0 z-10 transition-transform duration-700 hover:scale-105">
+      {/* Top Notch */}
+      <div className="absolute top-0 inset-x-0 h-6 flex justify-center z-20">
+        <div className="w-32 h-6 bg-slate-900 rounded-b-3xl"></div>
+      </div>
+      
+      {/* Screen Content */}
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-900 via-slate-900 to-black p-4 flex flex-col pt-12">
+        <div className="w-20 h-20 rounded-full mx-auto mb-4 p-1 rounded-full bg-gradient-to-tr from-cyan-400 to-indigo-500">
+           <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&h=256&q=80" alt="Creator" className="w-full h-full object-cover rounded-full border-2 border-black" />
+        </div>
+        <h3 className="text-white font-bold text-lg text-center">Sarah Jenkins</h3>
+        <p className="text-indigo-200 text-xs text-center mb-6">Digital Creator & Designer</p>
+        
+        <div className="space-y-3 flex-1">
+          <div className="w-full py-3 px-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 text-white text-sm font-semibold flex items-center justify-between">
+            <span>My Presets (Store)</span> <ChevronRight className="w-4 h-4 opacity-50" />
+          </div>
+          <div className="w-full py-3 px-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 text-white text-sm font-semibold flex items-center justify-between">
+            <span>Photography Portfolio</span> <ChevronRight className="w-4 h-4 opacity-50" />
+          </div>
+          <div className="w-full py-3 px-4 rounded-2xl bg-white/5 border border-white/5 text-slate-300 text-sm font-semibold flex items-center justify-between">
+            <span>Watch my latest video</span> <Play className="w-4 h-4 opacity-50" />
           </div>
         </div>
-        <div className="px-4 pb-5 text-center">
-          {/* Avatar */}
-          <div className="w-14 h-14 rounded-2xl mx-auto mb-2 flex items-center justify-center text-2xl"
-            style={{ background: "rgba(255,255,255,0.2)", border: "2px solid rgba(255,255,255,0.3)" }}>
-            {template.emoji}
-          </div>
-          <h3 className="text-white font-bold text-xs">Alex Rivera</h3>
-          <p className="text-white/60 text-[9px] mb-3">Digital Creator</p>
-          {/* Links */}
-          <div className="space-y-2">
-            {template.links.map((link) => (
-              <div key={link} className="py-2 px-3 rounded-xl text-[9px] font-semibold text-center"
-                style={{ background: "rgba(255,255,255,0.15)", color: template.accent }}>
-                {link}
-              </div>
-            ))}
-          </div>
-          <p className="text-white/30 text-[8px] mt-3">getprofile.link/alex</p>
+        
+        <div className="pb-2 text-center text-[10px] text-slate-500 flex items-center justify-center gap-1">
+          <Globe className="w-3 h-3" /> getprofile.me/sarah
         </div>
       </div>
     </div>
   );
 }
 
+/* ─── VIP Marquee ───────────────────────────────────────────── */
+const AVATARS = [
+  "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop",
+  "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop",
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
+  "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop",
+  "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
+  "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop",
+  "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100&h=100&fit=crop",
+];
+
 /* ─── Page ──────────────────────────────────────────────────── */
 export default function HomePage() {
   const { data: session } = useSession();
-  const [activeTemplate, setActiveTemplate] = useState(0);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  return (
-    <div className="min-h-screen bg-white overflow-hidden">
+  // Injects keyframes for smooth horizontal auto-scrolling
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.innerHTML = `
+      @keyframes scroll {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+      .animate-scroll {
+        animation: scroll 20s linear infinite;
+      }
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
+      }
+      .animate-float-delayed {
+        animation: float 6s ease-in-out 3s infinite;
+      }
+      @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+        100% { transform: translateY(0px); }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => style.remove();
+  }, []);
 
-      {/* ── NAVBAR ── */}
-      <nav className="fixed top-0 inset-x-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+  return (
+    <div className="min-h-screen bg-[#020617] text-slate-50 overflow-hidden font-sans selection:bg-indigo-500/30">
+
+      {/* ── FLOATING PILL NAVBAR ── */}
+      <div className="fixed top-6 inset-x-0 z-50 flex justify-center px-4">
+        <nav className="w-full max-w-4xl bg-white/5 backdrop-blur-xl border border-white/10 rounded-full px-6 py-3 flex items-center justify-between shadow-2xl shadow-black/50">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 gradient-bg rounded-xl flex items-center justify-center shadow-md shadow-indigo-200 group-hover:shadow-indigo-300 transition-shadow">
+            <div className="w-8 h-8 bg-gradient-to-tr from-indigo-500 to-cyan-400 rounded-full flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform">
               <Globe className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-slate-900">Get<span className="gradient-text">Profile</span></span>
+            <span className="text-lg font-bold text-white tracking-tight">GetProfile</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
-            {["features","templates","pricing","faq"].map(s => (
-              <a key={s} href={`#${s}`} className="text-sm text-slate-500 hover:text-slate-900 transition-colors capitalize">{s}</a>
+            {["features", "pricing", "faq"].map(s => (
+              <a key={s} href={`#${s}`} className="text-sm text-slate-300 hover:text-white transition-colors capitalize font-medium">{s}</a>
             ))}
           </div>
           <div className="flex items-center gap-3">
             {session ? (
-              <Link href="/dashboard" className="btn-primary">Dashboard <ArrowRight className="w-4 h-4" /></Link>
+              <Link href="/dashboard" className="px-5 py-2 rounded-full bg-white text-slate-900 text-sm font-bold hover:bg-slate-200 transition-colors">
+                Dashboard
+              </Link>
             ) : (
               <>
-                <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Log in</Link>
-                <Link href="/signup" className="btn-primary">Sign up free <ArrowRight className="w-4 h-4" /></Link>
+                <Link href="/login" className="hidden sm:block text-sm font-medium text-slate-300 hover:text-white transition-colors">Log in</Link>
+                <Link href="/signup" className="px-5 py-2 rounded-full bg-gradient-to-r from-indigo-500 to-cyan-400 text-white text-sm font-bold shadow-lg shadow-indigo-500/25 hover:opacity-90 transition-opacity">
+                  Claim your link
+                </Link>
               </>
             )}
           </div>
-        </div>
-      </nav>
+        </nav>
+      </div>
 
-      {/* ── HERO ── */}
-      <section className="relative pt-32 pb-24 px-6 overflow-hidden">
-        {/* Background */}
-        <div className="absolute inset-0 gradient-bg-subtle" />
-        <div className="absolute top-20 right-0 w-[600px] h-[600px] rounded-full blur-3xl opacity-20 -translate-y-1/4 translate-x-1/4"
-          style={{ background: "radial-gradient(circle, #6366f1 0%, transparent 70%)" }} />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full blur-3xl opacity-15 translate-y-1/4 -translate-x-1/4"
-          style={{ background: "radial-gradient(circle, #06b6d4 0%, transparent 70%)" }} />
+      {/* ── LINK.ME ORBITAL HERO ── */}
+      <section className="relative pt-44 pb-32 px-6 lg:min-h-screen flex items-center">
+        {/* Massive Neon Glowing Orbs Background */}
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[150px] pointer-events-none" />
 
-        <div className="relative max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left — text */}
-            <div className="text-left animate-slide-up">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-sm border border-slate-100 mb-8">
-                <Sparkles className="w-4 h-4 text-indigo-500" />
-                <span className="text-sm text-slate-600">Portfolio · Link in Bio · Creator Store</span>
+        <div className="max-w-7xl mx-auto w-full grid lg:grid-cols-2 gap-16 items-center z-10">
+          {/* Left Sub-Hero Text */}
+          <div className="text-left">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-md">
+              <Sparkles className="w-4 h-4 text-cyan-400" />
+              <span className="text-sm font-medium text-slate-300">The Ultimate Creator Hub</span>
+            </div>
+            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tighter text-white leading-[1.05] mb-6 drop-shadow-2xl">
+              One link.<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-emerald-400">
+                Your entire world.
+              </span>
+            </h1>
+            <p className="text-lg sm:text-xl text-slate-400 max-w-lg mb-10 leading-relaxed font-medium">
+              Combine your link-in-bio, portfolio, and digital storefront into one jaw-dropping, elite profile. 
+            </p>
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <Link href="/signup"
+                className="w-full sm:w-auto px-8 py-4 rounded-full bg-white text-slate-900 text-lg font-black hover:bg-slate-200 hover:scale-105 transition-all flex items-center justify-center gap-2">
+                Claim getprofile.me/ <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Right Floating Phone Mockup */}
+          <div className="relative flex justify-center lg:justify-end items-center h-[600px]">
+            {/* Orbital Glass Cards */}
+            <div className="absolute top-10 right-10 animate-float bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-2xl shadow-2xl z-20 flex items-center gap-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 text-white" />
               </div>
-              <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight text-slate-900 leading-tight mb-6">
-                One link.<br />
-                Your entire<br />
-                <span className="gradient-text">creator world.</span>
-              </h1>
-              <p className="text-lg text-slate-500 max-w-lg mb-8 leading-relaxed">
-                Build a stunning profile page that works as your portfolio, link-in-bio, and digital store — all in one place. Trusted by thousands of creators.
-              </p>
-              <div className="flex flex-wrap items-center gap-4">
-                <Link href="/signup"
-                  className="inline-flex items-center gap-2 px-8 py-4 gradient-bg text-white rounded-2xl text-base font-bold hover:opacity-90 transition-all shadow-xl shadow-indigo-200 hover:-translate-y-0.5">
-                  Create your profile <ArrowRight className="w-5 h-5" />
-                </Link>
-                <a href="#templates" className="inline-flex items-center gap-2 px-6 py-4 border-2 border-slate-200 text-slate-700 rounded-2xl text-base font-semibold hover:border-indigo-300 hover:text-indigo-600 transition-all">
-                  <Play className="w-4 h-4" /> See examples
-                </a>
-              </div>
-              <p className="text-sm text-slate-400 mt-4">Free forever · No credit card required · Live in 2 minutes</p>
-
-              {/* Social proof */}
-              <div className="flex items-center gap-3 mt-8">
-                <div className="flex -space-x-2">
-                  {["🧑","👩","👨","🧑","👩"].map((emoji, i) => (
-                    <div key={i} className="w-8 h-8 rounded-full gradient-bg border-2 border-white flex items-center justify-center text-xs">{emoji}</div>
-                  ))}
-                </div>
-                <div>
-                  <div className="flex items-center gap-1">
-                    {[1,2,3,4,5].map(i => <Star key={i} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />)}
-                  </div>
-                  <p className="text-xs text-slate-500">Loved by 10,000+ creators</p>
-                </div>
+              <div>
+                <p className="text-white font-bold text-sm">34.2K Views</p>
+                <p className="text-slate-400 text-xs">This month</p>
               </div>
             </div>
 
-            {/* Right — phone mockups */}
-            <div className="hidden lg:flex items-end justify-center gap-4 relative">
-              <div className="translate-y-8 opacity-70 scale-90">
-                <PhoneMockup template={TEMPLATES[1]} />
+            <div className="absolute bottom-20 left-0 animate-float-delayed bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-2xl shadow-2xl z-20 flex items-center gap-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center">
+                <ShoppingBag className="w-5 h-5 text-white" />
               </div>
-              <div className="shadow-2xl shadow-indigo-200/60 rounded-[2.5rem]">
-                <PhoneMockup template={TEMPLATES[0]} />
-              </div>
-              <div className="translate-y-8 opacity-70 scale-90">
-                <PhoneMockup template={TEMPLATES[2]} />
-              </div>
-              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 px-5 py-2.5 bg-white rounded-2xl shadow-lg border border-slate-100 flex items-center gap-2 whitespace-nowrap">
-                <Zap className="w-4 h-4 text-amber-500" />
-                <span className="text-sm font-semibold text-slate-800">Live in under 2 minutes</span>
+              <div>
+                <p className="text-white font-bold text-sm">Preset Sold!</p>
+                <p className="text-emerald-400 text-xs">+$29.00</p>
               </div>
             </div>
+
+            <PhoneMockup />
           </div>
         </div>
       </section>
 
-      {/* ── FEATURES ── */}
-      <section id="features" className="py-24 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-sm font-bold text-indigo-600 uppercase tracking-widest mb-3">Everything in one place</p>
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">
-              More than a link-in-bio
-            </h2>
-            <p className="text-slate-500 max-w-xl mx-auto">GetProfile combines Linktree, a portfolio site, and a digital storefront into one shareable profile.</p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {FEATURES.map((f) => (
-              <div key={f.title} className="p-6 rounded-2xl border border-slate-100 bg-white card-hover group cursor-default">
-                <div className={`w-12 h-12 rounded-2xl ${f.bg} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
-                  <div className={`w-6 h-6 bg-gradient-to-br ${f.color} rounded-lg flex items-center justify-center`}>
-                    <f.icon className="w-3.5 h-3.5 text-white" />
-                  </div>
+      {/* ── VIP MARQUEE (HOO.BE STYLE) ── */}
+      <section className="py-10 border-y border-white/5 bg-white/[0.02] overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 mb-6 text-center">
+          <p className="text-sm font-bold tracking-widest text-slate-500 uppercase">Loved by 10,000+ elite creators</p>
+        </div>
+        <div className="flex whitespace-nowrap overflow-hidden relative w-full">
+          {/* Fading Edges */}
+          <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#020617] to-transparent z-10" />
+          <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#020617] to-transparent z-10" />
+          
+          <div className="flex gap-8 animate-scroll items-center w-[200%]">
+            {[...AVATARS, ...AVATARS, ...AVATARS].map((src, i) => (
+              <div key={i} className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-full pr-6 p-2 backdrop-blur-sm hover:bg-white/10 transition-colors cursor-default">
+                <img src={src} className="w-10 h-10 rounded-full object-cover border border-white/20 grayscale hover:grayscale-0 transition-all" alt="Creator" />
+                <div className="flex flex-col">
+                  <span className="text-white text-sm font-bold">Creator {i+1}</span>
+                  <div className="flex items-center gap-1"><Star className="w-3 h-3 text-amber-400 fill-amber-400" /><Star className="w-3 h-3 text-amber-400 fill-amber-400" /><Star className="w-3 h-3 text-amber-400 fill-amber-400" /><Star className="w-3 h-3 text-amber-400 fill-amber-400" /><Star className="w-3 h-3 text-amber-400 fill-amber-400" /></div>
                 </div>
-                <h3 className="font-bold text-slate-900 mb-2">{f.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{f.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ── */}
-      <section className="py-24 px-6" style={{ background: "linear-gradient(135deg, #eef2ff 0%, #ecfeff 100%)" }}>
+      {/* ── THE BENTO BOX FEATURE GRID ── */}
+      <section id="features" className="py-32 px-6 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-black text-white mb-4">Everything you need. <span className="text-slate-500">Zero bloat.</span></h2>
+            <p className="text-lg text-slate-400">A powerful suite of tools designed exclusively so you can monetize and grow.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[280px]">
+            {/* Large Card 1: Store */}
+            <div className="md:col-span-2 bg-gradient-to-br from-slate-900 to-black border border-white/10 rounded-3xl p-8 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-3xl rounded-full" />
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                <div>
+                  <div className="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mb-6 border border-emerald-500/30">
+                    <ShoppingBag className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Digital Storefront</h3>
+                  <p className="text-slate-400 max-w-sm">Sell ebooks, courses, presets, and accept payments seamlessly directly on your profile. No external websites needed.</p>
+                </div>
+                <div className="mt-6 flex gap-3">
+                  <div className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-bold flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-400"/> Stripe Ready</div>
+                  <div className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-bold flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-400"/> Instant Payouts</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Small Card 1: Links */}
+            <div className="bg-gradient-to-br from-slate-900 to-black border border-white/10 rounded-3xl p-8 relative overflow-hidden group">
+              <div className="w-12 h-12 bg-indigo-500/20 text-indigo-400 rounded-2xl flex items-center justify-center mb-6 border border-indigo-500/30">
+                <Link2 className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Smart Links</h3>
+              <p className="text-slate-400 text-sm">Add unlimited links with high-conversion animations and deep real-time click tracking.</p>
+            </div>
+
+            {/* Small Card 2: Customization */}
+            <div className="bg-gradient-to-br from-slate-900 to-black border border-white/10 rounded-3xl p-8 relative overflow-hidden group">
+              <div className="w-12 h-12 bg-pink-500/20 text-pink-400 rounded-2xl flex items-center justify-center mb-6 border border-pink-500/30">
+                <Palette className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Bespoke Themes</h3>
+              <p className="text-slate-400 text-sm">Choose from 6+ stunning themes or craft your exact brand identity with custom colors and fonts.</p>
+            </div>
+
+            {/* Large Card 2: Analytics */}
+            <div className="md:col-span-2 bg-gradient-to-br from-slate-900 to-black border border-white/10 rounded-3xl p-8 relative overflow-hidden group">
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/10 blur-3xl rounded-full" />
+              <div className="relative z-10 h-full flex flex-col md:flex-row gap-8 items-center">
+                <div className="flex-1">
+                  <div className="w-12 h-12 bg-cyan-500/20 text-cyan-400 rounded-2xl flex items-center justify-center mb-6 border border-cyan-500/30">
+                    <BarChart3 className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-2">Audience Analytics</h3>
+                  <p className="text-slate-400">Track profile views, locate geography, monitor CTR, and analyze exactly where your revenue originates in real-time.</p>
+                </div>
+                {/* Simulated Chart Mockup */}
+                <div className="w-full max-w-[200px] h-32 bg-white/5 border border-white/10 rounded-xl relative flex items-end p-2 gap-1 backdrop-blur-sm">
+                  {[40, 60, 45, 80, 55, 90, 100].map((h, i) => (
+                    <div key={i} className="flex-1 bg-gradient-to-t from-cyan-500 to-indigo-500 rounded-t-sm" style={{ height: `${h}%` }}></div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 2-TIER PRICING ── */}
+      <section id="pricing" className="py-32 px-6 relative bg-black/40 border-y border-white/5">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Up and running in minutes</h2>
-            <p className="text-slate-500">No tech skills needed. Build your profile step by step.</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { step: "01", title: "Sign up free", desc: "Create your account and claim your getprofile.link/username URL instantly.", emoji: "🚀" },
-              { step: "02", title: "Build your profile", desc: "Add links, upload portfolio items, set up your store, and pick a theme.", emoji: "🎨" },
-              { step: "03", title: "Share everywhere", desc: "Put your link in your Instagram bio, Twitter, email signature, anywhere.", emoji: "🌍" },
-            ].map((s) => (
-              <div key={s.step} className="bg-white rounded-3xl p-8 text-center shadow-sm border border-white card-hover">
-                <div className="text-4xl mb-4">{s.emoji}</div>
-                <div className="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-2">Step {s.step}</div>
-                <h3 className="text-lg font-bold text-slate-900 mb-3">{s.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── TEMPLATES ── */}
-      <section id="templates" className="py-24 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">
-              Pick a style. <span className="gradient-text">Make it yours.</span>
-            </h2>
-            <p className="text-slate-500 max-w-xl mx-auto">5 beautiful templates to start with. Fully customizable colors, fonts, and layouts.</p>
+            <h2 className="text-4xl sm:text-5xl font-black text-white mb-4">Simple, Transparent Pricing.</h2>
+            <p className="text-lg text-slate-400">No hidden fees. Scale your audience without limits.</p>
           </div>
 
-          {/* Template selector */}
-          <div className="flex items-center justify-center gap-2 flex-wrap mb-10">
-            {TEMPLATES.map((t, i) => (
-              <button key={t.name} onClick={() => setActiveTemplate(i)}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${activeTemplate === i ? "gradient-bg text-white shadow-md" : "border border-slate-200 text-slate-600 hover:border-indigo-300"}`}>
-                {t.emoji} {t.name}
-              </button>
-            ))}
-          </div>
-
-          {/* Preview */}
-          <div className="flex items-center justify-center">
-            <div className="relative">
-              <div className="w-[260px] shadow-2xl shadow-slate-300/60 rounded-[2.5rem] overflow-hidden">
-                <PhoneMockup template={TEMPLATES[activeTemplate]} />
-              </div>
-              <div className="absolute -right-32 top-1/2 -translate-y-1/2 space-y-3 hidden lg:block">
-                {["Custom colors", "6 font choices", "5 layouts", "Dark mode"].map((tag) => (
-                  <div key={tag} className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-slate-100 shadow-sm text-sm font-medium text-slate-700 whitespace-nowrap">
-                    <CheckCircle2 className="w-4 h-4 text-indigo-500" />{tag}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="text-center mt-10">
-            <Link href="/signup" className="btn-primary px-8 py-3 text-base">
-              Use this template <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── STORE FEATURE SPOTLIGHT ── */}
-      <section className="py-24 px-6" style={{ background: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)" }}>
-        <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
-          <div>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 text-sm font-semibold"
-              style={{ background: "rgba(99,102,241,0.2)", color: "#818cf8" }}>
-              <ShoppingBag className="w-4 h-4" /> Creator Store
-            </div>
-            <h2 className="text-4xl font-bold text-white mb-6">
-              Turn your profile into<br />
-              <span className="gradient-text">a revenue stream</span>
-            </h2>
-            <p className="text-slate-400 text-lg mb-8 leading-relaxed">
-              Sell your own digital products or earn with affiliate links — all directly from your GetProfile page.
-            </p>
-            <div className="space-y-4">
-              {[
-                { icon: ShoppingBag, title: "Own products", desc: "Ebooks, presets, courses, Notion templates, anything digital", color: "text-emerald-400" },
-                { icon: Tag, title: "Affiliate links", desc: "Amazon, brands, SaaS tools — shown transparently with AD badge", color: "text-amber-400" },
-                { icon: ExternalLink, title: "Any platform", desc: "Connect Gumroad, Lemon Squeezy, Stripe, Payhip, and more", color: "text-indigo-400" },
-              ].map((item) => (
-                <div key={item.title} className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(255,255,255,0.1)" }}>
-                    <item.icon className={`w-5 h-5 ${item.color}`} />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-white text-sm">{item.title}</h4>
-                    <p className="text-slate-400 text-sm">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* Store card mockup */}
-          <div className="bg-white/5 border border-white/10 rounded-3xl p-6 space-y-4">
-            <h3 className="text-white font-bold text-sm mb-5 opacity-60 uppercase tracking-widest">Store Preview</h3>
-            {[
-              { name: "Lightroom Preset Pack", price: "$19", isAffiliate: false, emoji: "🎨" },
-              { name: "Productivity Notion Kit", price: "$29", isAffiliate: false, emoji: "📋" },
-              { name: "Notion (Affiliate)", price: "AD", isAffiliate: true, emoji: "🔗" },
-            ].map((item) => (
-              <div key={item.name} className="flex items-center gap-4 p-4 rounded-2xl" style={{ background: "rgba(255,255,255,0.07)" }}>
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: "rgba(255,255,255,0.1)" }}>
-                  {item.emoji}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-white font-semibold text-sm">{item.name}</h4>
-                  {item.isAffiliate && <span className="text-[10px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded-full font-bold">AFFILIATE</span>}
-                </div>
-                <span className={`font-bold text-sm ${item.isAffiliate ? "text-amber-400" : "text-emerald-400"}`}>{item.price}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── PRICING ── */}
-      <section id="pricing" className="py-24 px-6 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Simple pricing. No surprises.</h2>
-            <p className="text-slate-500 max-w-xl mx-auto">Start free. Upgrade when you're ready to unlock your full potential as a creator.</p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-6 items-start">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto items-center">
             {PLANS.map((plan) => (
-              <div key={plan.name}
-                className={`relative rounded-3xl p-8 ${plan.popular ? "gradient-bg text-white shadow-2xl shadow-indigo-200 scale-[1.03]" : "bg-white border-2 border-slate-100"}`}>
+              <div key={plan.name} className={`relative rounded-[32px] p-8 sm:p-10 ${
+                plan.popular 
+                ? "bg-gradient-to-b from-indigo-900/40 to-slate-900/40 border-2 border-indigo-500/50 shadow-2xl shadow-indigo-500/20 transform md:-translate-y-4" 
+                : "bg-slate-900/50 border border-white/10"
+              }`}>
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-white text-indigo-600 text-xs font-bold rounded-full shadow-lg border border-indigo-100">
-                    ✨ MOST POPULAR
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-indigo-500 to-cyan-400 text-white text-xs font-bold rounded-full shadow-lg">
+                    MOST POPULAR
                   </div>
                 )}
-                <h3 className={`font-bold text-lg mb-1 ${plan.popular ? "text-white" : "text-slate-900"}`}>{plan.name}</h3>
-                <div className="flex items-baseline gap-1 mb-6">
-                  <span className="text-4xl font-extrabold">{plan.price}</span>
-                  <span className={`text-sm ${plan.popular ? "text-white/70" : "text-slate-400"}`}>{plan.period}</span>
+                
+                <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
+                <p className="text-sm text-slate-400 mb-6 h-10">{plan.desc}</p>
+                
+                <div className="flex items-baseline gap-1 mb-8">
+                  <span className="text-5xl font-black text-white">{plan.price}</span>
+                  <span className="text-slate-400 font-medium">{plan.period}</span>
                 </div>
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2.5 text-sm">
-                      <CheckCircle2 className={`w-4 h-4 flex-shrink-0 ${plan.popular ? "text-white/80" : "text-indigo-500"}`} />
-                      <span className={plan.popular ? "text-white/90" : "text-slate-600"}>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/signup"
-                  className={`block w-full py-3.5 rounded-2xl text-center text-sm font-bold transition-all ${
-                    plan.popular ? "bg-white text-indigo-600 hover:bg-slate-50" : "bg-slate-900 text-white hover:bg-slate-800"
-                  }`}>
+
+                <Link href="/signup" className={`w-full py-4 rounded-full font-bold text-sm flex items-center justify-center transition-all ${
+                  plan.popular 
+                  ? "bg-white text-slate-900 hover:bg-slate-200 hover:scale-105" 
+                  : "bg-slate-800 text-white hover:bg-slate-700"
+                }`}>
                   {plan.cta}
                 </Link>
+
+                <div className="mt-10 space-y-4">
+                  {plan.features.map(f => (
+                    <div key={f} className="flex items-start gap-3">
+                      <div className={`mt-0.5 rounded-full p-1 ${plan.popular ? "bg-indigo-500/20 text-indigo-400" : "bg-white/10 text-slate-300"}`}>
+                        <CheckCircle2 className="w-3 h-3" />
+                      </div>
+                      <span className="text-sm font-medium text-slate-300">{f}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
@@ -377,61 +355,41 @@ export default function HomePage() {
       </section>
 
       {/* ── FAQ ── */}
-      <section id="faq" className="py-24 px-6" style={{ background: "linear-gradient(135deg,#eef2ff 0%, #ecfeff 100%)" }}>
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Frequently asked questions</h2>
-          </div>
-          <div className="space-y-3">
-            {FAQS.map((faq, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-                <button onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-left gap-4">
-                  <span className="font-semibold text-slate-900">{faq.q}</span>
-                  <ChevronDown className={`w-5 h-5 text-slate-400 flex-shrink-0 transition-transform ${openFaq === i ? "rotate-180" : ""}`} />
-                </button>
-                {openFaq === i && (
-                  <div className="px-6 pb-5 text-slate-500 text-sm leading-relaxed animate-fade-in">{faq.a}</div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA ── */}
-      <section className="py-24 px-6 bg-white">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="gradient-bg rounded-3xl p-12">
-            <div className="text-5xl mb-4">🚀</div>
-            <h2 className="text-4xl font-bold text-white mb-4">Your creator profile awaits</h2>
-            <p className="text-white/75 mb-8 max-w-lg mx-auto">Join 10,000+ creators who use GetProfile to build their online presence and monetize their audience.</p>
-            <Link href="/signup"
-              className="inline-flex items-center gap-2 px-10 py-4 bg-white text-indigo-600 rounded-2xl text-lg font-bold hover:bg-slate-50 transition-all shadow-xl">
-              Create your free profile <ArrowRight className="w-5 h-5" />
-            </Link>
-            <p className="text-white/50 text-sm mt-4">Free forever · No credit card · Live in 2 minutes</p>
-          </div>
+      <section id="faq" className="py-32 px-6 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-black text-center text-white mb-12">Frequently Asked Questions</h2>
+        <div className="space-y-4">
+          {FAQS.map((faq, i) => (
+            <div key={i} className="bg-slate-900/50 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 transition-colors">
+              <button 
+                className="w-full px-6 py-5 text-left flex items-center justify-between font-bold text-slate-200"
+                onClick={() => setOpenFaq(openFaq === i ? null : i)}
+              >
+                {faq.q}
+                <ChevronRight className={`w-5 h-5 text-slate-500 transition-transform ${openFaq === i ? "rotate-90" : ""}`} />
+              </button>
+              {openFaq === i && (
+                <div className="px-6 pb-5 text-slate-400 text-sm leading-relaxed border-t border-white/5 pt-4">
+                  {faq.a}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="border-t border-slate-100 py-12 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+      <footer className="border-t border-white/10 bg-black pt-16 pb-8 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 gradient-bg rounded-lg flex items-center justify-center">
-              <Globe className="w-4 h-4 text-white" />
+            <div className="w-6 h-6 bg-gradient-to-tr from-indigo-500 to-cyan-400 rounded-md flex items-center justify-center">
+              <Globe className="w-3 h-3 text-white" />
             </div>
-            <span className="font-bold text-slate-900">GetProfile</span>
+            <span className="font-bold text-white tracking-tight">GetProfile</span>
           </div>
-          <div className="flex items-center gap-6 text-sm text-slate-400">
-            <a href="#" className="hover:text-slate-600 transition-colors">Privacy</a>
-            <a href="#" className="hover:text-slate-600 transition-colors">Terms</a>
-            <a href="#" className="hover:text-slate-600 transition-colors">Contact</a>
-          </div>
-          <p className="text-sm text-slate-400">© {new Date().getFullYear()} GetProfile. All rights reserved.</p>
+          <p className="text-sm text-slate-500 font-medium">© {new Date().getFullYear()} GetProfile. All rights reserved.</p>
         </div>
       </footer>
+
     </div>
   );
 }
