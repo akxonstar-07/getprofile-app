@@ -57,7 +57,7 @@ export default function SignupPage() {
           <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-8">
             <Globe className="w-9 h-9 text-white" />
           </div>
-          <h2 className="text-4xl font-bold mb-4">Join GetProfile</h2>
+          <h2 className="text-4xl font-bold mb-4">Join getprofile.link</h2>
           <p className="text-white/70 text-lg max-w-sm">
             Create your creator profile and start sharing your work with the world.
           </p>
@@ -71,7 +71,7 @@ export default function SignupPage() {
             <div className="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
               <Globe className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold">Get<span className="gradient-text">Profile</span></span>
+            <span className="text-xl font-black italic">getprofile.link</span>
           </Link>
 
           <h1 className="text-3xl font-bold mb-2">Create your account</h1>

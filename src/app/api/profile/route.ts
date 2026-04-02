@@ -67,8 +67,6 @@ export async function PUT(request: Request) {
         ...(instagram !== undefined && { instagram }),
         ...(linkedin !== undefined && { linkedin }),
         ...(youtube !== undefined && { youtube }),
-        ...(linkedin !== undefined && { linkedin }),
-        ...(youtube !== undefined && { youtube }),
         ...(github !== undefined && { github }),
         ...(tiktok !== undefined && { tiktok }),
         ...(website !== undefined && { website }),

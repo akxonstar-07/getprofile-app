@@ -8,7 +8,7 @@ const messages = [
   { id: 2, sender: "Sarah Jenkins", subject: "Question about your editing preset", preview: "I just purchased the preset pack but I'm having trouble installing it...", time: "5h ago", unread: true, starred: false },
   { id: 3, sender: "Local Events Team", subject: "Speaking Opportunity at CreatorCon", preview: "We are organizing the annual CreatorCon and would be honored if...", time: "1d ago", unread: false, starred: true },
   { id: 4, sender: "Mike D.", subject: "Collab proposal", preview: "Hey man, huge fan. I'm a videographer in your area and was hoping...", time: "2d ago", unread: false, starred: false },
-  { id: 5, sender: "GetProfile Support", subject: "Your Pro Subscription is Active", preview: "Welcome to GetProfile Pro! Here's a quick guide to getting started...", time: "3d ago", unread: false, starred: false },
+  { id: 5, sender: "getprofile.link Support", subject: "Your Pro Subscription is Active", preview: "Welcome to getprofile.link Pro! Here's a quick guide to getting started...", time: "3d ago", unread: false, starred: false },
 ];
 
 export default function MessagesPage() {

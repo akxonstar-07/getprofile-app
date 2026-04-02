@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
                 fontFamily: 'monospace',
               }}
             >
-              getprofile.me/{username}
+              getprofile.link/{username}
             </p>
           </div>
         </div>

@@ -16,19 +16,19 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "GetProfile — Build Your Creator Profile in Minutes",
+  title: "getprofile.link — Build Your Creator Profile in Minutes",
   description:
-    "Create a portfolio, link hub, and creator store in one beautiful profile. The modern link-in-bio platform for creators.",
+    "The all-in-one platform for creators to showcase their portfolio, manage links, and sell digital products.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    title: "GetProfile",
+    title: "getprofile.link",
     statusBarStyle: "black-translucent",
   },
   keywords: ["creator", "portfolio", "link in bio", "profile", "personal website", "creator store"],
   openGraph: {
-    title: "GetProfile — Build Your Creator Profile in Minutes",
-    description: "Create a portfolio, link hub, and creator store in one profile.",
+    title: "getprofile.link — Build Your Creator Profile in Minutes",
+    description: "The all-in-one platform for creators to showcase their portfolio, manage links, and sell digital products.",
     type: "website",
   },
 };

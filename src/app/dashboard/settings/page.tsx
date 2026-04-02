@@ -55,7 +55,7 @@ export default function SettingsPage() {
               </h2>
               <p className="text-sm text-slate-600 mb-4">Unlock unlimited links, custom domains, and no watermark.</p>
               <ul className="space-y-1.5 text-sm text-slate-600 mb-5">
-                {["Unlimited links", "Creator Store (unlimited products)", "Custom domain", "Remove GetProfile watermark", "Priority support"].map((f) => (
+                {["Unlimited links", "Creator Store (unlimited products)", "Custom domain", "Remove getprofile.link watermark", "Priority support"].map((f) => (
                   <li key={f} className="flex items-center gap-2">
                     <span className="w-4 h-4 rounded-full bg-indigo-100 flex items-center justify-center text-xs text-indigo-600 flex-shrink-0">✓</span>
                     {f}

@@ -57,7 +57,7 @@ export default function LoginPage() {
             <div className="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
               <Globe className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold">Get<span className="gradient-text">Profile</span></span>
+            <span className="text-xl font-black italic">getprofile.link</span>
           </Link>
 
           <h1 className="text-3xl font-bold mb-2">Log in</h1>

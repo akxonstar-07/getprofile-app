@@ -147,7 +147,7 @@ export default function MerchPage() {
             </div>
             <button className="btn-primary px-4">Connect</button>
           </div>
-          <p className="text-xs text-slate-400">By connecting a fulfillment partner, all orders placed through your GetProfile store will automatically be routed to their factories.</p>
+          <p className="text-xs text-slate-400">By connecting a fulfillment partner, all orders placed through your getprofile.link store will automatically be routed to their factories.</p>
         </div>
       )}
     </div>

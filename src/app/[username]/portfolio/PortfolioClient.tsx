@@ -596,7 +596,7 @@ export default function PortfolioClient({ user }: Props) {
       ═══════════════════════════════════════ */}
       <footer className="py-10 border-t border-white/5 text-center">
         <a href="/" className="inline-flex items-center gap-1.5 text-xs text-white/20 hover:text-white/40 transition-opacity">
-          <Globe className="w-3 h-3" /> Built with GetProfile
+          <Globe className="w-3 h-3" /> Built with getprofile.link
         </a>
         <p className="text-[10px] text-white/10 mt-2">© {new Date().getFullYear()} {user.name || user.username}</p>
       </footer>

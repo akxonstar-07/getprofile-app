@@ -456,3 +456,59 @@
 .animate-bounce-arrow { animation: bounce-arrow 2s ease-in-out infinite; }
 .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
 
+
+/* ════════ Elite Creator Design System (Hoo.be / Link.me) ════════ */
+.feature-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 2.5rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  height: 520px;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.feature-card:hover { transform: translateY(-8px); box-shadow: 0 40px 80px rgba(0,0,0,0.08); }
+
+.feature-card-mint { background: linear-gradient(180deg, #E6FFFA 0%, #F0FFF4 100%); }
+.feature-card-lavender { background: linear-gradient(180deg, #F5F3FF 0%, #EDE9FE 100%); }
+.feature-card-peach { background: linear-gradient(180deg, #FFF5F1 0%, #FFF1EB 100%); }
+
+.hoobe-input-container {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 9999px;
+  padding: 4px;
+  padding-left: 20px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+  border: 1px solid #f1f5f9;
+  width: 100%;
+  max-width: 500px;
+}
+
+.hoobe-gradient-banner {
+  background: linear-gradient(93.5deg, #00C2FF 0.6%, #5E5CE6 99.4%);
+}
+
+.app-icon-wall {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  opacity: 0.25;
+}
+@media (min-width: 640px) { .app-icon-wall { grid-template-columns: repeat(10, 1fr); } }
+@media (min-width: 1024px) { .app-icon-wall { grid-template-columns: repeat(14, 1fr); } }
+
+.glass-card-prestige {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2rem;
+}
+
+.hoobe-title {
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}

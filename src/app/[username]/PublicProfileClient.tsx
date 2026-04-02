@@ -549,7 +549,7 @@ export default function PublicProfileClient({ user }: Props) {
         <div className="text-center pt-6 pb-4">
           <a href="/" className="inline-flex items-center gap-1.5 text-xs opacity-30 hover:opacity-60 transition-opacity"
             style={{ color: mutedColor }}>
-            <Globe className="w-3 h-3" /> Powered by GetProfile
+            <Globe className="w-3 h-3" /> Powered by getprofile.link
           </a>
         </div>
 

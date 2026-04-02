@@ -10,15 +10,15 @@ interface Message {
 }
 
 const SUGGESTIONS = [
-  { icon: Lightbulb, text: "Improve my bio", prompt: "Help me write a better bio for my GetProfile page. Make it engaging, short, and professional." },
+  { icon: Lightbulb, text: "Improve my bio", prompt: "Help me write a better bio for my getprofile.link page. Make it engaging, short, and professional." },
   { icon: BarChart3, text: "Grow my audience", prompt: "What are the best strategies to grow my audience using my link in bio page?" },
   { icon: Palette,   text: "Best template for me", prompt: "Based on creator profiles, which template style works best for influencers?" },
-  { icon: Zap,       text: "Monetization tips", prompt: "How can I best monetize my GetProfile page using affiliate links and products?" },
+  { icon: Zap,       text: "Monetization tips", prompt: "How can I best monetize my getprofile.link page using affiliate links and products?" },
 ];
 
 const AI_RESPONSES: Record<string, string> = {
   bio: "✨ **Bio Tips for Creators:**\n\n1. **Hook first** — Start with what makes you unique\n2. **Keep it under 150 chars** — Scannable on mobile\n3. **Include a CTA** — e.g. \"DM me for collabs 👇\"\n4. **Use emoji sparingly** — 1-2 max\n\n**Example:** *\"Digital creator | Sharing tips on growth & design 🎨 | DM for collabs\"*",
-  grow: "📈 **Top Growth Strategies:**\n\n1. **Add your GetProfile link to ALL socials** — Instagram bio, TikTok bio, YouTube about\n2. **Pin a post** showing your link page on each platform\n3. **Post behind-the-scenes** content linking to your portfolio\n4. **Use link.me-style stories** showing your profile QR code\n5. **Engage with comments** — every reply drives profile visits",
+  grow: "📈 **Top Growth Strategies:**\n\n1. **Add your getprofile.link link to ALL socials** — Instagram bio, TikTok bio, YouTube about\n2. **Pin a post** showing your link page on each platform\n3. **Post behind-the-scenes** content linking to your portfolio\n4. **Use link.me-style stories** showing your profile QR code\n5. **Engage with comments** — every reply drives profile visits",
   template: "🎨 **Best Templates by Category:**\n\n• **Influencer/Creator** → Bold dark theme with vibrant accent\n• **Photographer/Model** → Full photo banner, minimal text\n• **Developer** → Clean minimal with GitHub prominent\n• **Coach/Consultant** → Trust-building layout, testimonials\n• **Brand/Business** → Professional with store section first\n\nGo to **Appearance** in your dashboard to switch now!",
   monetize: "💰 **Monetization Strategy:**\n\n1. **Own Products** — Sell presets, ebooks, templates via Gumroad\n2. **Affiliate Links** — Add Amazon/Flipkart links with honest notes\n3. **Tips** — Add a tip button ($5/$10/$20) — fans love supporting you\n4. **Course sales** — Link your Teachable/Udemy course directly\n5. **Brand deals** — Use your analytics page to pitch brands with real data\n\n**Pro tip:** Highlighted links get 3x more clicks!",
 };
@@ -29,7 +29,7 @@ function getAIResponse(message: string): string {
   if (lower.includes("grow") || lower.includes("audience") || lower.includes("follower")) return AI_RESPONSES.grow;
   if (lower.includes("template") || lower.includes("design") || lower.includes("theme")) return AI_RESPONSES.template;
   if (lower.includes("monetize") || lower.includes("money") || lower.includes("earn") || lower.includes("affiliate")) return AI_RESPONSES.monetize;
-  return `🤖 **Great question!**\n\nI'm your GetProfile AI assistant. I can help you with:\n\n• **Bio writing** — Craft the perfect creator bio\n• **Growth strategies** — Grow your audience faster\n• **Template selection** — Find your perfect design\n• **Monetization** — Earn from your profile\n\nTry asking me something specific like *"Help me write my bio"* or *"How do I monetize my links?"*`;
+  return `🤖 **Great question!**\n\nI'm your getprofile.link AI assistant. I can help you with:\n\n• **Bio writing** — Craft the perfect creator bio\n• **Growth strategies** — Grow your audience faster\n• **Template selection** — Find your perfect design\n• **Monetization** — Earn from your profile\n\nTry asking me something specific like *"Help me write my bio"* or *"How do I monetize my links?"*`;
 }
 
 function formatMessage(text: string) {
@@ -58,7 +58,7 @@ function formatMessage(text: string) {
 export default function AIAssistantPage() {
   const [messages, setMessages] = useState<Message[]>([{
     role: "assistant",
-    content: "👋 Hi! I'm your **GetProfile AI Assistant**.\n\nI'm here to help you:\n• Write the perfect bio\n• Choose the best template\n• Grow your audience\n• Monetize your profile\n\nWhat would you like help with today?",
+    content: "👋 Hi! I'm your **getprofile.link AI Assistant**.\n\nI'm here to help you:\n• Write the perfect bio\n• Choose the best template\n• Grow your audience\n• Monetize your profile\n\nWhat would you like help with today?",
     time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
   }]);
   const [input, setInput]     = useState("");

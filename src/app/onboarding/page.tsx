@@ -286,7 +286,7 @@ export default function OnboardingWizard() {
         {/* Logo */}
         <div className="text-center mb-8">
           <h2 className="text-2xl font-black bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-            GetProfile
+            getprofile.link
           </h2>
         </div>
 
@@ -312,7 +312,7 @@ export default function OnboardingWizard() {
           {/* ═══ STEP 1: Category + Name ═══ */}
           {step === 1 && (
             <div>
-              <h1 className="text-3xl font-black text-white mb-2">Welcome to GetProfile!</h1>
+              <h1 className="text-3xl font-black text-white mb-2">Welcome to getprofile.link!</h1>
               <p className="text-white/50 mb-8">What best describes you?</p>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
