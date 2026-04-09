@@ -171,8 +171,8 @@ export default function AppearancePage() {
       {/* Right: Settings */}
       <div className="flex-1 w-full max-w-xl space-y-6">
         <div className="mb-8 pt-8">
-          <h1 className="text-2xl font-black text-white drop-shadow-sm">Appearance</h1>
-          <p className="text-white/80 text-sm mt-1">Choose a template and customize how your public profile looks</p>
+          <h1 className="text-2xl font-black text-slate-900 drop-shadow-sm">Appearance</h1>
+          <p className="text-slate-500 text-sm mt-1">Choose a template and customize how your public profile looks</p>
         </div>
           <div className="dash-card">
             <div className="flex items-center justify-between mb-5">

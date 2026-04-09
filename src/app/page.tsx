@@ -206,11 +206,11 @@ export default function LandingPage() {
               <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-[2rem] w-full max-w-md relative z-10">
                 <div className="bg-white rounded-full p-1.5 pl-5 flex items-center mb-4 border border-white/20">
                   <span className="text-slate-400 font-bold text-sm">getprofile.link/</span>
-                  <input type="text" placeholder="username" className="flex-1 bg-transparent border-none focus:ring-0 text-slate-900 font-bold" />
+                  <input type="text" placeholder="username" value={username} onChange={(e) => setUsername(e.target.value)} className="flex-1 bg-transparent border-none focus:ring-0 text-slate-900 font-bold" />
                 </div>
-                <button className="w-full bg-slate-900 text-white rounded-full py-4 font-black hover:bg-slate-800 transition-all flex items-center justify-center gap-2">
+                <Link href={`/signup?username=${username}`} className="w-full bg-slate-900 text-white rounded-full py-4 font-black hover:bg-slate-800 transition-all flex items-center justify-center gap-2">
                   create my link <ArrowRight className="w-5 h-5" />
-                </button>
+                </Link>
               </div>
 
               {/* Background Shapes */}

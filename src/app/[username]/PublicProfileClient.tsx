@@ -9,6 +9,12 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { getRoleDashboardConfig } from "@/lib/role-dashboard-config";
+import CheckoutModal from "@/components/public/CheckoutModal";
+import TipWidget from "@/components/public/TipWidget";
+import PublicBookingWidget from "@/components/public/PublicBookingWidget";
+import EmailCapture from "@/components/public/EmailCapture";
+import EmbedBlock from "@/components/public/EmbedBlock";
+import { getSidebarConfigForRole } from "@/lib/role-sidebar-map";
 
 /* ─── Platform config & Icons ─── */
 function detectPlatform(url: string): { name: string; color: string; bg: string; icon: React.ReactNode } {
@@ -38,6 +44,8 @@ export default function PublicProfileClient({ user: initialUser }: { user: any }
   const [chatOpen, setChatOpen] = useState(false);
   const [messages, setMessages] = useState<any[]>([{ sender: "AI", content: `Hi! I'm ${user.name}'s virtual assistant. How can I help you today?` }]);
   const [input, setInput] = useState("");
+  const [checkoutProduct, setCheckoutProduct] = useState<any>(null);
+  const roleConfig = getSidebarConfigForRole(user.profileRole || "personal_brand");
 
   useEffect(() => {
     setHasMounted(true);
@@ -143,7 +151,7 @@ export default function PublicProfileClient({ user: initialUser }: { user: any }
                 {products.map((p: any) => (
                   <div key={p.id} className="group bg-zinc-900 border border-white/5 p-6 rounded-[40px] hover:border-indigo-500/50 transition-all duration-500">
                     <div className="aspect-[4/5] rounded-[30px] overflow-hidden mb-6 bg-zinc-800 relative">
-                       <img src={p.image || "/placeholder.jpg"} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                       <img src={p.image || "/placeholder.svg"} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                        <div className="absolute top-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest text-white">
                          {p.productType}
                        </div>
@@ -153,7 +161,7 @@ export default function PublicProfileClient({ user: initialUser }: { user: any }
                         <h3 className="text-xl font-bold line-clamp-1">{p.name}</h3>
                         <span className="text-indigo-400 font-black">${p.price}</span>
                       </div>
-                      <button className="w-full bg-white text-black py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all">
+                      <button onClick={() => setCheckoutProduct(p)} className="w-full bg-white text-black py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all">
                         Buy Now
                       </button>
                     </div>
@@ -195,7 +203,7 @@ export default function PublicProfileClient({ user: initialUser }: { user: any }
         /* 📱 MOBILE LINK-IN-BIO TEMPLATE (Bento/Kinetic) */
         <div className="max-w-[480px] mx-auto min-h-screen bg-black flex flex-col pb-20">
           <div className="relative aspect-[4/5] max-h-[500px]">
-            <img src={profile.avatarUrl || "/placeholder.jpg"} className="absolute inset-0 w-full h-full object-cover grayscale" />
+            <img src={profile.avatarUrl || "/placeholder.svg"} className="absolute inset-0 w-full h-full object-cover grayscale" />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
             <div className="absolute bottom-10 left-0 right-0 text-center px-6">
                <h1 className="text-4xl font-black tracking-tighter text-white mb-2">{user.name || user.username}</h1>
@@ -224,7 +232,7 @@ export default function PublicProfileClient({ user: initialUser }: { user: any }
                      {products.map((p: any) => (
                         <div key={p.id} className="min-w-[180px] bg-white rounded-[32px] p-2 flex flex-col gap-3">
                            <div className="aspect-square rounded-[24px] overflow-hidden bg-zinc-100">
-                             <img src={p.image || "/placeholder.jpg"} className="w-full h-full object-cover" alt={p.name} />
+                             <img src={p.image || "/placeholder.svg"} className="w-full h-full object-cover" alt={p.name} />
                            </div>
                            <div className="px-2 pb-2">
                              <p className="text-black font-bold text-xs line-clamp-1">{p.name}</p>
@@ -235,8 +243,39 @@ export default function PublicProfileClient({ user: initialUser }: { user: any }
                   </div>
                 </div>
              )}
+              {/* ── Embed Blocks for YouTube/Spotify links ── */}
+              <div className="space-y-3">
+                {links.filter((l: any) => {
+                  const url = l.url.toLowerCase();
+                  return url.includes('youtube.com') || url.includes('youtu.be') || url.includes('spotify.com') || url.includes('soundcloud.com');
+                }).slice(0, 3).map((l: any) => (
+                  <EmbedBlock key={l.id} url={l.url} title={l.title} />
+                ))}
+              </div>
+
+              {/* ── Booking Widget (for service roles) ── */}
+              {roleConfig.showBookings && (
+                <div className="mt-6">
+                  <PublicBookingWidget username={user.username} creatorName={user.name || user.username} />
+                </div>
+              )}
+
+              {/* ── Email Capture ── */}
+              <div className="mt-6">
+                <EmailCapture username={user.username} creatorName={user.name || user.username} />
+              </div>
           </div>
         </div>
+      )}
+
+      {/* ── 💰 TIP WIDGET (Pro Only) ── */}
+      {creatorIsPro && (
+        <TipWidget username={user.username} creatorName={user.name || user.username} />
+      )}
+
+      {/* ── 🛒 CHECKOUT MODAL ── */}
+      {checkoutProduct && (
+        <CheckoutModal product={checkoutProduct} username={user.username} onClose={() => setCheckoutProduct(null)} />
       )}
 
       {/* ── 🤖 AI ASSISTANT CHAT WIDGET (Pro Only) ── */}

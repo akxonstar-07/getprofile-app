@@ -1,82 +1,97 @@
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-// Ensure STRIPE_SECRET_KEY exists in production
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_placeholder", {
-  // @ts-ignore
-  apiVersion: "2024-04-10",
-});
-
+/**
+ * POST /api/checkout/process
+ * Creates an order for a product. In production, integrate Stripe PaymentIntent here.
+ * For now, creates the order record and returns a success response.
+ */
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    // Note: Checkout can be public (for buyers). We only check session if this is a creator-initiated action (like subscribing to Pro).
-    // For this route, we assume it's for buying products/tips from a creator.
-    
     const body = await req.json();
-    const { productId, type = "product", amount, creatorId, returnUrl } = body;
+    const { productId, customerEmail, customerName, promoCode } = body;
 
-    if (!creatorId) {
-      return NextResponse.json({ error: "Creator ID required" }, { status: 400 });
+    if (!productId || !customerEmail) {
+      return NextResponse.json({ error: "Product ID and email required" }, { status: 400 });
     }
 
-    let lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
-    let metadata: any = { type, creatorId };
-
-    if (type === "product" && productId) {
-      const product = await prisma.product.findUnique({ where: { id: productId } });
-      if (!product) return NextResponse.json({ error: "Product not found" }, { status: 404 });
-      
-      lineItems = [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: product.name,
-              description: product.description || undefined,
-            },
-            unit_amount: Math.round(product.price * 100), // Stripe expects cents
-          },
-          quantity: 1,
-        },
-      ];
-      metadata.productId = product.id;
-    } else if (type === "tip" && amount) {
-      lineItems = [
-        {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: "Tip for Creator",
-              description: "Thank you for your support!",
-            },
-            unit_amount: Math.round(amount * 100),
-          },
-          quantity: 1,
-        },
-      ];
-    } else {
-      return NextResponse.json({ error: "Invalid checkout request" }, { status: 400 });
-    }
-
-    // Determine domain (localhost or production)
-    const origin = req.headers.get("origin") || process.env.NEXTAUTH_URL || "http://localhost:3000";
-
-    const checkoutSession = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: lineItems,
-      mode: "payment",
-      success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}&type=${type}`,
-      cancel_url: returnUrl || `${origin}/`,
-      metadata,
+    // Fetch the product
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      include: { user: true }
     });
 
-    return NextResponse.json({ url: checkoutSession.url });
+    if (!product || !product.enabled) {
+      return NextResponse.json({ error: "Product not found or unavailable" }, { status: 404 });
+    }
+
+    let finalPrice = product.price;
+
+    // Apply promo code if provided
+    if (promoCode) {
+      const promo = await prisma.promoCode.findFirst({
+        where: {
+          userId: product.userId,
+          code: promoCode.toUpperCase(),
+          enabled: true,
+        }
+      });
+
+      if (promo && promo.currentUses < promo.maxUses) {
+        const expired = promo.expiresAt && new Date(promo.expiresAt) < new Date();
+        if (!expired) {
+          finalPrice = product.price * (1 - promo.discountPercent / 100);
+          // Increment promo usage
+          await prisma.promoCode.update({
+            where: { id: promo.id },
+            data: { currentUses: { increment: 1 } }
+          });
+        }
+      }
+    }
+
+    // In production: Create Stripe PaymentIntent here
+    // const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+    // const paymentIntent = await stripe.paymentIntents.create({
+    //   amount: Math.round(finalPrice * 100),
+    //   currency: 'usd',
+    //   metadata: { productId, customerEmail }
+    // });
+
+    // Create order record
+    const order = await prisma.order.create({
+      data: {
+        userId: product.userId,
+        productId: product.id,
+        customerEmail,
+        amount: finalPrice,
+        status: "PAID", // In production: set to PENDING until Stripe webhook confirms
+      }
+    });
+
+    // Decrement inventory for physical products
+    if (product.productType === "PHYSICAL" && product.inventory && product.inventory > 0) {
+      await prisma.product.update({
+        where: { id: product.id },
+        data: { inventory: { decrement: 1 } }
+      });
+    }
+
+    return NextResponse.json({
+      success: true,
+      order: {
+        id: order.id,
+        amount: finalPrice,
+        originalPrice: product.price,
+        productName: product.name,
+        digitalUrl: product.productType === "DIGITAL" ? product.digitalUrl : null,
+      },
+      // In production: include clientSecret for Stripe Elements
+      // clientSecret: paymentIntent.client_secret,
+    });
+
   } catch (error: any) {
-    console.error("STRIPE CHECKOUT ERROR:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    console.error("Checkout error:", error);
+    return NextResponse.json({ error: "Checkout failed" }, { status: 500 });
   }
 }
