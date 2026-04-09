@@ -3,23 +3,45 @@ import type { NextRequest } from 'next/server';
 
 export function proxy(request: NextRequest) {
   const url = request.nextUrl;
+  const { pathname } = url;
   
-  // Only process standard profile/page visits (ignore static assets or API routes)
+  // Skip static assets and API routes
   if (
-    url.pathname.startsWith('/_next') ||
-    url.pathname.startsWith('/api') ||
-    url.pathname.match(/\.(png|jpg|jpeg|svg|ico)$/)
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.match(/\.(png|jpg|jpeg|svg|ico|webp|css|js)$/)
   ) {
     return NextResponse.next();
   }
 
-  // Look for Common Attribution query parameters
+  // Check for auth token
+  const token =
+    request.cookies.get("next-auth.session-token")?.value ||
+    request.cookies.get("__Secure-next-auth.session-token")?.value;
+
+  // ── Protected routes: /dashboard/* and /onboarding ──
+  if (pathname.startsWith("/dashboard") || pathname === "/onboarding") {
+    if (!token) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // ── Redirect authenticated users from login/signup to dashboard ──
+  if (pathname === "/login" || pathname === "/signup") {
+    if (token) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+  }
+
+  // ── Attribution tracking (affiliate & UTM) ──
   const ref = url.searchParams.get('ref');
   const utmSource = url.searchParams.get('utm_source');
   
   const response = NextResponse.next();
 
-  // If a referral code exists, stamp it so their future purchases in the Store are attributed
+  // If a referral code exists, stamp it for 30 days
   if (ref) {
     response.cookies.set({
       name: 'gp_affiliate_id',
@@ -29,7 +51,7 @@ export function proxy(request: NextRequest) {
     });
   }
 
-  // Stamp UTM Source for Analytics (e.g. from a Link in a TikTok bio)
+  // Stamp UTM Source for Analytics
   if (utmSource) {
     response.cookies.set({
       name: 'gp_utm_source',
@@ -43,7 +65,6 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Apply this middleware to every route EXCEPT API & internal next files
   matcher: [
     '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],

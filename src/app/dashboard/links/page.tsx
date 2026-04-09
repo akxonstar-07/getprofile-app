@@ -6,6 +6,7 @@ import {
   ToggleLeft, ToggleRight, Star, MousePointerClick, Smartphone, ArrowUpRight,
   Link2
 } from "lucide-react";
+import { LinkScheduler, ABTestPanel } from "@/components/dashboard/LinkTools";
 
 interface LinkItem {
   id: string; title: string; url: string;
@@ -208,8 +209,8 @@ export default function LinksPage() {
         {/* Header */}
         <div className="flex items-start justify-between mb-8">
           <div>
-            <h1 className="text-2xl pt-8 font-black text-white drop-shadow-sm">Manage Links</h1>
-            <p className="text-white/80 text-sm mt-1">{links.length} links · {totalClicks} total clicks</p>
+            <h1 className="text-2xl pt-8 font-black text-slate-900 drop-shadow-sm">Manage Links</h1>
+            <p className="text-slate-500 text-sm mt-1">{links.length} links · {totalClicks} total clicks</p>
           </div>
           <button onClick={() => setShowForm(!showForm)} className="bg-white text-slate-900 mt-8 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:shadow-md transition-shadow">
             <Plus className="w-4 h-4 inline mr-1" /> Add link
@@ -329,6 +330,12 @@ export default function LinksPage() {
                   <a href={link.url} target="_blank" rel="noopener noreferrer" className="p-1.5 text-slate-300 hover:text-indigo-500 transition-colors flex-shrink-0">
                     <ExternalLink className="w-4 h-4" />
                   </a>
+
+                  {/* Schedule */}
+                  <LinkScheduler link={link} onSave={(id, data) => updateLink(id, data)} />
+
+                  {/* A/B Test */}
+                  <ABTestPanel link={link} onSave={(id, data) => updateLink(id, data)} />
 
                   {/* Delete */}
                   <button onClick={() => deleteLink(link.id)} className="p-1.5 text-slate-300 hover:text-red-500 transition-colors flex-shrink-0">

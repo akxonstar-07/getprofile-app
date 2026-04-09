@@ -5,11 +5,15 @@ import { useSession, signOut } from "next-auth/react";
 import { Settings, Shield, Trash2, LogOut, Crown, Bell, Globe, Sparkles, Zap, Check } from "lucide-react";
 import Link from "next/link";
 import { getUserPlanInfo, type PlanInfo } from "@/lib/plan-guard";
+import QRCodeCard from "@/components/dashboard/QRCodeCard";
+import SEOEditor from "@/components/dashboard/SEOEditor";
+import CustomDomainCard from "@/components/dashboard/CustomDomainCard";
 
 export default function SettingsPage() {
   const { data: session } = useSession();
   const [planInfo, setPlanInfo] = useState<PlanInfo | null>(null);
   const [profileRole, setProfileRole] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
 
   useEffect(() => {
     fetch("/api/profile").then(r => r.json()).then(d => {
@@ -17,6 +21,7 @@ export default function SettingsPage() {
         const info = getUserPlanInfo({ plan: d.user.plan || "FREE", trialEndsAt: d.user.trialEndsAt });
         setPlanInfo(info);
         setProfileRole(d.user.profileRole || "personal_brand");
+        setUsername(d.user.username || "");
       }
     }).catch(() => {});
   }, []);
@@ -189,6 +194,14 @@ export default function SettingsPage() {
             </button>
           </div>
         </div>
+        {/* QR Code */}
+        {username && <QRCodeCard username={username} />}
+
+        {/* Custom Domain */}
+        <CustomDomainCard />
+
+        {/* SEO Editor */}
+        {username && <SEOEditor username={username} />}
       </div>
     </div>
   );
