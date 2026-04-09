@@ -1,14 +1,39 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
-import { Settings, Shield, Trash2, LogOut, Crown, Bell, Globe } from "lucide-react";
+import { Settings, Shield, Trash2, LogOut, Crown, Bell, Globe, Sparkles, Zap, Check } from "lucide-react";
 import Link from "next/link";
+import { getUserPlanInfo, type PlanInfo } from "@/lib/plan-guard";
 
 export default function SettingsPage() {
   const { data: session } = useSession();
+  const [planInfo, setPlanInfo] = useState<PlanInfo | null>(null);
+  const [profileRole, setProfileRole] = useState<string>("");
+
+  useEffect(() => {
+    fetch("/api/profile").then(r => r.json()).then(d => {
+      if (d.user) {
+        const info = getUserPlanInfo({ plan: d.user.plan || "FREE", trialEndsAt: d.user.trialEndsAt });
+        setPlanInfo(info);
+        setProfileRole(d.user.profileRole || "personal_brand");
+      }
+    }).catch(() => {});
+  }, []);
+
+  // Dynamic plan badge
+  const getPlanBadge = () => {
+    if (!planInfo) return { label: "Loading...", color: "bg-slate-100 text-slate-500" };
+    if (planInfo.status === "PRO") return { label: "Pro Plan", color: "bg-indigo-100 text-indigo-700" };
+    if (planInfo.status === "TRIAL") return { label: `Trial (${planInfo.trialDaysLeft}d left)`, color: "bg-amber-100 text-amber-700" };
+    if (planInfo.status === "TRIAL_EXPIRED") return { label: "Trial Expired", color: "bg-red-100 text-red-600" };
+    return { label: "Free Plan", color: "bg-slate-100 text-slate-600" };
+  };
+
+  const badge = getPlanBadge();
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-slate-900">Settings</h1>
         <p className="text-slate-500 text-sm mt-1">Manage your account preferences and security</p>
@@ -30,7 +55,7 @@ export default function SettingsPage() {
               <p className="text-sm text-slate-500">{session?.user?.email || "—"}</p>
             </div>
             <div className="ml-auto">
-              <span className="badge-primary">Free Plan</span>
+              <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${badge.color}`}>{badge.label}</span>
             </div>
           </div>
           <div className="space-y-2">
@@ -38,37 +63,79 @@ export default function SettingsPage() {
               <span className="text-sm text-slate-500">Display name</span>
               <span className="text-sm font-medium text-slate-900">{session?.user?.name || "—"}</span>
             </div>
-            <div className="flex items-center justify-between py-3">
+            <div className="flex items-center justify-between py-3 border-b border-slate-50">
               <span className="text-sm text-slate-500">Email</span>
               <span className="text-sm font-medium text-slate-900">{session?.user?.email || "—"}</span>
+            </div>
+            <div className="flex items-center justify-between py-3">
+              <span className="text-sm text-slate-500">Role</span>
+              <span className="text-sm font-medium text-slate-900 capitalize">{profileRole.replace(/_/g, " ")}</span>
             </div>
           </div>
         </div>
 
-        {/* Plan */}
-        <div className="dash-card border-2 border-indigo-100" style={{ background: "linear-gradient(135deg, #eef2ff, #ecfeff)" }}>
-          <div className="flex items-start justify-between">
-            <div>
-              <h2 className="font-semibold text-slate-900 mb-1 flex items-center gap-2">
-                <Crown className="w-4 h-4 text-amber-500" />
-                Upgrade to Pro
-              </h2>
-              <p className="text-sm text-slate-600 mb-4">Unlock unlimited links, custom domains, and no watermark.</p>
-              <ul className="space-y-1.5 text-sm text-slate-600 mb-5">
-                {["Unlimited links", "Creator Store (unlimited products)", "Custom domain", "Remove getprofile.link watermark", "Priority support"].map((f) => (
-                  <li key={f} className="flex items-center gap-2">
-                    <span className="w-4 h-4 rounded-full bg-indigo-100 flex items-center justify-center text-xs text-indigo-600 flex-shrink-0">✓</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <button className="btn-primary px-8 py-3">
-                <Crown className="w-4 h-4" />
-                Upgrade for $9/mo
-              </button>
+        {/* Plan — Show upgrade if not Pro, or current plan details */}
+        {planInfo?.isPro ? (
+          <div className="dash-card border-2 border-emerald-100" style={{ background: "linear-gradient(135deg, #ecfdf5, #f0fdf4)" }}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                <Crown className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-slate-900">
+                  {planInfo.isTrialActive ? "Pro Trial Active" : "Pro Plan Active"}
+                </h2>
+                <p className="text-sm text-emerald-600 font-medium">
+                  {planInfo.isTrialActive 
+                    ? `${planInfo.trialDaysLeft} days remaining in your trial`
+                    : "All premium features unlocked"
+                  }
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {["AI Assistant", "Booking Scheduler", "Discount Engine", "Custom Domain", 
+                "Unlimited Links", "Priority Support"].map((f) => (
+                <div key={f} className="flex items-center gap-2 text-sm text-slate-600">
+                  <Check className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                  {f}
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="dash-card border-2 border-indigo-100" style={{ background: "linear-gradient(135deg, #eef2ff, #ecfeff)" }}>
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="font-semibold text-slate-900 mb-1 flex items-center gap-2">
+                  <Crown className="w-4 h-4 text-amber-500" />
+                  Upgrade to Pro
+                </h2>
+                <p className="text-sm text-slate-600 mb-4">Unlock all features and grow your creator business.</p>
+                <ul className="space-y-1.5 text-sm text-slate-600 mb-5">
+                  {[
+                    "AI-powered business assistant",
+                    "Unlimited links & products", 
+                    "Booking scheduler & lead capture",
+                    "Discount engine with AI auto-offers",
+                    "Custom domain",
+                    "Remove getprofile.link watermark", 
+                    "Priority support"
+                  ].map((f) => (
+                    <li key={f} className="flex items-center gap-2">
+                      <span className="w-4 h-4 rounded-full bg-indigo-100 flex items-center justify-center text-xs text-indigo-600 flex-shrink-0">✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <button className="btn-primary px-8 py-3">
+                  <Crown className="w-4 h-4" />
+                  Upgrade for $9/mo
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Security */}
         <div className="dash-card">

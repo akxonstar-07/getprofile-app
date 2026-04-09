@@ -54,18 +54,29 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         (session.user as any).id = token.sub;
-        const dbUser = await prisma.user.findUnique({
-          where: { id: token.sub },
-        });
-        if (dbUser) {
-          (session.user as any).username = dbUser.username;
-        }
+        (session.user as any).role = token.role;
+        (session.user as any).username = token.username;
       }
       return session;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
+      // 1. Initial Login Case: Pass user role into the token
       if (user) {
         token.sub = user.id;
+        token.role = (user as any).role;
+        token.username = (user as any).username;
+      } 
+      
+      // 2. Dynamic Update Case: Fetch fresh data from DB if role is missing or manually trigger update
+      if (token.sub && !token.role) {
+        const freshUser = await prisma.user.findUnique({
+          where: { id: token.sub as string },
+          select: { role: true, username: true }
+        });
+        if (freshUser) {
+          token.role = freshUser.role;
+          token.username = freshUser.username;
+        }
       }
       return token;
     },

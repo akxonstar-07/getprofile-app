@@ -8,6 +8,7 @@ import {
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import AnalyticsChart from "@/components/dashboard/AnalyticsChart";
+import { useRoleDashboardConfig } from "@/hooks/useRoleDashboardConfig";
 
 interface DailyStats { [date: string]: { views: number; clicks: number } }
 
@@ -23,6 +24,8 @@ const COUNTRIES = [
 
 export default function AnalyticsPage() {
   const { data: session } = useSession();
+  const { config } = useRoleDashboardConfig();
+  const analyticsConfig = config.pages.analytics;
   const [loading, setLoading] = useState(true);
   const [range,   setRange]   = useState<Range>("7");
   const [stats,   setStats]   = useState({ totalViews: 0, totalClicks: 0, dailyStats: {} as DailyStats });
@@ -87,8 +90,8 @@ export default function AnalyticsPage() {
       {/* Header */}
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-black text-slate-900">Analytics</h1>
-          <p className="text-slate-500 text-sm mt-1">Track your profile performance and audience insights</p>
+          <h1 className="text-2xl font-black text-slate-900">{analyticsConfig.title}</h1>
+          <p className="text-slate-500 text-sm mt-1">{analyticsConfig.subtitle}</p>
         </div>
         {username && (
           <a href={`/${username}`} target="_blank" rel="noopener noreferrer"

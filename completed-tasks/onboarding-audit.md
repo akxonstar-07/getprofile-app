@@ -1,0 +1,11 @@
+# Output from UX Expert for onboarding-audit
+
+I'd be happy to help! After reviewing the `/onboarding` page flow, I've identified some areas for improvement that can reduce user drop-off and enhance the overall onboarding experience. Here are five concrete UX improvements:
+
+1. **Auto-focus the first input field**: Upon entering the `/onboarding` page, the focus should automatically shift to the first input field (e.g., email or username). This will encourage users to start filling out their information immediately, reducing the likelihood of them getting distracted or losing interest.
+2. **Simplify template selection by grouping similar templates together**: The current template selection step presents multiple options without any clear categorization or filtering. To improve this process, I recommend grouping similar templates (e.g., "Personal," "Business," or "Education") and providing a prominent filter/search bar to help users find the perfect template quickly.
+3. **Visualize progress with a clear indicator**: As users complete each step in the onboarding funnel, display a clear progress indicator (e.g., a horizontal progress bar, a series of connected dots, or a percentage complete meter). This will give users a sense of accomplishment and motivation to continue through the process.
+4. **Reduce cognitive load by providing example input values**: For fields that require specific formatting or syntax (e.g., phone number or date), provide example input values above or next to each field. This will help users understand what's expected of them and reduce the likelihood of errors.
+5. **Streamline step navigation with a "Next" button and clear instructions**: Upon completing each step, present a prominent "Next" button that clearly communicates what's happening next (e.g., "Step 2: Add profile picture"). Ensure that the instructions for each step are concise, easy to read, and provide a clear understanding of what users need to do.
+
+By implementing these improvements, we can reduce user drop-off during the onboarding process, increase user satisfaction, and set the stage for a seamless and enjoyable experience within the platform.

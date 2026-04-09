@@ -5,7 +5,8 @@ import { prisma } from "@/lib/prisma";
 
 const SOCIAL_FIELDS = [
   "instagram", "tiktok", "youtube", "twitter", "spotify",
-  "facebook", "snapchat", "linkedin", "github", "website"
+  "facebook", "snapchat", "linkedin", "github", "website",
+  "telegram", "whatsapp", "threads"
 ];
 
 export async function POST(req: Request) {
@@ -17,7 +18,7 @@ export async function POST(req: Request) {
 
     const userId = (session.user as any).id;
     const body = await req.json();
-    const { category, displayName, platforms, urls, monetization, portfolioTheme, mobileTheme } = body;
+    const { category, profileRole, displayName, platforms, urls, monetization, portfolioTheme, mobileTheme } = body;
 
     // Build social fields to save on profile
     const socialData: Record<string, string> = {};
@@ -66,11 +67,18 @@ export async function POST(req: Request) {
       }
     });
 
-    await prisma.user.update({
+    // Activate 14-day Pro trial on onboarding completion
+    const trialEndsAt = new Date();
+    trialEndsAt.setDate(trialEndsAt.getDate() + 14);
+
+    await (prisma as any).user.update({
       where: { id: userId },
       data: {
         name: displayName,
         onboardingCompleted: true,
+        profileRole: profileRole || "personal_brand",
+        plan: "TRIAL",
+        trialEndsAt,
       }
     });
 

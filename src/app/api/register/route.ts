@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, password, username } = body;
+    const { name, email, password, username, profileRole } = body;
 
     if (!name || !email || !password || !username) {
       return NextResponse.json(
@@ -29,12 +29,19 @@ export async function POST(request: Request) {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const user = await prisma.user.create({
+    // Set 14-day Pro trial for all new users
+    const trialEnd = new Date();
+    trialEnd.setDate(trialEnd.getDate() + 14);
+
+    const user = await (prisma as any).user.create({
       data: {
         name,
         email,
         username: username.toLowerCase(),
         hashedPassword,
+        profileRole: profileRole || "personal_brand",
+        plan: "TRIAL",
+        trialEndsAt: trialEnd,
         profile: {
           create: {},
         },

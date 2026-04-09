@@ -1,0 +1,334 @@
+// ═══════════════════════════════════════════════════
+// getprofile.link — Role Definitions (22 Roles)
+// Stage 2: The Template Engine
+// ═══════════════════════════════════════════════════
+
+export interface RoleDefinition {
+  id: string;
+  label: string;
+  emoji: string;
+  category: "sell" | "get_hired" | "build_brand" | "serve_community";
+  categoryLabel: string;
+  description: string;
+  defaultBlocks: string[];
+  proFeatures: string[];
+  price: number; // Monthly Pro price in USD
+  gradient: string;
+}
+
+export const ROLE_CATEGORIES = [
+  { id: "sell", label: "I want to Sell", emoji: "🛒", description: "Sell products, services, and digital goods" },
+  { id: "get_hired", label: "I want to Get Hired", emoji: "💼", description: "Showcase your work and land opportunities" },
+  { id: "build_brand", label: "I want to Build My Brand", emoji: "⭐", description: "Grow your audience and monetize your expertise" },
+  { id: "serve_community", label: "I want to Serve My Community", emoji: "🤝", description: "Connect with clients and serve your local area" },
+] as const;
+
+export const ROLES: RoleDefinition[] = [
+  // ═══ SELL ═══
+  {
+    id: "fitness_coach",
+    label: "Fitness Coach",
+    emoji: "🏋️",
+    category: "sell",
+    categoryLabel: "I want to Sell",
+    description: "Show workouts, sell meal plans, book training sessions",
+    defaultBlocks: ["social-grid", "video", "store-product", "testimonial", "booking", "link"],
+    proFeatures: ["ai_assistant", "gated_content", "booking_scheduler", "discount_engine"],
+    price: 9,
+    gradient: "from-orange-500 to-red-500",
+  },
+  {
+    id: "side_hustler",
+    label: "Side-Hustler / Home Seller",
+    emoji: "🍰",
+    category: "sell",
+    categoryLabel: "I want to Sell",
+    description: "List products, take orders, look professional",
+    defaultBlocks: ["social-grid", "store-product", "testimonial", "link", "qr-code"],
+    proFeatures: ["ai_assistant", "discount_engine", "visitor_recognition"],
+    price: 9,
+    gradient: "from-pink-500 to-rose-500",
+  },
+  {
+    id: "store_manager",
+    label: "Store Manager",
+    emoji: "🏪",
+    category: "sell",
+    categoryLabel: "I want to Sell",
+    description: "Digital storefront with catalog, offers, and reviews",
+    defaultBlocks: ["store-product", "map", "pricing-table", "testimonial", "qr-code", "link"],
+    proFeatures: ["ai_assistant", "discount_engine", "review_collector"],
+    price: 9,
+    gradient: "from-emerald-500 to-teal-500",
+  },
+  {
+    id: "artist",
+    label: "Artist / Musician",
+    emoji: "🎤",
+    category: "sell",
+    categoryLabel: "I want to Sell",
+    description: "Press kit with music, tour dates, and merch",
+    defaultBlocks: ["social-grid", "video", "event", "store-product", "image", "link"],
+    proFeatures: ["ai_assistant", "gated_content", "fan_collection"],
+    price: 9,
+    gradient: "from-purple-500 to-fuchsia-500",
+  },
+  {
+    id: "collector",
+    label: "Collector / Reseller",
+    emoji: "👟",
+    category: "sell",
+    categoryLabel: "I want to Sell",
+    description: "Show off and sell your collection",
+    defaultBlocks: ["image", "store-product", "social-grid", "link"],
+    proFeatures: ["ai_assistant", "discount_engine"],
+    price: 9,
+    gradient: "from-amber-500 to-orange-500",
+  },
+
+  // ═══ GET HIRED ═══
+  {
+    id: "job_seeker",
+    label: "Job Seeker",
+    emoji: "💼",
+    category: "get_hired",
+    categoryLabel: "I want to Get Hired",
+    description: "Replace your PDF resume with a living portfolio",
+    defaultBlocks: ["social-grid", "image", "stats-counter", "link", "form"],
+    proFeatures: ["ai_assistant", "analytics", "pdf_export"],
+    price: 5,
+    gradient: "from-blue-500 to-indigo-500",
+  },
+  {
+    id: "student",
+    label: "Student / Intern",
+    emoji: "🎓",
+    category: "get_hired",
+    categoryLabel: "I want to Get Hired",
+    description: "Show personality and potential to employers",
+    defaultBlocks: ["social-grid", "image", "link", "qr-code"],
+    proFeatures: ["custom_themes", "analytics"],
+    price: 3,
+    gradient: "from-cyan-500 to-blue-500",
+  },
+  {
+    id: "freelancer",
+    label: "Freelancer (Writer, Photographer)",
+    emoji: "✏️",
+    category: "get_hired",
+    categoryLabel: "I want to Get Hired",
+    description: "Send a portfolio link instantly, show rates, get hired",
+    defaultBlocks: ["image", "pricing-table", "testimonial", "social-grid", "form", "link"],
+    proFeatures: ["ai_assistant", "store_product", "custom_domain"],
+    price: 9,
+    gradient: "from-violet-500 to-purple-500",
+  },
+  {
+    id: "video_editor",
+    label: "Video Editor / Designer",
+    emoji: "🎬",
+    category: "get_hired",
+    categoryLabel: "I want to Get Hired",
+    description: "Show your reel, display pricing, get hired fast",
+    defaultBlocks: ["video", "before-after", "pricing-table", "testimonial", "form", "link"],
+    proFeatures: ["ai_assistant", "store_product", "custom_domain"],
+    price: 9,
+    gradient: "from-red-500 to-pink-500",
+  },
+
+  // ═══ BUILD BRAND ═══
+  {
+    id: "content_creator",
+    label: "Content Creator / Influencer",
+    emoji: "📱",
+    category: "build_brand",
+    categoryLabel: "I want to Build My Brand",
+    description: "Monetize your following with links, store, and fan engagement",
+    defaultBlocks: ["social-grid", "link", "store-product", "video", "event"],
+    proFeatures: ["ai_assistant", "gated_content", "discount_engine", "analytics"],
+    price: 9,
+    gradient: "from-pink-500 to-amber-400",
+  },
+  {
+    id: "high_ticket_coach",
+    label: "High-Ticket Coach / Consultant",
+    emoji: "💰",
+    category: "build_brand",
+    categoryLabel: "I want to Build My Brand",
+    description: "Look expensive, filter leads, book discovery calls",
+    defaultBlocks: ["testimonial", "image", "booking", "stats-counter", "social-grid", "link"],
+    proFeatures: ["ai_assistant", "gated_content", "booking_scheduler", "discount_engine", "lead_qualifier"],
+    price: 19,
+    gradient: "from-amber-400 to-yellow-500",
+  },
+  {
+    id: "motivational_speaker",
+    label: "Motivational / Spiritual Speaker",
+    emoji: "🙏",
+    category: "build_brand",
+    categoryLabel: "I want to Build My Brand",
+    description: "Build a following, share teachings, sell books/courses",
+    defaultBlocks: ["video", "quote-of-day", "event", "store-product", "social-grid", "link"],
+    proFeatures: ["ai_assistant", "gated_content", "fan_collection"],
+    price: 9,
+    gradient: "from-indigo-400 to-purple-500",
+  },
+  {
+    id: "stock_analyst",
+    label: "Stock Market Analyst",
+    emoji: "📈",
+    category: "build_brand",
+    categoryLabel: "I want to Build My Brand",
+    description: "Share insights, build credibility, sell premium analysis",
+    defaultBlocks: ["social-grid", "stats-counter", "store-product", "disclaimer", "link"],
+    proFeatures: ["ai_assistant", "gated_content", "fan_collection"],
+    price: 12,
+    gradient: "from-green-500 to-emerald-500",
+  },
+  {
+    id: "marketing_manager",
+    label: "Marketing Manager",
+    emoji: "📢",
+    category: "build_brand",
+    categoryLabel: "I want to Build My Brand",
+    description: "Professional brand, case studies, thought leadership",
+    defaultBlocks: ["image", "stats-counter", "testimonial", "social-grid", "form", "link"],
+    proFeatures: ["ai_assistant", "lead_capture", "analytics"],
+    price: 9,
+    gradient: "from-sky-500 to-blue-500",
+  },
+  {
+    id: "sales_manager",
+    label: "Sales Manager",
+    emoji: "🤑",
+    category: "build_brand",
+    categoryLabel: "I want to Build My Brand",
+    description: "Build trust, share catalogs, capture leads",
+    defaultBlocks: ["store-product", "testimonial", "booking", "form", "social-grid", "link"],
+    proFeatures: ["ai_assistant", "lead_capture", "discount_engine", "analytics"],
+    price: 9,
+    gradient: "from-emerald-500 to-cyan-500",
+  },
+  {
+    id: "social_media_manager",
+    label: "Social Media Manager",
+    emoji: "📱",
+    category: "build_brand",
+    categoryLabel: "I want to Build My Brand",
+    description: "Showcase managed accounts, display growth, get clients",
+    defaultBlocks: ["image", "stats-counter", "pricing-table", "testimonial", "form", "link"],
+    proFeatures: ["ai_assistant", "store_product", "lead_capture"],
+    price: 9,
+    gradient: "from-pink-500 to-violet-500",
+  },
+
+  // ═══ SERVE COMMUNITY ═══
+  {
+    id: "barber",
+    label: "Local Service (Barber, Plumber, Nail Tech)",
+    emoji: "💇",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "Show prices, take bookings, share location",
+    defaultBlocks: ["pricing-table", "image", "map", "booking", "testimonial", "qr-code", "link"],
+    proFeatures: ["ai_assistant", "booking_scheduler", "review_collector", "whatsapp"],
+    price: 7,
+    gradient: "from-teal-500 to-cyan-500",
+  },
+  {
+    id: "real_estate",
+    label: "Real Estate / Car Salesperson",
+    emoji: "🏡",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "Show listings, capture leads, host open houses",
+    defaultBlocks: ["image", "map", "event", "form", "social-grid", "link"],
+    proFeatures: ["ai_assistant", "event_hub", "lead_capture", "analytics"],
+    price: 12,
+    gradient: "from-rose-500 to-orange-500",
+  },
+  {
+    id: "event_organizer",
+    label: "Event Organizer",
+    emoji: "🎉",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "One link for RSVPs, location, schedule, and photos",
+    defaultBlocks: ["event", "map", "image", "social-grid", "link"],
+    proFeatures: ["ai_assistant", "guest_management"],
+    price: 9,
+    gradient: "from-yellow-500 to-pink-500",
+  },
+  {
+    id: "lawyer",
+    label: "Lawyer",
+    emoji: "⚖️",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "Build credibility, show expertise, capture inquiries",
+    defaultBlocks: ["social-grid", "testimonial", "booking", "disclaimer", "form", "link"],
+    proFeatures: ["ai_assistant", "booking_scheduler", "lead_qualifier"],
+    price: 12,
+    gradient: "from-slate-500 to-gray-600",
+  },
+  {
+    id: "online_tutor",
+    label: "Online Tutor",
+    emoji: "📚",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "Show subjects, qualifications, book and pay for lessons",
+    defaultBlocks: ["pricing-table", "testimonial", "booking", "store-product", "social-grid", "link"],
+    proFeatures: ["ai_assistant", "gated_content", "booking_scheduler"],
+    price: 7,
+    gradient: "from-amber-500 to-orange-500",
+  },
+  {
+    id: "ngo_member",
+    label: "NGO / Charity Member",
+    emoji: "❤️",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "Tell your cause, collect donations, recruit volunteers",
+    defaultBlocks: ["image", "video", "event", "form", "social-grid", "link"],
+    proFeatures: ["ai_assistant", "donation_tracker", "event_hub"],
+    price: 7,
+    gradient: "from-red-500 to-rose-500",
+  },
+  {
+    id: "networker",
+    label: "Offline Networker / Conference Attendee",
+    emoji: "🤝",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "Replace paper business cards with a digital hub",
+    defaultBlocks: ["social-grid", "form", "qr-code", "link"],
+    proFeatures: ["ai_assistant", "scan_analytics"],
+    price: 5,
+    gradient: "from-indigo-500 to-blue-500",
+  },
+];
+
+// ═══ Helper Functions ═══
+export function getRoleById(id: string): RoleDefinition | undefined {
+  return ROLES.find(r => r.id === id);
+}
+
+export function getRolesByCategory(category: string): RoleDefinition[] {
+  return ROLES.filter(r => r.category === category);
+}
+
+export function getDefaultRole(): RoleDefinition {
+  return {
+    id: "personal_brand",
+    label: "Personal Brand",
+    emoji: "✨",
+    category: "build_brand",
+    categoryLabel: "I want to Build My Brand",
+    description: "A universal template that works for everyone",
+    defaultBlocks: ["social-grid", "link", "image", "form"],
+    proFeatures: ["ai_assistant", "analytics"],
+    price: 9,
+    gradient: "from-indigo-500 to-cyan-500",
+  };
+}

@@ -133,6 +133,22 @@ export default function LinksPage() {
     fetchProfile();
   }, []);
 
+  // Hoo.be real-time iframe sync
+  useEffect(() => {
+    const iframe = document.getElementById("preview-iframe") as HTMLIFrameElement;
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage({
+        type: "UPDATE_PREVIEW",
+        payload: { 
+          links,
+          name: profile?.name,
+          username: profile?.username,
+          profile: profile
+        }
+      }, "*");
+    }
+  }, [links, profile]);
+
   async function fetchLinks() {
     const res  = await fetch("/api/links");
     const data = await res.json();

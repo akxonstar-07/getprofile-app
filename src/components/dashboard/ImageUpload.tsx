@@ -29,20 +29,21 @@ export default function ImageUpload({ value, onChange, label, className = "" }: 
       });
       
       const data = await res.json();
-      if (data.url) {
+      if (res.ok && data.url) {
         onChange(data.url);
       } else {
-        alert(data.error || "Upload failed");
+        // More descriptive error handling
+        const msg = data.error?.includes("cloud_name") 
+          ? "Cloudinary credentials missing in .env" 
+          : (data.error || "Upload failed");
+        alert(msg);
       }
     } catch (error) {
       console.error(error);
       alert("Network error. Please try again.");
     } finally {
       setIsUploading(false);
-      // Reset input so they can select the same file again if needed
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 

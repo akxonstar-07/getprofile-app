@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "ai:start": "tsx src/lib/ai-team/run-team.ts",
+    "AI-TEAM": "npm run ai:start"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
@@ -30,6 +32,7 @@
     "react-dom": "19.2.4",
     "recharts": "^3.8.1",
     "resend": "^6.10.0",
+    "sonner": "^2.0.7",
     "stripe": "^21.0.1"
   },
   "devDependencies": {
@@ -39,9 +42,12 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "chalk": "^4.1.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
+    "gray-matter": "^4.0.3",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

@@ -6,6 +6,26 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  USER
+  AGENCY
+  ADMIN
+}
+
+enum ProductType {
+  PHYSICAL
+  DIGITAL
+  SERVICE
+}
+
+enum MessageCategory {
+  FAN
+  BRAND
+  SALE
+  SUBSCRIPTION
+  OTHER
+}
+
 model User {
   id             String    @id @default(cuid())
   name           String?
@@ -13,9 +33,15 @@ model User {
   emailVerified  DateTime?
   username       String?   @unique
   hashedPassword String?
+  role           Role      @default(USER)
   image          String?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+
+  // Profile Role (e.g. "fitness_coach", "barber", "lawyer")
+  profileRole    String?   @default("personal_brand")
+  plan           String    @default("FREE") // FREE | TRIAL | PRO
+  trialEndsAt    DateTime?
 
   accounts       Account[]
   sessions       Session[]
@@ -25,7 +51,31 @@ model User {
   products       Product[]
   analyticsEvents AnalyticsEvent[]
   subscribers    Subscriber[]
+  promoCodes     PromoCode[]
+  contentSubscriptions ContentSubscription[] @relation("CreatorSubscriptions")
+  fanSubscriptions     ContentSubscription[] @relation("FanSubscriptions")
+  bookings       Booking[]
   onboardingCompleted Boolean @default(false)
+
+  // Agency specific
+  managedByAgencyId String?
+  agency            Agency? @relation("AgencyToCreator", fields: [managedByAgencyId], references: [id])
+  ownedAgency       Agency? @relation("AgencyOwner")
+
+  // Commerce & Messaging
+  orders         Order[]
+  conversations  Conversation[]
+  events         Event[]
+}
+
+model Agency {
+  id          String   @id @default(cuid())
+  name        String
+  ownerId     String   @unique
+  owner       User     @relation("AgencyOwner", fields: [ownerId], references: [id])
+  creators    User[]   @relation("AgencyToCreator")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Account {
@@ -80,6 +130,7 @@ model Profile {
   mobileTheme    String @default("default")
   monetizationGoals String?
 
+  // Socials
   twitter        String?
   instagram      String?
   linkedin       String?
@@ -93,15 +144,19 @@ model Profile {
   totalFollowers Int?    @default(0)
 
   // Portfolio / Media Kit fields
-  portfolioTitle    String?    // e.g. "Creator • Model • Brand Ambassador"
-  portfolioBio      String?    // Longer bio for portfolio page
-  skills            String?    // JSON array: ["Photography", "Video Editing"]
-  brandLogos        String?    // JSON array of brand logo URLs for collab section
-  pressLogos        String?    // JSON array of press/publication logo URLs
-  businessEmail     String?    // Public business contact email
+  portfolioTitle    String?    
+  portfolioBio      String?    
+  skills            String?    
+  brandLogos        String?    
+  pressLogos        String?    
+  businessEmail     String?    
   availableForWork  Boolean    @default(true)
   statsBrandDeals   Int        @default(0)
   statsContentCount Int        @default(0)
+
+  // Device-Specific Configs (JSON)
+  webConfig         String?    @default("{}") // Layout config for website view
+  mobileConfig      String?    @default("{}") // Layout config for link-in-bio view
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -118,7 +173,6 @@ model Link {
   order     Int      @default(0)
   clicks    Int      @default(0)
   
-  // A/B Testing
   abTestActive Boolean @default(false)
   variantBUrl  String?
   variantBTitle String?
@@ -126,7 +180,6 @@ model Link {
   clicksB      Int     @default(0)
 
   createdAt DateTime @default(now())
-
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -141,29 +194,87 @@ model PortfolioItem {
   order       Int     @default(0)
   createdAt   DateTime @default(now())
 
-  // Influencer media kit fields
-  itemType    String?    // "project" | "collaboration" | "reel" | "press" | "instagram"
-  brandName   String?    // For collaborations: "Nike", "Samsung"
-  videoUrl    String?    // For reels/TikToks: direct video embed URL
+  itemType    String?    
+  brandName   String?    
+  videoUrl    String?    
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Product {
-  id           String  @id @default(cuid())
+  id           String      @id @default(cuid())
   userId       String
   name         String
   description  String?
-  price        Float   @default(0)
+  price        Float       @default(0)
   image        String?
-  checkoutUrl  String?
-  enabled      Boolean @default(true)
-  order        Int     @default(0)
-  isAffiliate  Boolean @default(false)
+  productType  ProductType @default(DIGITAL)
+  digitalUrl   String?     // URL to digital asset (PDF, zip, etc.)
+  inventory    Int?        @default(1) // For physical products
+  category     String?     // e.g. "Presets", "Merch"
+  enabled      Boolean     @default(true)
+  order        Int         @default(0)
+  isAffiliate  Boolean     @default(false)
   affiliateNote String?
-  createdAt    DateTime @default(now())
+  createdAt    DateTime    @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders Order[]
+}
+
+model Order {
+  id          String   @id @default(cuid())
+  userId      String   // The Creator selling the product
+  productId   String
+  customerEmail String
+  amount      Float
+  status      String   @default("PENDING") // PENDING, PAID, SHIPPED, etc.
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  description String?
+  date        DateTime
+  location    String?  // URL for webinar or physical address
+  isVirtual   Boolean  @default(true)
+  maxAttendees Int?
+  currentRSVP Int       @default(0)
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Conversation {
+  id           String   @id @default(cuid())
+  userId      String   // The Creator
+  visitorId   String?  // Optional: tracking anonymous visitors
+  visitorEmail String?
+  visitorName String?
+  summary      String?  // AI Summary of the conversation
+  lastMessageAt DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  messages Message[]
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id             String          @id @default(cuid())
+  conversationId String
+  sender         String          // "VISITOR" or "CREATOR" or "AI_ASSISTANT"
+  content        String
+  category       MessageCategory @default(OTHER)
+  isRead         Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 }
 
 model AnalyticsEvent {
@@ -186,4 +297,55 @@ model Subscriber {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, email])
+}
+
+// ═══ Stage 1: PromoCode Engine ═══
+model PromoCode {
+  id              String   @id @default(cuid())
+  userId          String
+  code            String
+  discountPercent Int      @default(10)
+  maxUses         Int      @default(100)
+  currentUses     Int      @default(0)
+  expiresAt       DateTime?
+  aiTriggered     Boolean  @default(false) // Was this auto-offered by AI?
+  enabled         Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, code])
+}
+
+// ═══ Stage 4: Gated Content Subscriptions ═══
+model ContentSubscription {
+  id              String   @id @default(cuid())
+  creatorId       String   // The creator offering gated content
+  subscriberId    String   // The fan subscribing
+  tier            String   @default("basic") // basic, premium, vip
+  status          String   @default("ACTIVE") // ACTIVE, CANCELLED, EXPIRED
+  stripeSubId     String?  // Stripe Subscription ID
+  pricePerMonth   Float    @default(5.0)
+  currentPeriodEnd DateTime?
+  createdAt       DateTime @default(now())
+
+  creator    User @relation("CreatorSubscriptions", fields: [creatorId], references: [id], onDelete: Cascade)
+  subscriber User @relation("FanSubscriptions", fields: [subscriberId], references: [id], onDelete: Cascade)
+}
+
+// ═══ Stage 5: Booking / Scheduling ═══
+model Booking {
+  id              String   @id @default(cuid())
+  userId          String   // The creator being booked
+  guestName       String
+  guestEmail      String
+  date            DateTime
+  time            String   // e.g. "10:00 AM"
+  duration        Int      @default(30) // minutes
+  status          String   @default("PENDING") // PENDING, CONFIRMED, CANCELLED
+  preQualAnswers  String?  // JSON: {"budget": "$500", "need": "Website redesign"}
+  notes           String?
+  createdAt       DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

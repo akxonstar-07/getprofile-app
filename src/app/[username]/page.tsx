@@ -38,7 +38,14 @@ export default async function PublicProfilePage({ params }: Props) {
 
   const user = await prisma.user.findUnique({
     where: { username },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      username: true,
+      image: true,
+      plan: true,
+      trialEndsAt: true,
+      profileRole: true,
       profile: true,
       links: {
         where: { enabled: true },
