@@ -56,11 +56,18 @@ export async function PUT(request: Request) {
   }
 
   const body = await request.json();
-  const { id, title, url, icon, image, highlight, enabled, order } = body;
+  const { 
+    id, title, url, icon, image, highlight, enabled, order,
+    abTestActive, variantBUrl, variantBTitle,
+    scheduledStart, scheduledEnd
+  } = body;
 
   if (!id) {
     return NextResponse.json({ error: "Link ID required" }, { status: 400 });
   }
+
+  // Convert dates if provided
+  const parseDate = (d: any) => d ? new Date(d) : null;
 
   const link = await prisma.link.updateMany({
     where: { id, userId: (session.user as any).id },
@@ -72,6 +79,11 @@ export async function PUT(request: Request) {
       ...(highlight !== undefined && { highlight }),
       ...(enabled !== undefined && { enabled }),
       ...(order !== undefined && { order }),
+      ...(abTestActive !== undefined && { abTestActive }),
+      ...(variantBUrl !== undefined && { variantBUrl }),
+      ...(variantBTitle !== undefined && { variantBTitle }),
+      ...(scheduledStart !== undefined && { scheduledStart: parseDate(scheduledStart) }),
+      ...(scheduledEnd !== undefined && { scheduledEnd: parseDate(scheduledEnd) }),
     },
   });
 

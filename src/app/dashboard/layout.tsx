@@ -9,12 +9,13 @@ import {
   DollarSign, ShoppingBag, DownloadCloud,
   GraduationCap, Bot, Users, Globe, LogOut, Menu, X, Plus, Sparkles, ExternalLink,
   Layers, Palette, ShoppingCart, Calendar, Activity, Settings, Shield, ShieldCheck,
-  Tag, Phone, Lock, Crown
+  Tag, Phone, Lock, Crown, Sun, Moon
 } from "lucide-react";
 import { getSidebarConfigForRole } from "@/lib/role-sidebar-map";
 import { getUserPlanInfo } from "@/lib/plan-guard";
 import NotificationCenter from "@/components/dashboard/NotificationCenter";
 import { getRoleDashboardConfig } from "@/lib/role-dashboard-config";
+import { useTheme } from "@/components/providers/ThemeProvider";
 
 const creatorItems = [
   { href: "/dashboard",            icon: BarChart3,    label: "Overview",         group: "main", roles: ["USER"] },
@@ -49,6 +50,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [previewMode, setPreviewMode] = useState<"mobile" | "desktop">("mobile");
+  const { theme, setTheme, resolvedTheme } = useTheme();
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/login");
@@ -292,6 +294,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="flex items-center gap-4">
             <button className="hidden md:flex items-center gap-2 bg-black text-white px-4 py-1.5 rounded-full text-xs font-bold hover:shadow-lg hover:-translate-y-0.5 transition-all">
               <Plus className="w-3.5 h-3.5" /> Share
+            </button>
+            <button
+              onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+              className="w-9 h-9 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+              aria-label="Toggle dark mode"
+            >
+              {resolvedTheme === "dark"
+                ? <Sun className="w-4 h-4 text-amber-400" />
+                : <Moon className="w-4 h-4" />}
             </button>
             <NotificationCenter />
             <div className="w-9 h-9 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 font-bold shadow-inner cursor-pointer hover:ring-2 ring-[#5E5CE6] ring-offset-2 transition-all">

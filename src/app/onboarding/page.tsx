@@ -2,58 +2,24 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ChevronRight, ChevronLeft, Sparkles, Search, ArrowRight } from "lucide-react";
+import { Check, ChevronRight, ChevronLeft, Sparkles, Search, ArrowRight, LayoutTemplate, Palette, Type, MousePointerSquareDashed } from "lucide-react";
 import { ROLES, ROLE_CATEGORIES, type RoleDefinition } from "@/lib/roles";
+import { TEMPLATES, TEMPLATE_CATEGORIES, HEADER_STYLES, COLOR_SCHEMES, FONT_OPTIONS, BUTTON_STYLES, getTemplatesByCategory, getTemplateById, type TemplateConfig } from "@/lib/templates";
 
 /* ═══════════════════════════════════════════════════
    BRANDED PLATFORM SVG ICONS
    ═══════════════════════════════════════════════════ */
 const PLATFORMS = [
-  { id: "instagram", label: "Instagram", color: "#E4405F",
-    icon: <svg viewBox="0 0 24 24" className="w-8 h-8"><rect width="24" height="24" rx="6" fill="#E4405F"/><path d="M12 7.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9zm0 7.4a2.9 2.9 0 110-5.8 2.9 2.9 0 010 5.8zm4.7-7.6a1.05 1.05 0 11-2.1 0 1.05 1.05 0 012.1 0z" fill="white"/></svg> },
-  { id: "tiktok", label: "TikTok", color: "#000",
-    icon: <svg viewBox="0 0 24 24" className="w-8 h-8"><rect width="24" height="24" rx="6" fill="#010101"/><path d="M16.8 8.4a3.8 3.8 0 01-2.4-2.9V5h-2.2v9.3a2 2 0 01-2 1.7 2 2 0 01-2-2 2 2 0 012-2c.2 0 .4 0 .5.1V9.8h-.5A4.3 4.3 0 006 14.1a4.3 4.3 0 004.3 4.3 4.3 4.3 0 004.3-4.3v-4a5.5 5.5 0 003.2 1V8.8a3.8 3.8 0 01-.7-.1z" fill="#25F4EE"/></svg> },
-  { id: "youtube", label: "YouTube", color: "#FF0000",
-    icon: <svg viewBox="0 0 24 24" className="w-8 h-8"><rect width="24" height="24" rx="6" fill="#FF0000"/><path d="M10 15.5v-7l6 3.5-6 3.5z" fill="white"/></svg> },
-  { id: "twitter", label: "X", color: "#000",
-    icon: <svg viewBox="0 0 24 24" className="w-8 h-8"><rect width="24" height="24" rx="6" fill="#000"/><path d="M15.7 6h1.8l-3.9 4.5L18 18h-3.4l-2.8-3.7L8.7 18H6.9l4.2-4.8L6.5 6h3.5l2.5 3.3L15.7 6zm-.6 10.8h1l-6.5-8.5h-1.1l6.6 8.5z" fill="white"/></svg> },
-  { id: "linkedin", label: "LinkedIn", color: "#0A66C2",
-    icon: <svg viewBox="0 0 24 24" className="w-8 h-8"><rect width="24" height="24" rx="6" fill="#0A66C2"/><path d="M8.5 17.5h-2v-7h2v7zm-1-8a1.2 1.2 0 110-2.4 1.2 1.2 0 010 2.4zm9 8h-2v-3.4c0-.8 0-1.9-1.1-1.9s-1.3.9-1.3 1.8v3.5h-2v-7h1.9v1h0a2.1 2.1 0 011.9-1c2 0 2.4 1.3 2.4 3.1v3.9z" fill="white"/></svg> },
-  { id: "spotify", label: "Spotify", color: "#1DB954",
-    icon: <svg viewBox="0 0 24 24" className="w-8 h-8"><rect width="24" height="24" rx="6" fill="#1DB954"/><path d="M16.5 14.5c-.2 0-.3-.1-.5-.2-1.8-1.1-4-1.3-6.6-.7-.2.1-.4.1-.5-.1-.1-.2-.1-.4.1-.5 2.9-.7 5.3-.4 7.3.8.2.1.3.3.2.5 0 .1-.1.2-.3.2h.3z" fill="white"/></svg> },
-  { id: "whatsapp", label: "WhatsApp", color: "#25D366",
-    icon: <svg viewBox="0 0 24 24" className="w-8 h-8"><rect width="24" height="24" rx="6" fill="#25D366"/><path d="M12 5.5A6.5 6.5 0 005.5 12c0 1.2.3 2.3.9 3.2l-.6 2.2 2.3-.6c.9.5 2 .8 3 .8A6.5 6.5 0 0012 5.5z" fill="white"/></svg> },
-  { id: "facebook", label: "Facebook", color: "#1877F2",
-    icon: <svg viewBox="0 0 24 24" className="w-8 h-8"><rect width="24" height="24" rx="6" fill="#1877F2"/><path d="M16.5 12.5h-2.2V18h-2.8v-5.5H9.8V10h1.7V8.4c0-1.7 1-2.6 2.5-2.6.7 0 1.5.1 1.5.1v1.7h-.8c-.8 0-1.1.5-1.1 1V10h1.9l-.5 2.5z" fill="white"/></svg> },
-  { id: "github", label: "GitHub", color: "#333",
-    icon: <svg viewBox="0 0 24 24" className="w-8 h-8"><rect width="24" height="24" rx="6" fill="#333"/><path d="M12 5.5A6.5 6.5 0 005.5 12c0 2.9 1.9 5.3 4.4 6.2.3.1.4-.1.4-.3v-1.1c-1.8.4-2.2-.8-2.2-.8-.3-.8-.7-1-.7-1-.6-.4 0-.4 0-.4.6 0 1 .7 1 .7.6 1 1.5.7 1.9.5 0-.4.2-.7.4-.9-1.4-.2-2.9-.7-2.9-3.2 0-.7.3-1.3.7-1.7-.1-.2-.3-.8.1-1.7 0 0 .5-.2 1.8.7.5-.2 1.1-.2 1.6-.2.5 0 1.1.1 1.6.2 1.2-.8 1.8-.7 1.8-.7.4.9.2 1.5.1 1.7.4.4.7 1 .7 1.7 0 2.5-1.5 3-2.9 3.2.2.2.4.6.4 1.2v1.8c0 .2.1.4.4.3A6.5 6.5 0 0012 5.5z" fill="white"/></svg> },
-  { id: "website", label: "Website", color: "#6366f1",
-    icon: <svg viewBox="0 0 24 24" className="w-8 h-8"><rect width="24" height="24" rx="6" fill="#6366f1"/><circle cx="12" cy="12" r="5" stroke="white" strokeWidth="1.5" fill="none"/></svg> },
-  { id: "telegram", label: "Telegram", color: "#26A5E4",
-    icon: <svg viewBox="0 0 24 24" className="w-8 h-8"><rect width="24" height="24" rx="6" fill="#26A5E4"/><path d="M17.5 7.2l-2.3 10.8c-.2.7-.6.9-1.2.5l-3.3-2.5-1.6 1.5c-.2.2-.3.3-.6.3l.2-3.3 5.9-5.3c.3-.2-.1-.3-.4-.1l-7.2 4.5-3.1-1c-.7-.2-.7-.7.1-1l12.2-4.7c.6-.2 1 .1.9 1l-.6.8z" fill="white"/></svg> },
-  { id: "snapchat", label: "Snapchat", color: "#FFFC00",
-    icon: <svg viewBox="0 0 24 24" className="w-8 h-8"><rect width="24" height="24" rx="6" fill="#FFFC00"/><path d="M12 6c1.7 0 3.3.8 4 2.5.3.7.2 2 .1 3.1v.2s.4.2.9.2c.4 0 .6-.1.6-.1.3-.1.5 0 .7.1.2.1.3.3.3.5 0 .4-.5.6-.9.7-.1 0-.3.1-.4.1z" fill="#000"/></svg> },
+  { id: "instagram", label: "Instagram", color: "#E4405F", icon: <svg viewBox="0 0 24 24" className="w-8 h-8"><rect width="24" height="24" rx="6" fill="#E4405F"/><path d="M12 7.5a4.5 4.5 0 100 9 4.5 4.5 0 000-9zm0 7.4a2.9 2.9 0 110-5.8 2.9 2.9 0 010 5.8zm4.7-7.6a1.05 1.05 0 11-2.1 0 1.05 1.05 0 012.1 0z" fill="white"/></svg> },
+  { id: "tiktok", label: "TikTok", color: "#000", icon: <svg viewBox="0 0 24 24" className="w-8 h-8"><rect width="24" height="24" rx="6" fill="#010101"/><path d="M16.8 8.4a3.8 3.8 0 01-2.4-2.9V5h-2.2v9.3a2 2 0 01-2 1.7 2 2 0 01-2-2 2 2 0 012-2c.2 0 .4 0 .5.1V9.8h-.5A4.3 4.3 0 006 14.1a4.3 4.3 0 004.3 4.3 4.3 4.3 0 004.3-4.3v-4a5.5 5.5 0 003.2 1V8.8a3.8 3.8 0 01-.7-.1z" fill="#25F4EE"/></svg> },
+  { id: "youtube", label: "YouTube", color: "#FF0000", icon: <svg viewBox="0 0 24 24" className="w-8 h-8"><rect width="24" height="24" rx="6" fill="#FF0000"/><path d="M10 15.5v-7l6 3.5-6 3.5z" fill="white"/></svg> },
+  { id: "twitter", label: "X", color: "#000", icon: <svg viewBox="0 0 24 24" className="w-8 h-8"><rect width="24" height="24" rx="6" fill="#000"/><path d="M15.7 6h1.8l-3.9 4.5L18 18h-3.4l-2.8-3.7L8.7 18H6.9l4.2-4.8L6.5 6h3.5l2.5 3.3L15.7 6zm-.6 10.8h1l-6.5-8.5h-1.1l6.6 8.5z" fill="white"/></svg> },
+  { id: "linkedin", label: "LinkedIn", color: "#0A66C2", icon: <svg viewBox="0 0 24 24" className="w-8 h-8"><rect width="24" height="24" rx="6" fill="#0A66C2"/><path d="M8.5 17.5h-2v-7h2v7zm-1-8a1.2 1.2 0 110-2.4 1.2 1.2 0 010 2.4zm9 8h-2v-3.4c0-.8 0-1.9-1.1-1.9s-1.3.9-1.3 1.8v3.5h-2v-7h1.9v1h0a2.1 2.1 0 011.9-1c2 0 2.4 1.3 2.4 3.1v3.9z" fill="white"/></svg> },
+  { id: "spotify", label: "Spotify", color: "#1DB954", icon: <svg viewBox="0 0 24 24" className="w-8 h-8"><rect width="24" height="24" rx="6" fill="#1DB954"/><path d="M16.5 14.5c-.2 0-.3-.1-.5-.2-1.8-1.1-4-1.3-6.6-.7-.2.1-.4.1-.5-.1-.1-.2-.1-.4.1-.5 2.9-.7 5.3-.4 7.3.8.2.1.3.3.2.5 0 .1-.1.2-.3.2h.3z" fill="white"/></svg> },
 ];
 
 /* ═══════════════════════════════════════════════════
-   PORTFOLIO / MOBILE TEMPLATES (link.me / hoo.be inspired)
-   ═══════════════════════════════════════════════════ */
-const PORTFOLIO_TEMPLATES = [
-  { id: "agency", name: "Dark Prestige", colors: ["#0f172a", "#1e293b", "#6366f1"], desc: "Bold & professional" },
-  { id: "creative", name: "Creator Energy", colors: ["#f97316", "#ec4899", "#fbbf24"], desc: "Vibrant & dynamic" },
-  { id: "minimal", name: "Clean Minimal", colors: ["#ffffff", "#f8fafc", "#0f172a"], desc: "Simple & elegant" },
-  { id: "luxury", name: "Liquid Glass", colors: ["#0a0a0f", "#6366f1", "#06b6d4"], desc: "Premium & exclusive" },
-];
-
-const MOBILE_TEMPLATES = [
-  { id: "dark-neo", name: "Dark Neo", colors: ["#0c0f1a", "#6366f1", "#06b6d4"], desc: "Moody & sleek" },
-  { id: "light-glass", name: "Light Glass", colors: ["#ffffff", "#f8fafc", "#6366f1"], desc: "Clean & bright" },
-  { id: "gradient", name: "Sunset Glow", colors: ["#f97316", "#ec4899", "#6366f1"], desc: "Warm & inviting" },
-  { id: "bento", name: "Bento Grid", colors: ["#fafafa", "#18181b", "#a855f7"], desc: "hoo.be style" },
-];
-
-/* ═══════════════════════════════════════════════════
-   MAIN COMPONENT — 5-Step Wizard
+   MAIN COMPONENT — Onboarding Wizard
    ═══════════════════════════════════════════════════ */
 export default function OnboardingWizard() {
   const router = useRouter();
@@ -61,21 +27,26 @@ export default function OnboardingWizard() {
   const [loading, setLoading] = useState(false);
   const [animating, setAnimating] = useState(false);
 
-  // Step 1: Role Selection
+  // Step 1: Role
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState<RoleDefinition | null>(null);
   const [roleSearch, setRoleSearch] = useState("");
 
-  // Step 2: Display Name
+  // Step 2: Name
   const [displayName, setDisplayName] = useState("");
 
   // Step 3: Platforms
   const [platforms, setPlatforms] = useState<string[]>([]);
   const [urls, setUrls] = useState<Record<string, string>>({});
 
-  // Step 4–5: Templates
-  const [portfolioTheme, setPortfolioTheme] = useState("agency");
-  const [mobileTheme, setMobileTheme] = useState("dark-neo");
+  // Step 4: Template Gallery
+  const [templateCategory, setTemplateCategory] = useState("all");
+  const filteredTemplates = getTemplatesByCategory(templateCategory);
+  
+  // Modal State for "Style It Your Way"
+  const [showStyleModal, setShowStyleModal] = useState(false);
+  const [activeTemplate, setActiveTemplate] = useState<TemplateConfig>(TEMPLATES[0]);
+  const [customConfig, setCustomConfig] = useState(TEMPLATES[0]);
 
   const TOTAL_STEPS = 5;
 
@@ -87,14 +58,16 @@ export default function OnboardingWizard() {
   const togglePlatform = (id: string) =>
     setPlatforms(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
 
-  // Filter roles by search and category
-  const filteredRoles = ROLES.filter(r => {
-    const matchesSearch = roleSearch === "" ||
-      r.label.toLowerCase().includes(roleSearch.toLowerCase()) ||
-      r.description.toLowerCase().includes(roleSearch.toLowerCase());
-    const matchesCategory = !selectedCategory || r.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const openStyleModal = (template: TemplateConfig) => {
+    setActiveTemplate(template);
+    setCustomConfig(template);
+    setShowStyleModal(true);
+  };
+
+  const saveStyleConfig = () => {
+    setShowStyleModal(false);
+    goStep(5);
+  };
 
   const submitOnboarding = async () => {
     setLoading(true);
@@ -108,8 +81,13 @@ export default function OnboardingWizard() {
           displayName,
           platforms,
           urls,
-          portfolioTheme,
-          mobileTheme,
+          activeTemplateId: activeTemplate.id,
+          themeConfig: JSON.stringify({
+            headerStyle: customConfig.headerStyle,
+            colorScheme: customConfig.colorScheme,
+            font: customConfig.font,
+            buttonStyle: customConfig.buttonStyle
+          })
         }),
       });
       if (res.ok) router.push("/dashboard");
@@ -117,411 +95,401 @@ export default function OnboardingWizard() {
   };
 
   return (
-    <div className="onboarding-bg min-h-screen flex flex-col items-center justify-center p-4">
-      {/* Floating orbs */}
-      <div className="orb orb-1" />
-      <div className="orb orb-2" />
-      <div className="orb orb-3" />
-
-      <div className="relative z-10 w-full max-w-2xl">
-        {/* Logo — hoo.be inspired minimal */}
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-black bg-gradient-to-r from-indigo-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-            getprofile.link
-          </h2>
-        </div>
-
-        {/* Progress bar */}
-        <div className="flex items-center gap-2 mb-6 px-4">
+    <div className="min-h-screen bg-[#fafafa] flex flex-col font-sans">
+      
+      {/* Hoo.be Style Sticky Header */}
+      <div className="flex items-center justify-between p-6 w-full max-w-5xl mx-auto">
+        <h2 className="text-2xl font-black tracking-tighter text-black">
+          getprofile<span className="text-indigo-600">.link</span>
+        </h2>
+        <div className="flex gap-1">
           {Array.from({ length: TOTAL_STEPS }, (_, i) => (
-            <div key={i} className="flex-1 h-1.5 rounded-full overflow-hidden bg-white/10">
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{
-                  width: step > i + 1 ? "100%" : step === i + 1 ? "50%" : "0%",
-                  background: "linear-gradient(90deg, #6366f1, #06b6d4)",
-                }}
-              />
-            </div>
+            <div key={i} className={`h-1.5 rounded-full transition-all duration-300 ${step >= i + 1 ? "bg-black w-8" : "bg-gray-200 w-4"}`} />
           ))}
-          <span className="text-xs font-bold text-white/40 ml-2">{step}/{TOTAL_STEPS}</span>
         </div>
+      </div>
 
-        {/* Card */}
-        <div className={`glass-card p-8 sm:p-10 transition-all duration-200 ${animating ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}>
+      <div className="flex-1 flex flex-col items-center justify-center p-4 w-full">
+        <div className={`w-full max-w-2xl transition-all duration-300 ${animating ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"}`}>
 
-          {/* ═══ STEP 1: Pick Your Role (Smart Categories) ═══ */}
+          {/* ═══ STEP 1: Role ═══ */}
           {step === 1 && (
-            <div>
-              {/* hoo.be-inspired massive headline */}
-              <h1 className="text-3xl sm:text-4xl font-black text-white mb-2 leading-tight tracking-tight">
-                what do you<br />want to do?
-              </h1>
-              <p className="text-white/40 mb-6 text-sm">Pick your goal and we'll build the perfect page for you.</p>
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <h1 className="text-4xl sm:text-5xl font-black text-black mb-3 tracking-tight">What do you do?</h1>
+              <p className="text-gray-500 mb-8 text-lg">Pick your role so we can give you the best starting blocks.</p>
 
-              {/* Category Tabs */}
-              <div className="flex flex-wrap gap-2 mb-5">
-                <button
-                  onClick={() => setSelectedCategory(null)}
-                  className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
-                    !selectedCategory
-                      ? "bg-white text-black"
-                      : "bg-white/5 text-white/50 hover:bg-white/10"
-                  }`}
-                >
-                  All Roles
-                </button>
-                {ROLE_CATEGORIES.map(c => (
-                  <button
-                    key={c.id}
-                    onClick={() => setSelectedCategory(c.id)}
-                    className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${
-                      selectedCategory === c.id
-                        ? "bg-white text-black"
-                        : "bg-white/5 text-white/50 hover:bg-white/10"
-                    }`}
-                  >
-                    {c.emoji} {c.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Search */}
-              <div className="relative mb-5">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+              <div className="relative mb-6">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
                   placeholder='Search roles (e.g. "barber", "lawyer", "coach")'
                   value={roleSearch}
                   onChange={e => setRoleSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/25 text-sm focus:outline-none focus:border-indigo-500 transition-all"
+                  className="w-full pl-12 pr-4 py-4 bg-white border border-gray-200 rounded-2xl text-black placeholder-gray-400 text-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all shadow-sm"
                 />
               </div>
 
-              {/* Role Grid */}
-              <div className="grid grid-cols-2 gap-2 mb-6 max-h-[320px] overflow-y-auto pr-1" style={{ scrollbarWidth: "thin" }}>
-                {filteredRoles.map(r => (
+              <div className="grid grid-cols-2 gap-3 mb-8 max-h-[360px] overflow-y-auto px-1">
+                {ROLES.filter(r => roleSearch ? r.label.toLowerCase().includes(roleSearch.toLowerCase()) : true).slice(0, 12).map(r => (
                   <button
                     key={r.id}
                     onClick={() => setSelectedRole(r)}
-                    className={`relative p-3 rounded-xl border text-left transition-all hover:scale-[1.02] active:scale-[0.98] ${
+                    className={`relative p-4 rounded-2xl border-2 text-left transition-all hover:-translate-y-1 ${
                       selectedRole?.id === r.id
-                        ? "border-indigo-500 bg-indigo-500/15"
-                        : "border-white/8 bg-white/3 hover:border-white/15 hover:bg-white/5"
+                        ? "border-black bg-gray-50 shadow-md"
+                        : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm"
                     }`}
                   >
-                    {selectedRole?.id === r.id && (
-                      <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center">
-                        <Check className="w-3 h-3 text-white" strokeWidth={3} />
-                      </div>
-                    )}
-                    <span className="text-xl block mb-1">{r.emoji}</span>
-                    <p className="text-xs font-bold text-white leading-tight">{r.label}</p>
-                    <p className="text-[10px] text-white/35 mt-0.5 leading-tight">{r.description}</p>
+                    <span className="text-3xl block mb-2">{r.emoji}</span>
+                    <p className="text-sm font-bold text-black">{r.label}</p>
+                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">{r.description}</p>
                   </button>
                 ))}
-                {filteredRoles.length === 0 && (
-                  <div className="col-span-2 text-center py-8 text-white/30 text-sm">
-                    No roles found. Try a different search term.
-                  </div>
-                )}
               </div>
-
-              {/* "I'm Not Sure" fallback */}
-              <button
-                onClick={() => {
-                  setSelectedRole({
-                    id: "personal_brand", label: "Personal Brand", emoji: "✨",
-                    category: "build_brand", categoryLabel: "Build My Brand",
-                    description: "A universal page that works for everyone",
-                    defaultBlocks: ["social-grid", "link", "image", "form"],
-                    proFeatures: ["ai_assistant", "analytics"], price: 9,
-                    gradient: "from-indigo-500 to-cyan-500",
-                  });
-                }}
-                className="w-full text-center text-sm text-white/30 hover:text-white/50 transition-colors mb-4"
-              >
-                I'm not sure — give me a universal template
-              </button>
 
               <button
                 onClick={() => goStep(2)}
                 disabled={!selectedRole}
-                className="w-full py-4 rounded-xl font-bold text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed bg-gradient-to-r from-indigo-600 to-cyan-500 hover:shadow-lg hover:shadow-indigo-500/25"
+                className="w-full py-4 rounded-xl font-bold text-white bg-black disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-800 transition-all text-lg"
               >
-                Continue <ChevronRight className="inline w-4 h-4 ml-1" />
+                Continue
               </button>
             </div>
           )}
 
-          {/* ═══ STEP 2: Display Name ═══ */}
+          {/* ═══ STEP 2: Name ═══ */}
           {step === 2 && (
-            <div>
-              <h1 className="text-3xl font-black text-white mb-2 tracking-tight">what's your name?</h1>
-              <p className="text-white/40 mb-8 text-sm">This is how visitors will see you on your profile.</p>
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <h1 className="text-4xl sm:text-5xl font-black text-black mb-3 tracking-tight">What's your name?</h1>
+              <p className="text-gray-500 mb-8 text-lg">This is how visitors will see you on your profile.</p>
 
-              <div className="mb-6">
+              <div className="mb-8">
                 <input
                   type="text"
                   placeholder="e.g. Alex Rivera"
                   value={displayName}
                   onChange={e => setDisplayName(e.target.value)}
-                  className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white text-lg placeholder-white/25 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 transition-all"
+                  className="w-full p-5 bg-white border border-gray-200 rounded-2xl text-black text-2xl font-bold placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all shadow-sm"
                   autoFocus
                 />
               </div>
 
-              {/* Role confirmation badge */}
-              {selectedRole && (
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10 mb-8">
-                  <span className="text-2xl">{selectedRole.emoji}</span>
-                  <div>
-                    <p className="text-sm font-bold text-white">{selectedRole.label}</p>
-                    <p className="text-xs text-white/40">{selectedRole.description}</p>
-                  </div>
-                </div>
-              )}
-
               <div className="flex gap-3">
-                <button onClick={() => goStep(1)} className="px-6 py-4 rounded-xl font-bold text-white/50 border border-white/10 hover:border-white/20 transition-all">
-                  <ChevronLeft className="inline w-4 h-4 mr-1" /> Back
+                <button onClick={() => goStep(1)} className="px-6 py-4 rounded-xl font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-all">
+                  <ChevronLeft className="w-5 h-5 inline" />
                 </button>
                 <button
                   onClick={() => goStep(3)}
                   disabled={!displayName.trim()}
-                  className="flex-1 py-4 rounded-xl font-bold text-white transition-all disabled:opacity-30 bg-gradient-to-r from-indigo-600 to-cyan-500 hover:shadow-lg hover:shadow-indigo-500/25"
+                  className="flex-1 w-full py-4 rounded-xl font-bold text-white bg-black disabled:opacity-30 hover:bg-gray-800 transition-all text-lg"
                 >
-                  Continue <ChevronRight className="inline w-4 h-4 ml-1" />
+                  Continue
                 </button>
               </div>
             </div>
           )}
 
-          {/* ═══ STEP 3: Connect Platforms ═══ */}
+          {/* ═══ STEP 3: Platforms ═══ */}
           {step === 3 && (
-            <div>
-              <h1 className="text-3xl font-black text-white mb-2 tracking-tight">connect your world</h1>
-              <p className="text-white/40 mb-6 text-sm">Select the platforms you're active on.</p>
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+               <h1 className="text-4xl sm:text-5xl font-black text-black mb-3 tracking-tight">Connect your socials</h1>
+               <p className="text-gray-500 mb-8 text-lg">Select the platforms where your audience hangs out.</p>
 
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-6">
+               <div className="grid grid-cols-3 gap-4 mb-8">
                 {PLATFORMS.map(p => {
                   const active = platforms.includes(p.id);
                   return (
                     <button
                       key={p.id}
                       onClick={() => togglePlatform(p.id)}
-                      className={`platform-grid-item ${active ? "selected" : ""}`}
+                      className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all ${
+                        active ? "border-black bg-gray-50 scale-105 shadow-md" : "border-gray-100 bg-white hover:border-gray-200 hover:-translate-y-1"
+                      }`}
                     >
-                      {active && (
-                        <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-indigo-500 flex items-center justify-center">
-                          <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
-                        </div>
-                      )}
-                      <div className="relative">{p.icon}</div>
-                      <span className="text-xs font-semibold text-white/70">{p.label}</span>
+                      {p.icon}
+                      <span className="text-xs font-bold text-black mt-3">{p.label}</span>
                     </button>
                   );
                 })}
               </div>
 
-              {/* Quick URL inputs for selected platforms */}
-              {platforms.length > 0 && (
-                <div className="space-y-2 mb-6">
-                  <h3 className="text-xs font-bold text-white/30 uppercase tracking-widest">Add your handles</h3>
-                  {platforms.slice(0, 4).map(pId => {
-                    const p = PLATFORMS.find(a => a.id === pId);
-                    if (!p) return null;
-                    return (
-                      <div key={pId} className="flex items-center gap-2">
-                        <div className="flex-shrink-0">{p.icon}</div>
-                        <input
-                          type="text"
-                          placeholder={`@username or url...`}
-                          value={urls[pId] || ""}
-                          onChange={e => setUrls({ ...urls, [pId]: e.target.value })}
-                          className="flex-1 p-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/25 text-sm focus:outline-none focus:border-indigo-500 transition-all"
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-
               <div className="flex gap-3">
-                <button onClick={() => goStep(2)} className="px-6 py-4 rounded-xl font-bold text-white/50 border border-white/10 hover:border-white/20 transition-all">
-                  <ChevronLeft className="inline w-4 h-4 mr-1" /> Back
-                </button>
-                <button onClick={() => goStep(4)} className="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-indigo-600 to-cyan-500 hover:shadow-lg hover:shadow-indigo-500/25 transition-all">
-                  Continue <ChevronRight className="inline w-4 h-4 ml-1" />
-                </button>
-              </div>
-              <button onClick={() => goStep(4)} className="w-full py-3 mt-2 text-white/30 font-semibold hover:text-white/50 transition-colors text-sm">
-                Skip for now
-              </button>
-            </div>
-          )}
-
-          {/* ═══ STEP 4: Choose Your Look ═══ */}
-          {step === 4 && (
-            <div>
-              <h1 className="text-3xl font-black text-white mb-2 tracking-tight">choose your look</h1>
-              <p className="text-white/40 mb-6 text-sm">Pick a style for your web landing page and mobile bio page.</p>
-
-              {/* Web Template */}
-              <div className="mb-6">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-white/30 mb-3">
-                  Web Landing Page
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {PORTFOLIO_TEMPLATES.map(t => (
-                    <button
-                      key={t.id}
-                      onClick={() => setPortfolioTheme(t.id)}
-                      className={`rounded-2xl border-2 overflow-hidden transition-all hover:scale-[1.03] ${
-                        portfolioTheme === t.id ? "border-indigo-500 ring-1 ring-indigo-500/30" : "border-white/10"
-                      }`}
-                    >
-                      <div className="aspect-[4/3] relative" style={{ background: t.colors[0] }}>
-                        <div className="absolute bottom-0 inset-x-0 h-1/2" style={{ background: `linear-gradient(135deg, ${t.colors[2]}, ${t.colors[1]})`, opacity: 0.6 }} />
-                        <div className="absolute bottom-2 left-2 right-2">
-                          <div className="w-4 h-4 rounded-full mb-1" style={{ background: t.colors[2] }} />
-                          <div className="h-1 w-12 rounded" style={{ background: t.colors[2], opacity: 0.6 }} />
-                        </div>
-                      </div>
-                      <div className="p-2 bg-white/5">
-                        <p className="text-[11px] font-bold text-white text-center">{t.name}</p>
-                        <p className="text-[9px] text-white/30 text-center">{t.desc}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Mobile Template */}
-              <div className="mb-6">
-                <h3 className="text-xs font-bold uppercase tracking-widest text-white/30 mb-3">
-                  Mobile Bio Link
-                </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  {MOBILE_TEMPLATES.map(t => (
-                    <button
-                      key={t.id}
-                      onClick={() => setMobileTheme(t.id)}
-                      className={`rounded-2xl border-2 overflow-hidden transition-all hover:scale-[1.03] ${
-                        mobileTheme === t.id ? "border-cyan-500 ring-1 ring-cyan-500/30" : "border-white/10"
-                      }`}
-                    >
-                      <div className="aspect-[9/16] relative rounded-xl mx-1 mt-1" style={{ background: t.colors[0] }}>
-                        <div className="absolute top-3 left-1/2 -translate-x-1/2 w-5 h-5 rounded-full" style={{ background: t.colors[1], opacity: 0.5 }} />
-                        {[0, 1, 2].map(i => (
-                          <div key={i} className="absolute left-2 right-2 h-3 rounded-lg" style={{
-                            background: `linear-gradient(90deg, ${t.colors[1]}, ${t.colors[2]})`,
-                            opacity: 0.5 - i * 0.1,
-                            top: `${55 + i * 18}%`
-                          }} />
-                        ))}
-                      </div>
-                      <div className="p-2 bg-white/5">
-                        <p className="text-[11px] font-bold text-white text-center">{t.name}</p>
-                        <p className="text-[9px] text-white/30 text-center">{t.desc}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <button onClick={() => goStep(3)} className="px-6 py-4 rounded-xl font-bold text-white/50 border border-white/10 hover:border-white/20 transition-all">
-                  <ChevronLeft className="inline w-4 h-4 mr-1" /> Back
-                </button>
-                <button onClick={() => goStep(5)} className="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-indigo-600 to-cyan-500 hover:shadow-lg hover:shadow-indigo-500/25 transition-all">
-                  Almost done <ChevronRight className="inline w-4 h-4 ml-1" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* ═══ STEP 5: Launch ═══ */}
-          {step === 5 && (
-            <div>
-              <div className="text-center mb-8">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center mx-auto mb-4 animate-pulse-glow">
-                  <Sparkles className="w-8 h-8 text-white" />
-                </div>
-                <h1 className="text-3xl font-black text-white mb-2 tracking-tight">you're all set!</h1>
-                <p className="text-white/40 text-sm">Here's a summary of your new getprofile.link page.</p>
-              </div>
-
-              {/* Summary Cards */}
-              <div className="space-y-3 mb-8">
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
-                  <span className="text-2xl">{selectedRole?.emoji || "✨"}</span>
-                  <div>
-                    <p className="text-xs text-white/40">Your Role</p>
-                    <p className="text-sm font-bold text-white">{selectedRole?.label || "Personal Brand"}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
-                  <span className="text-2xl">👤</span>
-                  <div>
-                    <p className="text-xs text-white/40">Display Name</p>
-                    <p className="text-sm font-bold text-white">{displayName}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
-                  <span className="text-2xl">🎨</span>
-                  <div>
-                    <p className="text-xs text-white/40">Templates</p>
-                    <p className="text-sm font-bold text-white">
-                      {PORTFOLIO_TEMPLATES.find(t => t.id === portfolioTheme)?.name} + {MOBILE_TEMPLATES.find(t => t.id === mobileTheme)?.name}
-                    </p>
-                  </div>
-                </div>
-                {platforms.length > 0 && (
-                  <div className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
-                    <span className="text-2xl">🔗</span>
-                    <div>
-                      <p className="text-xs text-white/40">Connected Platforms</p>
-                      <p className="text-sm font-bold text-white">{platforms.length} platforms</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Pro Trial Badge */}
-                <div className="p-4 rounded-xl bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 border border-indigo-500/20">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Sparkles className="w-4 h-4 text-indigo-400" />
-                    <p className="text-sm font-bold text-indigo-300">14-Day Pro Trial Active</p>
-                  </div>
-                  <p className="text-xs text-white/40">All Pro features including AI Assistant are unlocked for 14 days.</p>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <button onClick={() => goStep(4)} className="px-6 py-4 rounded-xl font-bold text-white/50 border border-white/10 hover:border-white/20 transition-all">
-                  <ChevronLeft className="inline w-4 h-4 mr-1" /> Back
+                <button onClick={() => goStep(2)} className="px-6 py-4 rounded-xl font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-all">
+                  <ChevronLeft className="w-5 h-5 inline" />
                 </button>
                 <button
-                  onClick={submitOnboarding}
-                  disabled={loading}
-                  className="flex-1 py-4 rounded-xl font-black text-white bg-gradient-to-r from-indigo-600 via-purple-500 to-cyan-500 hover:shadow-xl hover:shadow-indigo-500/30 transition-all disabled:opacity-50 gradient-shift-bg"
-                  style={{ backgroundSize: "200% 200%" }}
+                  onClick={() => goStep(4)}
+                  className="flex-1 w-full py-4 rounded-xl font-bold text-white bg-black hover:bg-gray-800 transition-all text-lg"
                 >
-                  {loading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="40 60" /></svg>
-                      Building your page...
-                    </span>
-                  ) : (
-                    <>Launch My Page <ArrowRight className="inline w-4 h-4 ml-1" /></>
-                  )}
+                  Continue
                 </button>
               </div>
             </div>
           )}
-
         </div>
+
+        {/* ═══ STEP 4: Template Gallery (Wider Container) ═══ */}
+        {step === 4 && (
+          <div className="w-full max-w-6xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+             <div className="text-center mb-8">
+               <h1 className="text-4xl sm:text-5xl font-black text-black mb-3 tracking-tight">Pick a template</h1>
+               <p className="text-gray-500 text-lg">You can always customize it or change it completely later.</p>
+             </div>
+
+             {/* Template Category Filter Strip */}
+             <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
+                {TEMPLATE_CATEGORIES.map(c => (
+                  <button
+                    key={c.id}
+                    onClick={() => setTemplateCategory(c.id)}
+                    className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
+                      templateCategory === c.id 
+                        ? "bg-black text-white shadow-md scale-105" 
+                        : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+                    }`}
+                  >
+                    {c.emoji && <span className="mr-2">{c.emoji}</span>}
+                    {c.label}
+                  </button>
+                ))}
+             </div>
+
+             {/* Template Grid Masonry/Gallery */}
+             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-12">
+               {filteredTemplates.map(template => (
+                 <div key={template.id} className="group relative">
+                   <button 
+                     onClick={() => openStyleModal(template)}
+                     className="w-full text-left"
+                   >
+                     {/* Preview Card */}
+                     <div className="aspect-[9/16] rounded-3xl overflow-hidden mb-3 border border-gray-200/50 shadow-sm transition-all duration-300 group-hover:shadow-2xl group-hover:scale-[1.03] relative"
+                          style={{ background: template.colorScheme.bg }}>
+                        
+                        {/* Simulated UI based on Header Style */}
+                        {template.headerStyle === 'full-bleed' && (
+                          <div className="absolute top-0 inset-x-0 h-1/2" style={{ background: template.previewGradient }} />
+                        )}
+                        {template.headerStyle === 'gradient-overlay' && (
+                          <div className="absolute inset-0 opacity-80" style={{ background: template.previewGradient }} />
+                        )}
+                        
+                        {/* Avatar */}
+                        <div className="absolute top-12 left-1/2 -translate-x-1/2 w-16 h-16 bg-white/20 backdrop-blur-md flex items-center justify-center p-1"
+                             style={{ borderRadius: template.avatarShape === 'circle' ? '50%' : template.avatarShape === 'rounded-square' ? '16px' : '8px' }}>
+                             <div className="w-full h-full rounded-full bg-cover bg-center" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&h=500&fit=crop')` }} />
+                        </div>
+
+                        {/* Title text */}
+                        <div className="absolute top-[120px] left-0 right-0 text-center">
+                           <div className="h-3 w-32 mx-auto rounded-full mb-2" style={{ background: template.colorScheme.text }} />
+                           <div className="h-2 w-20 mx-auto rounded-full opacity-60" style={{ background: template.colorScheme.text }} />
+                        </div>
+
+                        {/* Buttons/Links mockup */}
+                        <div className="absolute top-[180px] left-4 right-4 space-y-3">
+                           {[1,2,3].map(i => (
+                             <div key={i} className="h-12 w-full flex items-center justify-center shadow-sm"
+                                  style={{
+                                    background: template.buttonStyle === 'outlined' ? 'transparent' : template.colorScheme.accent,
+                                    border: template.buttonStyle === 'outlined' ? `2px solid ${template.colorScheme.accent}` : 'none',
+                                    borderRadius: template.buttonRadius
+                                  }}>
+                                  <div className="h-2 w-24 rounded-full" style={{ background: template.buttonStyle === 'outlined' ? template.colorScheme.accent : '#fff' }} />
+                             </div>
+                           ))}
+                        </div>
+
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300" />
+                     </div>
+
+                     <h3 className="font-bold text-gray-900 text-sm ml-1">{template.name}</h3>
+                     <p className="text-xs text-gray-500 ml-1">{template.description}</p>
+                   </button>
+                 </div>
+               ))}
+             </div>
+          </div>
+        )}
+
+        {/* ═══ STEP 5: Final Launch ═══ */}
+        {step === 5 && (
+          <div className="w-full max-w-xl animate-in fade-in slide-in-from-bottom-4 duration-500 text-center">
+             <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Sparkles className="w-10 h-10 text-indigo-600" />
+             </div>
+             <h1 className="text-4xl sm:text-5xl font-black text-black mb-3 tracking-tight">You're all set!</h1>
+             <p className="text-gray-500 text-lg mb-10">We're setting up your {activeTemplate.name} layout.</p>
+
+             <button
+                onClick={submitOnboarding}
+                disabled={loading}
+                className="w-full py-5 rounded-2xl font-black text-white bg-black hover:bg-gray-800 hover:shadow-xl transition-all disabled:opacity-50 text-xl"
+              >
+                {loading ? "Building your portal..." : "Take me to my dashboard"} <ArrowRight className="inline ml-2" />
+              </button>
+          </div>
+        )}
       </div>
+
+      {/* ═══ "STYLE IT YOUR WAY" MODAL ═══ */}
+      {showStyleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-8 animate-in fade-in">
+          <div className="bg-white w-full max-w-5xl h-[85vh] rounded-[32px] shadow-2xl flex overflow-hidden">
+            
+            {/* Left side: Controls */}
+            <div className="w-1/2 p-8 overflow-y-auto border-r border-gray-100 custom-scrollbar">
+              <div className="flex justify-between items-center mb-8">
+                <div>
+                  <h2 className="text-2xl font-black text-black">Style It Your Way</h2>
+                  <p className="text-sm text-gray-500">Customize your {activeTemplate.name} page</p>
+                </div>
+                <button onClick={() => setShowStyleModal(false)} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200">
+                  ✕
+                </button>
+              </div>
+
+              {/* Header Style Row */}
+              <div className="mb-8">
+                <h3 className="text-sm font-bold text-black mb-4 flex items-center gap-2"><LayoutTemplate className="w-4 h-4"/> Header style</h3>
+                <div className="flex gap-4 overflow-x-auto pb-2 snap-x">
+                  {HEADER_STYLES.map(h => (
+                    <button 
+                      key={h.id}
+                      onClick={() => setCustomConfig({...customConfig, headerStyle: h.id as any})}
+                      className={`flex-shrink-0 w-28 aspect-[2/3] border-2 rounded-xl p-1 transition-all flex flex-col snap-start ${customConfig.headerStyle === h.id ? "border-indigo-600 shadow-md" : "border-gray-200 hover:border-gray-300"}`}
+                    >
+                      <div className="flex-1 bg-gray-100 rounded-lg overflow-hidden relative">
+                         {h.id === 'full-bleed' && <div className="absolute inset-0 bg-gray-800"/>}
+                         {h.id === 'split' && <div className="absolute top-0 inset-x-0 h-1/2 bg-gray-800"/>}
+                      </div>
+                      <span className="text-[10px] font-bold mt-2 text-center text-gray-700">{h.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Colors */}
+              <div className="mb-8">
+                <h3 className="text-sm font-bold text-black mb-4 flex items-center gap-2"><Palette className="w-4 h-4"/> Choose a color scheme</h3>
+                <div className="flex flex-wrap gap-3">
+                  {COLOR_SCHEMES.map(c => (
+                    <button
+                      key={c.id}
+                      onClick={() => setCustomConfig({...customConfig, colorScheme: c as any})}
+                      className={`w-14 h-20 rounded-xl border-2 flex flex-col p-1.5 gap-1 transition-all ${customConfig.colorScheme.bg === c.bg ? "border-indigo-600 scale-110 shadow-sm" : "border-gray-200 hover:border-gray-300"}`}
+                    >
+                      <div className="w-full h-8 rounded shrink-0" style={{ background: c.bg, border: '1px solid rgba(0,0,0,0.1)' }} />
+                      <div className="w-full h-2 rounded-full" style={{ background: c.text }} />
+                      <div className="w-full h-2 rounded-full" style={{ background: c.accent }} />
+                      <div className="w-1/2 h-2 rounded-full" style={{ background: c.secondary }} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+               {/* Fonts */}
+               <div className="mb-8">
+                <h3 className="text-sm font-bold text-black mb-4 flex items-center gap-2"><Type className="w-4 h-4"/> Font family</h3>
+                <div className="grid grid-cols-5 gap-3">
+                  {FONT_OPTIONS.map(f => (
+                    <button
+                      key={f.id}
+                      onClick={() => setCustomConfig({...customConfig, font: f.id})}
+                      className={`aspect-square rounded-xl border-2 flex items-center justify-center transition-all flex-col ${customConfig.font === f.id ? "border-indigo-600 scale-105 shadow-sm" : "border-gray-200 hover:border-gray-300"}`}
+                    >
+                      <span className="text-2xl font-medium" style={{ fontFamily: f.id }}>Aa</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Button Shape */}
+              <div className="mb-8">
+                <h3 className="text-sm font-bold text-black mb-4 flex items-center gap-2"><MousePointerSquareDashed className="w-4 h-4"/> Button style</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {BUTTON_STYLES.map(b => (
+                    <button
+                      key={b.id}
+                      onClick={() => setCustomConfig({...customConfig, buttonStyle: b.id as any, buttonRadius: b.radius})}
+                      className={`h-12 border-2 transition-all flex items-center justify-center font-bold text-sm ${customConfig.buttonStyle === b.id ? "border-indigo-600 text-indigo-600 bg-indigo-50" : "border-gray-200 text-gray-500 hover:bg-gray-50"}`}
+                      style={{ borderRadius: b.radius, borderStyle: b.id === 'ghost' ? 'dashed' : 'solid' }}
+                    >
+                      {b.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-4 pt-4 border-t border-gray-100">
+                <button onClick={() => setShowStyleModal(false)} className="flex-1 py-4 font-bold text-gray-600 rounded-xl hover:bg-gray-100">
+                  Cancel
+                </button>
+                <button onClick={saveStyleConfig} className="flex-[2] py-4 font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-md">
+                  Use this template
+                </button>
+              </div>
+            </div>
+
+            {/* Right side: Live Preview Canvas */}
+            <div className="w-1/2 bg-[#f4f4f5] p-8 flex items-center justify-center relative">
+               <div className="absolute top-4 right-4 bg-white px-3 py-1.5 rounded-full shadow-sm text-xs font-bold text-gray-400 flex items-center gap-2">
+                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"/> Live Preview
+               </div>
+
+               {/* Mobile Phone Mockup */}
+               <div className="w-[360px] h-[720px] rounded-[40px] border-[8px] border-black overflow-hidden shadow-2xl relative transition-all duration-500"
+                    style={{ background: customConfig.colorScheme.bg, fontFamily: customConfig.font }}>
+                  
+                  {/* Dynamic Header */}
+                  {customConfig.headerStyle === 'full-bleed' && (
+                    <div className="h-64 bg-cover bg-center" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1542204165-65bf26472b9b?w=800&fit=crop')` }}>
+                      <div className="w-full h-full bg-gradient-to-t from-black/60 to-transparent" />
+                    </div>
+                  )}
+                  {customConfig.headerStyle === 'split' && (
+                    <div className="h-48 bg-cover bg-center" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1542204165-65bf26472b9b?w=800&fit=crop')` }} />
+                  )}
+
+                  {/* Profile Info */}
+                  <div className={`px-6 relative z-10 ${customConfig.headerStyle === 'full-bleed' ? '-mt-20' : 'pt-10'} ${customConfig.headerStyle === 'offset' ? 'text-left' : 'text-center'}`}>
+                    <img 
+                      src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&h=500&fit=crop" 
+                      className="w-24 h-24 object-cover border-4 border-white shadow-lg mx-auto mb-4"
+                      style={{ 
+                        borderRadius: customConfig.avatarShape === 'circle' ? '50%' : customConfig.avatarShape === 'rounded-square' ? '16px' : '8px',
+                        marginLeft: customConfig.headerStyle === 'offset' ? '0' : 'auto'
+                      }}
+                    />
+                    <h1 className="text-2xl font-bold mb-1" style={{ color: customConfig.headerStyle === 'full-bleed' ? '#fff' : customConfig.colorScheme.text }}>
+                      {displayName || "Lukas Everett"}
+                    </h1>
+                    <p className="text-sm mb-6" style={{ color: customConfig.headerStyle === 'full-bleed' ? 'rgba(255,255,255,0.8)' : customConfig.colorScheme.secondary }}>
+                      Trailblazer | Storyteller | Explorer
+                    </p>
+
+                    {/* Links */}
+                    <div className="space-y-3">
+                      {["Latest Blog Posts", "My Travel Gear", "Book a Session"].map((text) => (
+                        <button key={text} className="w-full py-4 px-6 relative overflow-hidden transition-transform hover:scale-105 shadow-sm"
+                                style={{
+                                  background: customConfig.buttonStyle === 'outlined' || customConfig.buttonStyle === 'ghost' ? 'transparent' : customConfig.colorScheme.card,
+                                  border: customConfig.buttonStyle === 'outlined' ? `1px solid ${customConfig.colorScheme.text}` : customConfig.buttonStyle === 'ghost' ? '1px dashed rgba(0,0,0,0.2)' : 'none',
+                                  borderRadius: customConfig.buttonRadius,
+                                  color: customConfig.colorScheme.text
+                                }}>
+                          <span className="relative z-10 font-bold">{text}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+               </div>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }

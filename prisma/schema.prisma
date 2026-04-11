@@ -16,6 +16,7 @@ enum ProductType {
   PHYSICAL
   DIGITAL
   SERVICE
+  COURSE
 }
 
 enum MessageCategory {
@@ -66,6 +67,10 @@ model User {
   orders         Order[]
   conversations  Conversation[]
   events         Event[]
+
+  // ═══ NEW: Community & Memberships ═══
+  broadcastMessages BroadcastMessage[]
+  membershipTiers   MembershipTier[]
 }
 
 model Agency {
@@ -130,6 +135,20 @@ model Profile {
   mobileTheme    String @default("default")
   monetizationGoals String?
 
+  // ═══ NEW: Template Engine ("Style It Your Way") ═══
+  activeTemplateId String?  @default("minimal-white")
+  themeConfig      String?  @default("{}") // JSON: {headerStyle, colorScheme, font, buttonStyle}
+
+  // ═══ NEW: Live Streaming ═══
+  isLive    Boolean @default(false)
+  liveUrl   String?
+
+  // ═══ NEW: Fundraising / Tip Goals ═══
+  tipGoalTitle    String?
+  tipGoalImage    String?
+  tipGoalAmount   Float?   @default(0)
+  tipCurrentAmount Float?  @default(0)
+
   // Socials
   twitter        String?
   instagram      String?
@@ -179,6 +198,9 @@ model Link {
   clicksA      Int     @default(0)
   clicksB      Int     @default(0)
 
+  scheduledStart DateTime?
+  scheduledEnd   DateTime?
+
   createdAt DateTime @default(now())
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -197,6 +219,14 @@ model PortfolioItem {
   itemType    String?    
   brandName   String?    
   videoUrl    String?    
+
+  // ═══ NEW: Content Paywalling ═══
+  isLocked      Boolean  @default(false)
+  unlockPrice   Float?   @default(0)
+  requiredTier  String?  // "basic", "premium", "vip" — null = one-time unlock
+
+  // ═══ NEW: Attached Commerce (PDF overlay on video) ═══
+  attachedProductId String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -217,6 +247,12 @@ model Product {
   isAffiliate  Boolean     @default(false)
   affiliateNote String?
   createdAt    DateTime    @default(now())
+
+  // ═══ NEW: Affiliate Coupon Codes ═══
+  couponCode   String?     // e.g. "ILoveMatcha" — copyable by fans
+
+  // ═══ NEW: Course Structure (for productType=COURSE) ═══
+  courseModules String?     @default("[]") // JSON: [{title, chapters: [{title, videoUrl, duration}]}]
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders Order[]
@@ -247,6 +283,12 @@ model Event {
   currentRSVP Int       @default(0)
   enabled     Boolean  @default(true)
   createdAt   DateTime @default(now())
+
+  // ═══ NEW: Paid Ticketing ═══
+  ticketPrice  Float?   @default(0)
+  image        String?
+  earlyBirdPrice Float? @default(0)
+  earlyBirdEnds  DateTime?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -346,6 +388,35 @@ model Booking {
   preQualAnswers  String?  // JSON: {"budget": "$500", "need": "Website redesign"}
   notes           String?
   createdAt       DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ═══ NEW: Creator Membership Tiers ═══
+model MembershipTier {
+  id            String   @id @default(cuid())
+  userId        String   // The creator offering this tier
+  title         String   // e.g. "VIP Club", "Annual Membership"
+  description   String?
+  pricePerMonth Float    @default(5.0)
+  benefits      String?  @default("[]") // JSON: ["Exclusive content", "Early access"]
+  image         String?
+  color         String?  @default("#6366f1")
+  enabled       Boolean  @default(true)
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ═══ NEW: Community Broadcast Messages ═══
+model BroadcastMessage {
+  id        String   @id @default(cuid())
+  userId    String   // The creator posting
+  content   String
+  isPinned  Boolean  @default(false)
+  tier      String?  // null = public, "basic"/"vip" = gated
+  createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

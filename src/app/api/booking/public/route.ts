@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { publicApiLimiter } from "@/lib/rate-limit";
+import { sendBookingNotification } from "@/lib/email";
 
 /**
  * POST /api/booking/public
@@ -7,6 +9,13 @@ import { prisma } from "@/lib/prisma";
  */
 export async function POST(req: Request) {
   try {
+    // Rate limit: 20 requests per minute per IP
+    const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
+    const { success } = await publicApiLimiter.check(20, `booking_${ip}`);
+    if (!success) {
+      return NextResponse.json({ error: "Too many requests. Please slow down." }, { status: 429 });
+    }
+
     const body = await req.json();
     const { username, guestName, guestEmail, date, time, duration, notes, preQualAnswers } = body;
 
@@ -60,6 +69,9 @@ export async function POST(req: Request) {
         }),
       }
     });
+
+    // Notify creator
+    await sendBookingNotification(creator.email, guestName, date, time);
 
     return NextResponse.json({
       success: true,

@@ -8,6 +8,7 @@ interface PortfolioItem {
   id: string; title: string; image: string | null;
   description: string | null; link: string | null; category: string | null;
   itemType: string | null; brandName: string | null; videoUrl: string | null;
+  isLocked: boolean; unlockPrice: number | null; requiredTier: string | null;
 }
 
 const ITEM_TYPES = [
@@ -18,7 +19,7 @@ const ITEM_TYPES = [
   { id: "press", label: "Press / Media", icon: Newspaper, color: "bg-emerald-50 text-emerald-600" },
 ];
 
-const emptyForm = { title: "", image: "", description: "", link: "", category: "", itemType: "project", brandName: "", videoUrl: "" };
+const emptyForm = { title: "", image: "", description: "", link: "", category: "", itemType: "project", brandName: "", videoUrl: "", isLocked: false, unlockPrice: "", requiredTier: "" };
 
 const CATEGORY_COLORS: Record<string, string> = {
   design: "bg-pink-50 text-pink-600", photography: "bg-amber-50 text-amber-600",
@@ -58,7 +59,10 @@ export default function PortfolioPage() {
     await fetch("/api/portfolio", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify({
+        ...form,
+        unlockPrice: parseFloat(form.unlockPrice as string) || 0
+      }),
     });
     setForm(emptyForm);
     setShowForm(false);
@@ -161,6 +165,35 @@ export default function PortfolioPage() {
                 <input className="input-premium" type="url" value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} placeholder="https://..." />
               </div>
             </div>
+
+            {/* Paywall Toggle */}
+            <div className="p-4 bg-amber-50/50 border border-amber-100 rounded-xl mb-6">
+               <label className="flex items-center gap-3 cursor-pointer mb-3">
+                  <div onClick={() => setForm({ ...form, isLocked: !form.isLocked })}
+                    className={`w-11 h-6 rounded-full transition-all flex items-center p-0.5 ${form.isLocked ? "bg-amber-500 justify-end" : "bg-slate-200 justify-start"}`}>
+                    <div className="w-5 h-5 bg-white rounded-full shadow-sm" />
+                  </div>
+                  <span className="text-sm text-amber-700 font-bold">
+                    Lock behind Paywall / Membership
+                  </span>
+               </label>
+               {form.isLocked && (
+                 <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-amber-200/50">
+                    <div>
+                      <label className="block text-[10px] font-black text-amber-700/70 mb-1 uppercase tracking-wide">Unlock Price ($)</label>
+                      <input className="w-full bg-white border border-amber-200 rounded-xl px-3 py-2 text-sm outline-none" type="number" placeholder="4.99" value={form.unlockPrice} onChange={e => setForm({...form, unlockPrice: e.target.value})} />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-black text-amber-700/70 mb-1 uppercase tracking-wide">Required Tier (Optional)</label>
+                      <select className="w-full bg-white border border-amber-200 rounded-xl px-3 py-2 text-sm outline-none" value={form.requiredTier} onChange={e => setForm({...form, requiredTier: e.target.value})}>
+                         <option value="">None (One-time payment)</option>
+                         <option value="basic">Basic Membership</option>
+                         <option value="vip">VIP Membership</option>
+                      </select>
+                    </div>
+                 </div>
+               )}
+            </div>
           <div className="flex items-center gap-3">
             <button onClick={addItem} disabled={adding || !form.title} className="btn-primary">
               {adding ? "Adding…" : "Add to Portfolio"}
@@ -198,10 +231,15 @@ export default function PortfolioPage() {
                     </div>
                   )}
                   {/* Type badge */}
-                  <div className="absolute top-3 left-3">
+                  <div className="absolute top-3 left-3 flex gap-2">
                     <span className={`text-[10px] px-2 py-1 rounded-lg font-bold ${typeBadge.color}`}>
                       {typeBadge.label}
                     </span>
+                    {item.isLocked && (
+                      <span className="text-[10px] px-2 py-1 rounded-lg font-bold bg-amber-500 text-white shadow-sm flex items-center gap-1">
+                        🔒 Paywalled
+                      </span>
+                    )}
                   </div>
                   {/* Overlay actions */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all flex items-end justify-between p-4">

@@ -37,8 +37,12 @@ export default function CheckoutModal({ product, username, onClose }: CheckoutMo
 
       const data = await res.json();
       if (res.ok && data.success) {
-        setSuccess(true);
-        setOrderResult(data.order);
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          setSuccess(true);
+          setOrderResult(data.order);
+        }
       } else {
         setError(data.error || "Checkout failed");
       }

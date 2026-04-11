@@ -14,7 +14,11 @@ import TipWidget from "@/components/public/TipWidget";
 import PublicBookingWidget from "@/components/public/PublicBookingWidget";
 import EmailCapture from "@/components/public/EmailCapture";
 import EmbedBlock from "@/components/public/EmbedBlock";
+import GoalTracker from "@/components/public/GoalTracker";
+import CourseAccordion from "@/components/public/CourseAccordion";
+import CouponCard from "@/components/public/CouponCard";
 import { getSidebarConfigForRole } from "@/lib/role-sidebar-map";
+import { parseLiveUrl } from "@/lib/live-stream-parser";
 
 /* ─── Platform config & Icons ─── */
 function detectPlatform(url: string): { name: string; color: string; bg: string; icon: React.ReactNode } {
@@ -102,8 +106,28 @@ export default function PublicProfileClient({ user: initialUser }: { user: any }
     }
   };
 
+  let customConfig: any = null;
+  if (profile.themeConfig) {
+    try { customConfig = JSON.parse(profile.themeConfig); } catch (e) {}
+  }
+  
+  // Fallbacks if no themeConfig is present
+  const bgColor = customConfig?.colorScheme?.bg || profile.bgColor || "#000";
+  const textColor = customConfig?.colorScheme?.text || profile.textColor || "#fff";
+  const cardColor = customConfig?.colorScheme?.card || "#111";
+  const accentColor = customConfig?.colorScheme?.accent || profile.accentColor || "#6366f1";
+  const secColor = customConfig?.colorScheme?.secondary || "#888";
+  
+  const fontFam = customConfig?.font || profile.font || "Inter";
+  const hStyle = customConfig?.headerStyle || "minimal-avatar";
+  const bStyle = customConfig?.buttonStyle || "rounded";
+  
+  const buttonRadiusMap: any = { pill: "999px", rounded: "12px", square: "4px", outlined: "12px", ghost: "12px" };
+  const bRadius = customConfig?.buttonRadius || buttonRadiusMap[bStyle] || "12px";
+  const avatarShape = customConfig?.avatarShape || "circle";
+
   return (
-    <div className={`min-h-screen relative font-sans transition-colors duration-500`} style={{ backgroundColor: profile.bgColor || "#000", color: profile.textColor || "#fff" }}>
+    <div className={`min-h-screen relative transition-colors duration-500`} style={{ backgroundColor: bgColor, color: textColor, fontFamily: fontFam }}>
       
       {/* 📸 DESKTOP / WEB LANDING PAGE TEMPLATE */}
       {viewMode === "web" ? (
@@ -111,9 +135,16 @@ export default function PublicProfileClient({ user: initialUser }: { user: any }
           {/* Hero Section */}
           <section className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div className="space-y-8 animate-in fade-in slide-in-from-left-8 duration-1000">
-              <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 px-4 py-2 rounded-full text-indigo-400 text-xs font-black uppercase tracking-widest">
-                <Sparkles className="w-3.5 h-3.5" /> 10/10 Elite Profile
-              </div>
+              {profile.isLive && (
+                <div className="inline-flex items-center gap-2 bg-rose-500/10 border border-rose-500/20 px-4 py-2 rounded-full text-rose-500 text-xs font-black uppercase tracking-widest animate-pulse">
+                  <div className="w-2 h-2 bg-rose-500 rounded-full" /> LIVE NOW ON AIR
+                </div>
+              )}
+              {!profile.isLive && (
+                <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 px-4 py-2 rounded-full text-indigo-400 text-xs font-black uppercase tracking-widest">
+                  <Sparkles className="w-3.5 h-3.5" /> 10/10 Elite Profile
+                </div>
+              )}
               <h1 className="text-6xl lg:text-8xl font-black tracking-tighter leading-[0.9]">
                 {user.name || user.username}
               </h1>
@@ -129,10 +160,17 @@ export default function PublicProfileClient({ user: initialUser }: { user: any }
                 </button>
               </div>
             </div>
-            <div className="relative aspect-square rounded-[60px] overflow-hidden border border-white/10 shadow-2xl group animate-in fade-in zoom-in-95 duration-1000 delay-200">
-               <img src={profile.avatarUrl || "/placeholder-avatar.jpg"} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000" />
-               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
-            </div>
+            
+            {profile.isLive && parseLiveUrl(profile.liveUrl) ? (
+               <div className="relative aspect-video rounded-[40px] overflow-hidden border border-rose-500/30 shadow-2xl shadow-rose-500/20 animate-in fade-in zoom-in-95 duration-1000 delay-200">
+                  <iframe src={parseLiveUrl(profile.liveUrl) as string} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay; fullscreen" />
+               </div>
+            ) : (
+               <div className="relative aspect-square rounded-[60px] overflow-hidden border border-white/10 shadow-2xl group animate-in fade-in zoom-in-95 duration-1000 delay-200">
+                  <img src={profile.avatarUrl || "/placeholder-avatar.jpg"} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
+               </div>
+            )}
           </section>
 
           {/* Commerce Section: Mini Shopify */}
@@ -162,8 +200,10 @@ export default function PublicProfileClient({ user: initialUser }: { user: any }
                         <span className="text-indigo-400 font-black">${p.price}</span>
                       </div>
                       <button onClick={() => setCheckoutProduct(p)} className="w-full bg-white text-black py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-500 hover:text-white transition-all">
-                        Buy Now
+                        {p.isAffiliate ? "Get Offer" : "Buy Now"}
                       </button>
+                      {p.productType === "COURSE" && <CourseAccordion product={p} accentColor={accentColor} />}
+                      {p.isAffiliate && p.couponCode && <CouponCard couponCode={p.couponCode} accentColor={accentColor} />}
                     </div>
                   </div>
                 ))}
@@ -200,26 +240,95 @@ export default function PublicProfileClient({ user: initialUser }: { user: any }
           )}
         </div>
       ) : (
-        /* 📱 MOBILE LINK-IN-BIO TEMPLATE (Bento/Kinetic) */
-        <div className="max-w-[480px] mx-auto min-h-screen bg-black flex flex-col pb-20">
-          <div className="relative aspect-[4/5] max-h-[500px]">
-            <img src={profile.avatarUrl || "/placeholder.svg"} className="absolute inset-0 w-full h-full object-cover grayscale" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-            <div className="absolute bottom-10 left-0 right-0 text-center px-6">
-               <h1 className="text-4xl font-black tracking-tighter text-white mb-2">{user.name || user.username}</h1>
-               <p className="text-zinc-400 text-sm font-medium">@{user.username}</p>
-            </div>
+        /* 📱 MOBILE LINK-IN-BIO TEMPLATE (Dynamic Theme Config) */
+        <div className="max-w-[480px] mx-auto min-h-screen flex flex-col pb-20">
+          
+          {/* Dynamic Header Area */}
+          <div className="relative w-full">
+            {profile.isLive && parseLiveUrl(profile.liveUrl) ? (
+              <div className="h-64 sm:h-72 w-full bg-black">
+                 <iframe src={parseLiveUrl(profile.liveUrl) as string} className="w-full h-full" frameBorder="0" allowFullScreen allow="autoplay; fullscreen" />
+              </div>
+            ) : (
+              <>
+                {hStyle === 'full-bleed' && (
+                  <div className="h-64 sm:h-72 bg-cover bg-center" style={{ backgroundImage: `url(${profile.bannerUrl || 'https://images.unsplash.com/photo-1542204165-65bf26472b9b?w=800&fit=crop'})` }}>
+                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  </div>
+                )}
+                {hStyle === 'split' && (
+                  <div className="h-48 sm:h-56 bg-cover bg-center" style={{ backgroundImage: `url(${profile.bannerUrl || 'https://images.unsplash.com/photo-1542204165-65bf26472b9b?w=800&fit=crop'})` }} />
+                )}
+                {hStyle === 'gradient-overlay' && (
+                  <div className="h-64 sm:h-72 bg-cover bg-center" style={{ backgroundImage: `url(${profile.bannerUrl || 'https://images.unsplash.com/photo-1542204165-65bf26472b9b?w=800&fit=crop'})` }}>
+                     <div className="absolute inset-0 opacity-80" style={{ background: `linear-gradient(135deg, ${accentColor}, ${secColor})` }} />
+                  </div>
+                )}
+              </>
+            )}
+            
+            {/* Live Indicator inside banner if Live */}
+            {profile.isLive && !parseLiveUrl(profile.liveUrl) && (
+              <div className="absolute top-6 right-4 sm:right-6 bg-rose-500 text-white text-[10px] font-black uppercase px-3 py-1.5 rounded-md inline-flex items-center gap-1.5 shadow-lg shadow-rose-500/50 animate-pulse z-20">
+                <div className="w-1.5 h-1.5 bg-white rounded-full"></div> LIVE NOW
+              </div>
+            )}
           </div>
 
-          <div className="px-4 py-8 space-y-6">
-             {/* Bento Grid Links */}
-             <div className="grid grid-cols-2 gap-3">
-                {links.map((l: any) => (
-                  <Link key={l.id} href={l.url} target="_blank" className="bg-zinc-900 border border-white/5 p-4 rounded-3xl flex flex-col items-center justify-center text-center gap-3 aspect-square group hover:border-indigo-500/50 transition-all">
-                     <div className="w-12 h-12 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
-                        {detectPlatform(l.url).icon}
-                     </div>
-                     <span className="text-[11px] font-black uppercase tracking-widest leading-tight">{l.title}</span>
+          <div className={`px-5 relative z-10 ${hStyle === 'full-bleed' || hStyle === 'gradient-overlay' ? '-mt-20' : hStyle === 'split' ? '-mt-12' : 'pt-12'} ${hStyle === 'offset' ? 'text-left' : 'text-center'}`}>
+             <img 
+               src={profile.avatarUrl || "/placeholder.svg"} 
+               className={`w-28 h-28 object-cover border-[5px] shadow-xl ${hStyle === 'offset' ? 'mb-4' : 'mx-auto mb-4'}`}
+               style={{ 
+                 borderColor: bgColor, 
+                 borderRadius: avatarShape === 'circle' ? '50%' : avatarShape === 'rounded-square' ? '20px' : '10px' 
+               }}
+             />
+             <h1 className="text-3xl font-black tracking-tighter mb-1" style={{ color: (hStyle === 'full-bleed' || hStyle === 'gradient-overlay') ? '#fff' : textColor }}>
+                {user.name || user.username}
+             </h1>
+             <p className="text-sm font-medium mb-8" style={{ color: (hStyle === 'full-bleed' || hStyle === 'gradient-overlay') ? 'rgba(255,255,255,0.8)' : secColor }}>
+                @{user.username} {profile.bio ? `· ${profile.bio}` : ''}
+             </p>
+          </div>
+
+          <div className="px-5 space-y-6">
+
+             {/* Goal Tracker */}
+             {profile.tipGoalAmount > 0 && (
+                <GoalTracker 
+                   title={profile.tipGoalTitle}
+                   image={profile.tipGoalImage}
+                   targetAmount={profile.tipGoalAmount}
+                   currentAmount={profile.tipCurrentAmount}
+                   accentColor={accentColor}
+                   textColor={textColor}
+                   cardColor={cardColor}
+                />
+             )}
+             {/* Dynamic Buttons for Links */}
+             <div className="space-y-3">
+                {links.filter((l: any) => !l.image).map((l: any) => (
+                  <Link key={l.id} href={l.clickUrl || l.url} target="_blank" className="relative group block w-full">
+                     <button className="w-full py-4 px-6 relative overflow-hidden transition-all hover:scale-[1.02] shadow-sm flex items-center justify-between"
+                             style={{
+                               background: bStyle === 'outlined' || bStyle === 'ghost' ? 'transparent' : cardColor,
+                               border: bStyle === 'outlined' ? `1px solid ${textColor}` : bStyle === 'ghost' ? '1px dashed rgba(0,0,0,0.2)' : 'none',
+                               borderRadius: bRadius,
+                               color: textColor
+                             }}>
+                        <div className="flex items-center gap-3 relative z-10">
+                           {l.icon && <span className="text-xl">{l.icon}</span>}
+                           {!l.icon && detectPlatform(l.url).icon !== null && (
+                              <div className="opacity-70">{detectPlatform(l.url).icon}</div>
+                           )}
+                           <span className="font-bold text-sm tracking-wide">{l.displayTitle || l.title}</span>
+                        </div>
+                        <ChevronRight className="w-4 h-4 opacity-30 relative z-10" />
+                        {bStyle !== 'outlined' && bStyle !== 'ghost' && (
+                          <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity" style={{ background: textColor }} />
+                        )}
+                     </button>
                   </Link>
                 ))}
              </div>
@@ -238,6 +347,8 @@ export default function PublicProfileClient({ user: initialUser }: { user: any }
                              <p className="text-black font-bold text-xs line-clamp-1">{p.name}</p>
                              <p className="text-zinc-400 font-bold text-[10px] mt-0.5">${p.price}</p>
                            </div>
+                           {p.productType === "COURSE" && <CourseAccordion product={p} accentColor={accentColor} />}
+                           {p.isAffiliate && p.couponCode && <CouponCard couponCode={p.couponCode} accentColor={accentColor} />}
                         </div>
                      ))}
                   </div>

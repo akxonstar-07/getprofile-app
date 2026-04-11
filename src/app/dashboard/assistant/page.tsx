@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { 
   Bot, MessageSquare, Star, ShoppingCart, UserCheck, 
   Sparkles, Search, Filter, ArrowRight, Trash2, Loader2, Play,
-  Lock, Crown, Zap
+  Lock, Crown, Zap, Settings, Command, Power
 } from "lucide-react";
 import { toast } from "sonner";
 import { getUserPlanInfo, type PlanInfo } from "@/lib/plan-guard";
@@ -20,6 +20,12 @@ export default function AIAssistantPage() {
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState("Analyzing your audience strategy... 🤖");
   const [activeTab, setActiveTab] = useState("ALL");
+  const [viewState, setViewState] = useState<"INBOX" | "SETTINGS">("INBOX");
+  
+  // Settings State
+  const [voice, setVoice] = useState("Friendly & Professional");
+  const [autoRespond, setAutoRespond] = useState(false);
+  const [dmTrigger, setDmTrigger] = useState("LINK");
 
   useEffect(() => {
     fetch("/api/profile").then(r => r.json()).then(d => {
@@ -150,14 +156,92 @@ export default function AIAssistantPage() {
           </div>
           <p className="text-slate-500 font-medium max-w-md">{aiConfig.subtitle}</p>
         </div>
-        <button 
-          onClick={runAnalysis}
-          className="bg-indigo-500 text-white px-8 py-3.5 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center gap-2 hover:bg-indigo-600 transition-all shadow-xl shadow-indigo-500/20 active:scale-95">
-          <Play className="w-4 h-4" /> Run Fresh AI Analysis
-        </button>
+        <div className="flex items-center gap-3">
+          <button 
+             onClick={() => setViewState("SETTINGS")}
+             className="bg-white border border-slate-200 text-slate-700 px-4 py-3.5 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm active:scale-95">
+             <Settings className="w-4 h-4" /> Config
+          </button>
+          <button 
+            onClick={runAnalysis}
+            className="bg-indigo-500 text-white px-8 py-3.5 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center gap-2 hover:bg-indigo-600 transition-all shadow-xl shadow-indigo-500/20 active:scale-95">
+            <Play className="w-4 h-4" /> Run Fresh AI Analysis
+          </button>
+        </div>
       </div>
 
-      {/* ── AI STRATEGIC SUMMARY BOX ── */}
+      {viewState === "SETTINGS" ? (
+         <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+           <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-black text-slate-900">AI Automations & Settings</h2>
+              <button onClick={() => setViewState("INBOX")} className="text-sm font-bold text-slate-500 hover:text-slate-900">← Back to Inbox</button>
+           </div>
+           
+           <div className="grid lg:grid-cols-2 gap-8">
+              {/* Auto Responder Toggles */}
+              <div className="bg-white border p-8 rounded-3xl shadow-sm space-y-6">
+                 <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-500"><Power className="w-5 h-5"/></div>
+                    <div>
+                      <h3 className="text-lg font-black text-slate-900">Auto-Responder</h3>
+                      <p className="text-sm text-slate-500">Let AI reply to basic fan questions automatically.</p>
+                    </div>
+                 </div>
+                 
+                 <label className="flex items-center justify-between p-4 border rounded-2xl cursor-pointer hover:bg-slate-50 transition-colors">
+                    <span className="font-bold text-slate-800">Enable Auto-Pilot</span>
+                    <div onClick={() => setAutoRespond(!autoRespond)} className={`w-12 h-6 rounded-full transition-all flex items-center p-1 ${autoRespond ? "bg-indigo-500 justify-end" : "bg-slate-200 justify-start"}`}>
+                       <div className="w-4 h-4 bg-white rounded-full shadow-sm" />
+                    </div>
+                 </label>
+                 
+                 <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-2 uppercase tracking-wider">Brand Voice / Persona</label>
+                    <textarea 
+                       rows={4}
+                       className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 outline-none focus:border-indigo-500 transition-all text-sm font-medium"
+                       value={voice}
+                       onChange={e => setVoice(e.target.value)}
+                       placeholder="e.g. Act as a bubbly fitness coach. Always use emojis."
+                    />
+                 </div>
+              </div>
+
+              {/* Comment to DM Flow */}
+              <div className="bg-gradient-to-br from-slate-900 to-indigo-950 p-8 rounded-3xl shadow-xl shadow-indigo-900/20 text-white space-y-6 relative overflow-hidden">
+                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 blur-3xl pointer-events-none" />
+                 
+                 <div className="flex items-center gap-3 mb-2 relative z-10">
+                    <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-indigo-300"><Command className="w-5 h-5"/></div>
+                    <div>
+                      <h3 className="text-lg font-black text-white">Comment-to-DM Engine</h3>
+                      <p className="text-sm text-indigo-200">Automatically DM links when fans comment a keyword.</p>
+                    </div>
+                 </div>
+                 
+                 <div className="space-y-4 relative z-10">
+                    <div>
+                       <label className="block text-xs font-bold text-indigo-300 mb-2 uppercase tracking-wider">Trigger Keyword</label>
+                       <input 
+                          type="text"
+                          className="w-full bg-white/10 border border-white/20 rounded-2xl p-4 outline-none focus:border-indigo-400 transition-all font-black text-lg placeholder:text-white/30"
+                          value={dmTrigger}
+                          onChange={e => setDmTrigger(e.target.value)}
+                          placeholder="e.g. LINK or COURSE"
+                       />
+                       <p className="text-[10px] text-indigo-300 mt-2 font-medium">When someone comments this keyword on your IG/TikTok, the agent will DM them the attached link.</p>
+                    </div>
+                 </div>
+                 
+                 <button className="w-full bg-indigo-500 hover:bg-indigo-400 text-white py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all relative z-10">
+                    Save Workflows
+                 </button>
+              </div>
+           </div>
+         </div>
+      ) : (
+         <div className="animate-in fade-in slide-in-from-left-4 duration-500 space-y-10">
+           {/* ── AI STRATEGIC SUMMARY BOX ── */}
       <div className="bg-slate-900 rounded-[40px] p-8 shadow-2xl relative overflow-hidden group">
          <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 to-emerald-500/10 opacity-50 group-hover:opacity-100 transition-opacity" />
          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 blur-[100px] pointer-events-none" />
@@ -247,6 +331,8 @@ export default function AIAssistantPage() {
           ))
         )}
       </div>
+      </div>
+      )}
     </div>
   );
 }

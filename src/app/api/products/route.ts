@@ -39,8 +39,10 @@ export async function POST(req: Request) {
         productType: data.productType,
         digitalUrl: data.digitalUrl,
         inventory: data.inventory,
-        isAffiliate: data.isAffiliate,
+        isAffiliate: data.isAffiliate || false,
         affiliateNote: data.affiliateNote,
+        couponCode: data.couponCode || null,
+        courseModules: data.courseModules || "[]",
         enabled: true
       }
     });

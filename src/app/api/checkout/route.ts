@@ -1,21 +1,16 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import Stripe from "stripe";
 
-/**
- * POST /api/checkout/process
- * Creates an order for a product. In production, integrate Stripe PaymentIntent here.
- * For now, creates the order record and returns a success response.
- */
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { productId, customerEmail, customerName, promoCode } = body;
+    const { productId, customerEmail, customerName, promoCode, returnUrl } = body;
 
     if (!productId || !customerEmail) {
       return NextResponse.json({ error: "Product ID and email required" }, { status: 400 });
     }
 
-    // Fetch the product
     const product = await prisma.product.findUnique({
       where: { id: productId },
       include: { user: true }
@@ -27,7 +22,6 @@ export async function POST(req: Request) {
 
     let finalPrice = product.price;
 
-    // Apply promo code if provided
     if (promoCode) {
       const promo = await prisma.promoCode.findFirst({
         where: {
@@ -41,7 +35,6 @@ export async function POST(req: Request) {
         const expired = promo.expiresAt && new Date(promo.expiresAt) < new Date();
         if (!expired) {
           finalPrice = product.price * (1 - promo.discountPercent / 100);
-          // Increment promo usage
           await prisma.promoCode.update({
             where: { id: promo.id },
             data: { currentUses: { increment: 1 } }
@@ -49,45 +42,82 @@ export async function POST(req: Request) {
         }
       }
     }
-
-    // In production: Create Stripe PaymentIntent here
-    // const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-    // const paymentIntent = await stripe.paymentIntents.create({
-    //   amount: Math.round(finalPrice * 100),
-    //   currency: 'usd',
-    //   metadata: { productId, customerEmail }
-    // });
-
-    // Create order record
+    
+    // Create pending order record
     const order = await prisma.order.create({
       data: {
         userId: product.userId,
         productId: product.id,
         customerEmail,
         amount: finalPrice,
-        status: "PAID", // In production: set to PENDING until Stripe webhook confirms
+        status: "PENDING",
       }
     });
 
-    // Decrement inventory for physical products
-    if (product.productType === "PHYSICAL" && product.inventory && product.inventory > 0) {
-      await prisma.product.update({
-        where: { id: product.id },
-        data: { inventory: { decrement: 1 } }
+    // If Stripe isn't configured, mimic success directly for dev
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.warn("STRIPE_SECRET_KEY not set. Using dev fallback for order:", order.id);
+      
+      await prisma.order.update({
+        where: { id: order.id },
+        data: { status: "PAID" }
+      });
+      
+      if (product.productType === "PHYSICAL" && product.inventory && product.inventory > 0) {
+        await prisma.product.update({
+          where: { id: product.id },
+          data: { inventory: { decrement: 1 } }
+        });
+      }
+
+      return NextResponse.json({
+        success: true,
+        order: {
+          id: order.id,
+          amount: finalPrice,
+          originalPrice: product.price,
+          productName: product.name,
+          digitalUrl: product.productType === "DIGITAL" ? product.digitalUrl : null,
+        },
       });
     }
 
+    // Initialize Stripe
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+       apiVersion: '2023-10-16' as any,
+    });
+
+    // Create Stripe Checkout Session
+    const session = await stripe.checkout.sessions.create({
+       payment_method_types: ['card'],
+       customer_email: customerEmail,
+       line_items: [
+         {
+           price_data: {
+             currency: 'usd',
+             product_data: {
+               name: product.name,
+               description: product.description || undefined,
+               images: product.image ? [product.image] : undefined,
+             },
+             unit_amount: Math.round(finalPrice * 100),
+           },
+           quantity: 1,
+         },
+       ],
+       mode: 'payment',
+       success_url: `${returnUrl || process.env.NEXTAUTH_URL || "http://localhost:3000"}/${product.user.username}?success=true&orderId=${order.id}`,
+       cancel_url: `${returnUrl || process.env.NEXTAUTH_URL || "http://localhost:3000"}/${product.user.username}?canceled=true`,
+       metadata: {
+         orderId: order.id,
+         productId: product.id,
+         customerEmail,
+       }
+    });
+
     return NextResponse.json({
       success: true,
-      order: {
-        id: order.id,
-        amount: finalPrice,
-        originalPrice: product.price,
-        productName: product.name,
-        digitalUrl: product.productType === "DIGITAL" ? product.digitalUrl : null,
-      },
-      // In production: include clientSecret for Stripe Elements
-      // clientSecret: paymentIntent.client_secret,
+      url: session.url // Client will redirect to this checkout URL
     });
 
   } catch (error: any) {

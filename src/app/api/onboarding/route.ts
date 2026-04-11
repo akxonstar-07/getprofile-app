@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
     const userId = (session.user as any).id;
     const body = await req.json();
-    const { category, profileRole, displayName, platforms, urls, monetization, portfolioTheme, mobileTheme } = body;
+    const { category, profileRole, displayName, platforms, urls, activeTemplateId, themeConfig } = body;
 
     // Build social fields to save on profile
     const socialData: Record<string, string> = {};
@@ -53,16 +53,14 @@ export async function POST(req: Request) {
     const profile = await prisma.profile.upsert({
       where: { userId },
       update: {
-        portfolioTheme,
-        mobileTheme,
-        monetizationGoals: JSON.stringify(monetization),
+        activeTemplateId,
+        themeConfig,
         ...socialData,
       },
       create: {
         userId,
-        portfolioTheme,
-        mobileTheme,
-        monetizationGoals: JSON.stringify(monetization),
+        activeTemplateId,
+        themeConfig,
         ...socialData,
       }
     });
@@ -105,4 +103,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
-

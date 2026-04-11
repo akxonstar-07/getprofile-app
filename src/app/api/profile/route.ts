@@ -29,13 +29,14 @@ export async function PUT(request: Request) {
 
   const userId = (session.user as any).id;
   const body = await request.json();
-  const {
+const {
     name, username, bio, avatarUrl, bannerUrl, location,
     twitter, instagram, linkedin, youtube, github, tiktok, website,
     facebook, snapchat, spotify, totalFollowers,
     theme, font, bgColor, accentColor, layoutStyle,
     portfolioTitle, portfolioBio, skills, brandLogos, pressLogos,
-    businessEmail, availableForWork, statsBrandDeals, statsContentCount
+    businessEmail, availableForWork, statsBrandDeals, statsContentCount,
+    isLive, liveUrl
   } = body;
 
   try {
@@ -88,6 +89,8 @@ export async function PUT(request: Request) {
         ...(availableForWork !== undefined && { availableForWork }),
         ...(statsBrandDeals !== undefined && { statsBrandDeals: Number(statsBrandDeals) }),
         ...(statsContentCount !== undefined && { statsContentCount: Number(statsContentCount) }),
+        ...(isLive !== undefined && { isLive }),
+        ...(liveUrl !== undefined && { liveUrl }),
       },
       create: {
         userId,
