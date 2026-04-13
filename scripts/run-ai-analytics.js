@@ -7,7 +7,7 @@
  * Ensure your Next.js server is running and local Ollama is active on port 11434 before execution!
  */
 
-const fetch = require('node-fetch');
+
 
 // If you change your local dev port or host this online, change this URL.
 const API_URL = "http://localhost:3000/api/cron/analytics-ai";
