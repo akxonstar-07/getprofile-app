@@ -55,7 +55,6 @@ export default function StorePage() {
           });
         }
       } else if (activeTab === "memberships") {
-        // Assume API exists or falls back empty for now during frontend scaffolding
         setItems([]);
       } else if (activeTab === "tips") {
         const res = await fetch("/api/profile");
@@ -102,7 +101,7 @@ export default function StorePage() {
   const handleUpdateTips = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await fetch("/api/onboarding", { // using existing generic profile update endpoint 
+      await fetch("/api/onboarding", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ monetization: {
           tipGoalTitle: tipGoal.title,
@@ -115,40 +114,49 @@ export default function StorePage() {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-[400px]"><Loader2 className="w-8 h-8 text-indigo-500 animate-spin" /></div>;
+    return <div className="py-32 flex flex-col items-center justify-center text-white/50 gap-6">
+       <div className="w-16 h-16 border-[6px] border-white/10 border-t-[#D2FF00] rounded-full animate-spin" />
+       <p className="text-xs font-black uppercase tracking-[0.3em] text-[#D2FF00]">LOADING ENGINE...</p>
+    </div>;
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 w-full max-w-5xl">
+    <div className="space-y-12 animate-in fade-in duration-500 w-full max-w-6xl mx-auto pb-20 mt-8">
       
       {/* ── HEADER ── */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Monetization Hub</h1>
-          <p className="text-slate-500">Manage your products, courses, and fan memberships.</p>
-        </div>
-        {activeTab !== "tips" && (
-          <button 
-            onClick={() => setIsAdding(true)}
-            className="bg-black text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:shadow-lg transition-all">
-            <Plus className="w-4 h-4" /> Add {activeTab === "products" ? "Product" : activeTab === "courses" ? "Course" : "Tier"}
-          </button>
-        )}
+      <div className="bg-black border border-white/10 p-10 rounded-[3rem] shadow-2xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#D2FF00]/10 blur-[100px] rounded-full -mr-20 -mt-20 pointer-events-none" />
+         <div className="relative z-10">
+           <div className="flex items-center gap-3 mb-2">
+              <ShoppingBag className="w-6 h-6 text-[#D2FF00]" />
+              <h1 className="font-komi text-5xl text-white uppercase tracking-tighter leading-none mt-1">Monetization Hub</h1>
+           </div>
+           <p className="text-[#D2FF00] text-sm font-black uppercase tracking-widest opacity-80">
+              {stats.activeItems} Active Assets · High Fidelity Commerce
+           </p>
+         </div>
+         {activeTab !== "tips" && (
+           <button 
+             onClick={() => setIsAdding(!isAdding)}
+             className="relative z-10 bg-[#D2FF00] text-black px-8 py-5 rounded-2xl font-komi text-2xl uppercase tracking-widest shadow-[0_0_20px_rgba(210,255,0,0.2)] hover:scale-105 transition-transform shrink-0 flex items-center gap-2">
+             <Plus className="w-5 h-5" /> {isAdding ? "CANCEL" : activeTab === "products" ? "NEW PRODUCT" : activeTab === "courses" ? "NEW COURSE" : "NEW TIER"}
+           </button>
+         )}
       </div>
 
       {/* ── TABS ── */}
-      <div className="flex gap-2 p-1.5 bg-slate-100 rounded-2xl w-fit">
+      <div className="flex gap-2 flex-wrap items-center bg-white/5 p-2 rounded-[2rem] border border-white/10 w-[max-content]">
         {[
           { id: "products", icon: ShoppingBag, label: "Products" },
           { id: "courses", icon: BookOpen, label: "Courses" },
           { id: "memberships", icon: Crown, label: "VIP Memberships" },
-          { id: "tips", icon: Heart, label: "Tip Goals" }
+          { id: "tips", icon: Heart, label: "Fundraising" }
         ].map(t => (
           <button 
             key={t.id}
             onClick={() => { setActiveTab(t.id as any); setIsAdding(false); }}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${
-              activeTab === t.id ? "bg-white text-black shadow-sm" : "text-slate-500 hover:text-slate-800"
+            className={`flex items-center gap-2 px-6 py-4 rounded-[1.5rem] font-black text-xs uppercase tracking-widest transition-all ${
+              activeTab === t.id ? "bg-white text-black shadow-[0_0_15px_rgba(255,255,255,0.2)]" : "text-white/40 hover:text-white/80 hover:bg-white/5"
             }`}>
             <t.icon className={`w-4 h-4 ${activeTab === t.id && t.id === 'memberships' ? 'text-amber-500' : activeTab === t.id && t.id === 'tips' ? 'text-rose-500' : ''}`} /> {t.label}
           </button>
@@ -157,45 +165,46 @@ export default function StorePage() {
 
       {/* ── ADD PRODUCT / COURSE FORM ── */}
       {isAdding && (activeTab === "products" || activeTab === "courses") && (
-        <div className="bg-slate-900 p-8 rounded-[32px] shadow-2xl relative overflow-hidden">
+        <div className="bg-[#050505] p-10 rounded-[3rem] border border-[#D2FF00]/50 shadow-[0_0_40px_rgba(210,255,0,0.1)] relative overflow-hidden animate-in fade-in slide-in-from-top-4">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl font-black text-white">Create New {activeTab === "courses" ? "Course" : "Product"}</h2>
-            <button onClick={() => setIsAdding(false)} className="text-white/40 hover:text-white">✕</button>
+            <h2 className="font-komi text-4xl text-white uppercase tracking-tighter">Initialize {activeTab === "courses" ? "Course" : "Product"}</h2>
           </div>
-          <form onSubmit={handleAddProduct} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-               <div>
-                  <label className="text-xs font-bold text-slate-400 mb-1 block">Title</label>
-                  <input required className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white outline-none" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} />
+          <form onSubmit={handleAddProduct} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-6">
+               <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50 ml-2">Appellation (Title)</label>
+                  <input required className="w-full bg-black border border-white/10 rounded-2xl px-6 py-5 text-white font-bold outline-none focus:border-[#D2FF00] placeholder:text-white/20" placeholder="Alpha Preset Pack" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} />
                </div>
-               <div>
-                  <label className="text-xs font-bold text-slate-400 mb-1 block">Price ($)</label>
-                  <input type="number" required className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white outline-none" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} />
+               <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50 ml-2">Valuation ($)</label>
+                  <input type="number" required className="w-full bg-black border border-white/10 rounded-2xl px-6 py-5 text-[#D2FF00] font-mono text-xl outline-none focus:border-[#D2FF00] placeholder:text-white/20" placeholder="49.99" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} />
                </div>
-               <div>
-                  <label className="text-xs font-bold text-slate-400 mb-1 block">Cover Image URL</label>
-                  <input className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white outline-none" value={newProduct.image} onChange={e => setNewProduct({...newProduct, image: e.target.value})} />
+               <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50 ml-2">Thumbnail Vector (URL)</label>
+                  <input className="w-full bg-black border border-white/10 rounded-2xl px-6 py-5 text-white font-mono text-sm outline-none focus:border-[#D2FF00] placeholder:text-white/20" placeholder="https://..." value={newProduct.image} onChange={e => setNewProduct({...newProduct, image: e.target.value})} />
                </div>
             </div>
-            <div className="space-y-4">
+            
+            <div className="space-y-6">
                {activeTab === "products" && (
-                 <div>
-                    <label className="text-xs font-bold text-slate-400 mb-1 block">Type</label>
-                    <select className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white outline-none" value={newProduct.productType} onChange={e => setNewProduct({...newProduct, productType: e.target.value as any})}>
+                 <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50 ml-2">Class Type</label>
+                    <select className="w-full bg-black border border-white/10 rounded-2xl px-6 py-5 text-white outline-none focus:border-[#D2FF00] font-bold" value={newProduct.productType} onChange={e => setNewProduct({...newProduct, productType: e.target.value as any})}>
                       <option value="DIGITAL">Digital Download</option>
-                      <option value="PHYSICAL">Physical Goods</option>
-                      <option value="SERVICE">Service</option>
+                      <option value="PHYSICAL">Physical Delivery</option>
+                      <option value="SERVICE">Remote Service</option>
                     </select>
                  </div>
                )}
+               
                {activeTab === "courses" && (
-                 <div className="col-span-1 md:col-span-2 mt-4 border-t border-white/10 pt-4">
-                    <label className="text-sm font-black text-white mb-4 flex items-center gap-2"><Video className="w-4 h-4 text-indigo-400"/> Course Curriculum Builder</label>
+                 <div className="col-span-1 md:col-span-2 bg-[#111] border border-indigo-500/30 p-6 rounded-[2rem] shadow-[0_0_20px_rgba(99,102,241,0.1)]">
+                    <label className="text-sm font-black text-white uppercase tracking-widest mb-6 flex items-center gap-2"><Video className="w-4 h-4 text-indigo-400"/> Curriculum Engine</label>
                     <div className="space-y-4">
                       {courseModules.map((mod, mIdx) => (
-                        <div key={mIdx} className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                        <div key={mIdx} className="bg-black border border-white/10 rounded-2xl p-4">
                           <div className="flex items-center gap-3 mb-4">
-                            <span className="bg-indigo-500 text-white text-[10px] font-black px-2 py-1 rounded-md">M{mIdx + 1}</span>
+                            <span className="bg-indigo-500 text-white text-[10px] font-black px-3 py-1.5 rounded-lg border border-indigo-400">M_{mIdx + 1}</span>
                             <input 
                               className="flex-1 bg-transparent border-b border-white/20 px-2 py-1 text-white font-bold outline-none focus:border-indigo-500 transition-colors" 
                               value={mod.title} 
@@ -204,17 +213,18 @@ export default function StorePage() {
                                 newMods[mIdx].title = e.target.value;
                                 setCourseModules(newMods);
                               }} 
-                              placeholder="Module Title" 
+                              placeholder="Module Syntax" 
                             />
-                            <button type="button" onClick={() => setCourseModules(courseModules.filter((_, i) => i !== mIdx))} className="text-rose-400 hover:text-rose-500"><Trash2 className="w-4 h-4"/></button>
+                            <button type="button" onClick={() => setCourseModules(courseModules.filter((_, i) => i !== mIdx))} className="text-white/30 hover:text-rose-500 flex items-center justify-center p-2 rounded-xl hover:bg-white/5"><Trash2 className="w-5 h-5"/></button>
                           </div>
-                          <div className="space-y-2 pl-4 border-l-2 border-white/10">
+                          
+                          <div className="space-y-3 pl-4 border-l border-white/10 ml-4 py-2">
                             {mod.chapters.map((ch, cIdx) => (
-                              <div key={cIdx} className="flex items-center gap-2">
-                                <Video className="w-3 h-3 text-white/30" />
+                              <div key={cIdx} className="flex items-center gap-3">
+                                <Video className="w-3 h-3 text-white/20" />
                                 <input 
-                                  className="flex-[2] bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white outline-none focus:border-indigo-500" 
-                                  placeholder="Chapter Title" 
+                                  className="flex-[2] bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white outline-none focus:border-indigo-500 placeholder:text-white/20" 
+                                  placeholder="Chapter Index" 
                                   value={ch.title}
                                   onChange={e => {
                                     const newMods = [...courseModules];
@@ -223,8 +233,8 @@ export default function StorePage() {
                                   }}
                                 />
                                 <input 
-                                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white outline-none focus:border-indigo-500" 
-                                  placeholder="Duration (e.g. 5:00)" 
+                                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-mono text-[#D2FF00] outline-none focus:border-indigo-500 placeholder:text-[#D2FF00]/20" 
+                                  placeholder="00:05:00" 
                                   value={ch.duration}
                                   onChange={e => {
                                     const newMods = [...courseModules];
@@ -236,31 +246,34 @@ export default function StorePage() {
                                   const newMods = [...courseModules];
                                   newMods[mIdx].chapters = newMods[mIdx].chapters.filter((_, i) => i !== cIdx);
                                   setCourseModules(newMods);
-                                }} className="text-white/30 hover:text-rose-400"><X className="w-3 h-3"/></button>
+                                }} className="text-white/20 hover:text-rose-500 p-2"><X className="w-4 h-4"/></button>
                               </div>
                             ))}
                             <button type="button" onClick={() => {
                               const newMods = [...courseModules];
                               newMods[mIdx].chapters.push({ title: "", duration: "" });
                               setCourseModules(newMods);
-                            }} className="text-[10px] font-black uppercase text-indigo-400 mt-2 flex items-center gap-1 hover:text-indigo-300">
-                              <Plus className="w-3 h-3" /> Add Chapter
+                            }} className="text-[10px] font-black uppercase tracking-widest text-indigo-400 mt-4 flex items-center gap-1 hover:text-indigo-300 bg-indigo-500/10 px-3 py-2 rounded-lg w-max border border-indigo-500/20">
+                              <Plus className="w-3 h-3" /> Append Node
                             </button>
                           </div>
                         </div>
                       ))}
-                      <button type="button" onClick={() => setCourseModules([...courseModules, { title: `Module ${courseModules.length + 1}`, chapters: [{ title: "", duration: "" }] }])} className="w-full py-3 border-2 border-dashed border-white/20 rounded-2xl text-xs font-bold text-white/60 hover:text-white hover:border-white/40 transition-colors flex items-center justify-center gap-2">
-                        <Plus className="w-4 h-4" /> Add New Module
+                      <button type="button" onClick={() => setCourseModules([...courseModules, { title: `Module ${courseModules.length + 1}`, chapters: [{ title: "", duration: "" }] }])} 
+                        className="w-full py-5 border border-dashed border-white/20 rounded-2xl text-[10px] uppercase font-black tracking-[0.2em] text-white/40 hover:text-white hover:border-white/40 hover:bg-white/5 transition-all flex items-center justify-center gap-2">
+                        <Plus className="w-4 h-4" /> Instantiate Module
                       </button>
                     </div>
                  </div>
                )}
-               <div>
-                  <label className="text-xs font-bold text-slate-400 mb-1 block flex items-center gap-2"><Percent className="w-3 h-3"/> Fan Promo Code (Optional)</label>
-                  <input className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white outline-none placeholder:text-white/20" placeholder="e.g. EARLYBIRD" value={newProduct.couponCode} onChange={e => setNewProduct({...newProduct, couponCode: e.target.value})} />
+               
+               <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50 ml-2 flex items-center gap-2"><Percent className="w-3 h-3"/> Promotion Vector (Optional)</label>
+                  <input className="w-full bg-black border border-white/10 rounded-2xl px-6 py-5 text-[#D2FF00] font-mono text-sm outline-none focus:border-[#D2FF00] placeholder:text-[#D2FF00]/20" placeholder="SUMMER2026" value={newProduct.couponCode} onChange={e => setNewProduct({...newProduct, couponCode: e.target.value})} />
                </div>
-               <button className="w-full bg-indigo-500 text-white py-4 rounded-xl font-bold mt-4 hover:bg-indigo-600 transition-all">
-                  Launch {activeTab === "courses" ? "Course" : "Product"}
+               
+               <button className="w-full bg-[#D2FF00] text-black py-5 rounded-2xl font-komi text-2xl uppercase tracking-widest mt-4 hover:bg-white hover:scale-[1.02] transition-all">
+                  DEPLOY {activeTab === "courses" ? "COURSE" : "ASSET"}
                </button>
             </div>
           </form>
@@ -269,41 +282,44 @@ export default function StorePage() {
 
       {/* ── ALERTS FOR MEMBERSHIPS ── */}
       {activeTab === "memberships" && (
-        <div className="bg-amber-500/10 border border-amber-500/20 p-8 rounded-3xl text-center">
-           <Crown className="w-12 h-12 text-amber-500 mx-auto mb-4" />
-           <h3 className="text-xl font-black text-amber-600 mb-2">Stripe Connect Required</h3>
-           <p className="text-amber-600/80 mb-6 text-sm">To enable recurring VIP subscriptions, you must link your Stripe account in Settings.</p>
-           <button className="px-6 py-2.5 bg-amber-500 text-white font-bold rounded-xl shadow-lg shadow-amber-500/20">Connect Stripe</button>
+        <div className="bg-[#111] border border-amber-500/30 p-12 rounded-[3rem] text-center max-w-2xl mx-auto shadow-[0_0_40px_rgba(245,158,11,0.1)] relative overflow-hidden">
+           <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 blur-[80px] rounded-full pointer-events-none" />
+           <Crown className="w-16 h-16 text-amber-500 mx-auto mb-6 relative z-10" />
+           <h3 className="font-komi text-4xl text-white uppercase tracking-tighter mb-4 relative z-10">Stripe Integration Required</h3>
+           <p className="text-white/50 mb-8 font-medium relative z-10">To enable recurring VIP subscriptions and dynamic tier progression, you must initialize your Stripe Connect token in the Global Settings.</p>
+           <button className="px-10 py-5 bg-amber-500 text-black font-komi text-2xl uppercase tracking-widest rounded-2xl shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:scale-105 transition-transform hover:bg-amber-400 relative z-10">Allocate Stripe Node</button>
         </div>
       )}
 
       {/* ── TIPS & FUNDRAISING EDITOR ── */}
       {activeTab === "tips" && (
-        <div className="bg-white border p-8 rounded-3xl shadow-sm">
-           <div className="flex items-center gap-3 mb-6">
-             <div className="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center text-rose-500"><Heart className="w-5 h-5"/></div>
+        <div className="bg-[#050505] border border-white/10 p-10 rounded-[3rem] shadow-2xl relative overflow-hidden max-w-2xl">
+           <div className="flex items-center gap-4 mb-10 relative z-10">
+             <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500">
+                <Heart className="w-8 h-8"/>
+             </div>
              <div>
-               <h3 className="text-lg font-black text-slate-900">Fundraising & Tip Goal</h3>
-               <p className="text-sm text-slate-500">Show a progress thermometer on your profile</p>
+               <h3 className="font-komi text-4xl text-white tracking-tighter uppercase">Community Vaulting</h3>
+               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Inject a fundraising thermometer</p>
              </div>
            </div>
            
-           <form onSubmit={handleUpdateTips} className="space-y-5 max-w-xl">
-             <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1.5">What are you raising for?</label>
-                <input required className="input-premium" placeholder="e.g. New Camera Gear" value={tipGoal.title} onChange={e => setTipGoal({...tipGoal, title: e.target.value})} />
+           <form onSubmit={handleUpdateTips} className="space-y-8 relative z-10">
+             <div className="space-y-3">
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50 ml-2">Objective Tag</label>
+                <input required className="w-full bg-black border border-white/10 rounded-2xl px-6 py-5 text-white font-bold placeholder:text-white/20 outline-none focus:border-rose-500" placeholder="e.g. Cinema Camera Rig" value={tipGoal.title} onChange={e => setTipGoal({...tipGoal, title: e.target.value})} />
              </div>
-             <div className="grid grid-cols-2 gap-4">
-               <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1.5">Goal Amount ($)</label>
-                  <input type="number" required className="input-premium" placeholder="5000" value={tipGoal.tipGoalAmount} onChange={e => setTipGoal({...tipGoal, tipGoalAmount: e.target.value})} />
+             <div className="grid grid-cols-2 gap-6">
+               <div className="space-y-3">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50 ml-2">Target Mass ($)</label>
+                  <input type="number" required className="w-full bg-black border border-white/10 rounded-2xl px-6 py-5 text-rose-400 font-mono text-xl placeholder:text-white/20 outline-none focus:border-rose-500" placeholder="5000" value={tipGoal.tipGoalAmount} onChange={e => setTipGoal({...tipGoal, tipGoalAmount: e.target.value})} />
                </div>
-               <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1.5">Current Amount ($)</label>
-                  <input type="number" disabled className="input-premium bg-slate-50" value={tipGoal.tipCurrentAmount} />
+               <div className="space-y-3">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50 ml-2">Current Mass ($)</label>
+                  <input type="number" disabled className="w-full bg-white/5 border border-white/5 rounded-2xl px-6 py-5 text-white/30 font-mono text-xl cursor-not-allowed" value={tipGoal.tipCurrentAmount} />
                </div>
              </div>
-             <button className="bg-black text-white px-6 py-3 rounded-xl font-bold w-full hover:bg-slate-800 transition-all">Save Active Goal</button>
+             <button className="w-full bg-rose-600 text-white hover:bg-rose-500 py-5 rounded-2xl font-komi text-2xl uppercase tracking-widest transition-all">LOCK VECTORS</button>
            </form>
         </div>
       )}
@@ -312,22 +328,33 @@ export default function StorePage() {
       {(activeTab === "products" || activeTab === "courses") && !isAdding && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.length === 0 ? (
-            <div className="col-span-full py-16 text-center border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50">
-              <ShoppingBag className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <p className="font-bold text-slate-500">No {activeTab} created yet.</p>
-            </div>
+             <div className="col-span-full border border-dashed border-white/20 rounded-[3rem] p-32 flex flex-col items-center justify-center text-center bg-[#050505]">
+                <div className="w-20 h-20 bg-white/5 border border-white/10 rounded-[1.5rem] flex items-center justify-center mb-8">
+                   <ShoppingBag className="w-8 h-8 text-white/30" />
+                </div>
+                <h3 className="font-komi text-4xl text-white uppercase tracking-tighter mb-4">NO COMMERCE LOGS DETECTED</h3>
+                <p className="text-white/40 text-sm max-w-sm font-medium">Instantiate a new {activeTab === "courses" ? "Course" : "Product"} to generate revenue.</p>
+             </div>
           ) : (
             items.map((item) => (
-              <div key={item.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-lg transition-all group">
-                <div className="aspect-video bg-slate-100 relative">
-                  {item.image && <img src={item.image} alt={item.name} className="w-full h-full object-cover" />}
-                  {item.productType === "COURSE" && <div className="absolute top-2 right-2 bg-indigo-500 text-white text-[10px] font-black px-2 py-1 rounded-md flex items-center gap-1"><BookOpen className="w-3 h-3"/> COURSE</div>}
+              <div key={item.id} className="bg-[#050505] border border-white/10 rounded-[2rem] overflow-hidden hover:border-white/30 hover:shadow-2xl transition-all group shrink-0">
+                <div className="aspect-[4/3] bg-black p-4 relative border-b border-white/10">
+                  {item.image ? (
+                     <div className="w-full h-full rounded-xl overflow-hidden">
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80" />
+                     </div>
+                  ) : (
+                     <div className="w-full h-full rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                        <ImageIcon className="w-8 h-8 text-white/10" />
+                     </div>
+                  )}
+                  {item.productType === "COURSE" && <div className="absolute top-6 right-6 bg-indigo-500 text-white text-[10px] font-black px-3 py-1.5 rounded-lg uppercase tracking-[0.2em] shadow-lg flex items-center gap-1.5 border border-indigo-400"><BookOpen className="w-3.5 h-3.5"/> COURSE</div>}
                 </div>
-                <div className="p-5">
-                  <h3 className="font-bold text-slate-900 mb-1">{item.name}</h3>
-                  <div className="flex items-center justify-between mt-4">
-                    <span className="font-black text-lg">${item.price}</span>
-                    <button className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 className="w-4 h-4"/></button>
+                <div className="p-6">
+                  <h3 className="font-komi text-3xl text-white leading-none mt-2 truncate">{item.name}</h3>
+                  <div className="flex items-end justify-between mt-6">
+                    <span className="font-black text-2xl text-[#D2FF00]">${item.price}</span>
+                    <button className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/30 hover:bg-rose-500 hover:text-white transition-all border border-white/10"><Trash2 className="w-4 h-4"/></button>
                   </div>
                 </div>
               </div>
