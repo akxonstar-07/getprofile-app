@@ -1,139 +1,79 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, CheckCircle2, Smartphone } from "lucide-react";
+import { Save, CheckCircle2, MonitorSmartphone, Palette, Layout, Link2 } from "lucide-react";
 
+// The Elite Templates exactly matching the Public Profile capabilities
 const TEMPLATES = [
   {
-    id: "default", name: "Indigo",       category: "Minimal",
-    bg: "#ffffff", accent: "#6366f1", isDark: false,
-    preview: { banner: "linear-gradient(135deg,#6366f1,#6366f1aa)", cardBg: "#fff", text: "#0f172a", linkBg: "linear-gradient(135deg,#6366f1,#818cf8)" },
+    id: "komi-neon", name: "Neon Matrix", category: "Creator",
+    bg: "#050505", accent: "#D2FF00", isDark: true,
+    preview: { banner: "linear-gradient(135deg, #1A0B2E, #050505)", cardBg: "#050505", text: "#FFF", linkBg: "#111" },
   },
   {
-    id: "dark",    name: "Night",        category: "Dark",
-    bg: "#0c0f1a", accent: "#818cf8", isDark: true,
-    preview: { banner: "linear-gradient(135deg,#818cf8,#6366f1)", cardBg: "#0f172a", text: "#f1f5f9", linkBg: "linear-gradient(135deg,#818cf8,#6d28d9)" },
+    id: "linkme-b2b", name: "Enterprise Dark", category: "Agency",
+    bg: "#000000", accent: "#ffffff", isDark: true,
+    preview: { banner: "#000000", cardBg: "#111111", text: "#ffffff", linkBg: "#222" },
   },
   {
-    id: "warm",    name: "Sunset",       category: "Gradient",
-    bg: "#fff7ed", accent: "#f97316", isDark: false,
-    preview: { banner: "linear-gradient(135deg,#f97316,#fbbf24)", cardBg: "#fff7ed", text: "#7c2d12", linkBg: "linear-gradient(135deg,#f97316,#fbbf24)" },
-  },
-  {
-    id: "ocean",   name: "Ocean",        category: "Gradient",
-    bg: "#f0fdff", accent: "#0891b2", isDark: false,
-    preview: { banner: "linear-gradient(135deg,#0891b2,#06b6d4)", cardBg: "#ecfeff", text: "#164e63", linkBg: "linear-gradient(135deg,#0891b2,#22d3ee)" },
-  },
-  {
-    id: "forest",  name: "Forest",       category: "Minimal",
-    bg: "#f0fdf4", accent: "#16a34a", isDark: false,
-    preview: { banner: "linear-gradient(135deg,#16a34a,#22c55e)", cardBg: "#f0fdf4", text: "#14532d", linkBg: "linear-gradient(135deg,#16a34a,#4ade80)" },
-  },
-  {
-    id: "rose",    name: "Rose",         category: "Gradient",
-    bg: "#fff1f2", accent: "#f43f5e", isDark: false,
-    preview: { banner: "linear-gradient(135deg,#f43f5e,#fb7185)", cardBg: "#fff1f2", text: "#881337", linkBg: "linear-gradient(135deg,#f43f5e,#fb923c)" },
-  },
-  {
-    id: "purple",  name: "Galaxy",       category: "Dark",
-    bg: "#0d0b1a", accent: "#a855f7", isDark: true,
-    preview: { banner: "linear-gradient(135deg,#a855f7,#7c3aed)", cardBg: "#170f2e", text: "#e9d5ff", linkBg: "linear-gradient(135deg,#a855f7,#6d28d9)" },
-  },
-  {
-    id: "neon",    name: "Neon",         category: "Dark",
-    bg: "#050814", accent: "#22d3ee", isDark: true,
-    preview: { banner: "linear-gradient(135deg,#22d3ee,#06b6d4)", cardBg: "#060d1f", text: "#a5f3fc", linkBg: "linear-gradient(135deg,#22d3ee,#818cf8)" },
-  },
-  {
-    id: "slate",   name: "Minimal",      category: "Minimal",
-    bg: "#f8fafc", accent: "#334155", isDark: false,
-    preview: { banner: "linear-gradient(135deg,#334155,#475569)", cardBg: "#f8fafc", text: "#0f172a", linkBg: "linear-gradient(135deg,#334155,#64748b)" },
-  },
-  {
-    id: "gold",    name: "Gold",         category: "Premium",
-    bg: "#0d0a00", accent: "#f59e0b", isDark: true,
-    preview: { banner: "linear-gradient(135deg,#f59e0b,#d97706)", cardBg: "#1a1200", text: "#fef3c7", linkBg: "linear-gradient(135deg,#f59e0b,#b45309)" },
-  },
-  {
-    id: "spring",  name: "Spring",       category: "Gradient",
-    bg: "#fdf4ff", accent: "#d946ef", isDark: false,
-    preview: { banner: "linear-gradient(135deg,#d946ef,#a855f7)", cardBg: "#fdf4ff", text: "#701a75", linkBg: "linear-gradient(135deg,#d946ef,#f43f5e)" },
-  },
-  {
-    id: "mono",    name: "Black & White", category: "Minimal",
-    bg: "#ffffff", accent: "#000000", isDark: false,
-    preview: { banner: "linear-gradient(135deg,#000,#374151)", cardBg: "#fff", text: "#000", linkBg: "linear-gradient(135deg,#000,#374151)" },
-  },
+    id: "minimal-white", name: "Minimalist Light", category: "Brand",
+    bg: "#f5f5f7", accent: "#000000", isDark: false,
+    preview: { banner: "#ffffff", cardBg: "#ffffff", text: "#000000", linkBg: "#f0f0f0" },
+  }
 ];
 
 const FONTS = [
-  { name: "Inter",           sample: "Inter — Modern" },
-  { name: "Outfit",          sample: "Outfit — Clean" },
-  { name: "Poppins",         sample: "Poppins — Friendly" },
-  { name: "Space Grotesk",   sample: "Space Grotesk — Bold" },
-  { name: "Playfair Display",sample: "Playfair — Elegant" },
-  { name: "DM Sans",         sample: "DM Sans — Minimal" },
+  { name: "Anton", sample: "ANTON // BOLD" },
+  { name: "Inter", sample: "Inter // Clean" },
+  { name: "Space Grotesk", sample: "SPACE // TECH" }
 ];
 
-const LAYOUTS = [
-  { id: "minimal",      name: "Minimal",      desc: "Clean & distraction-free",  emoji: "⬜" },
-  { id: "influencer",   name: "Influencer",   desc: "Bold full-banner look",     emoji: "🌟" },
-  { id: "photographer", name: "Photographer", desc: "Photo-first visual grid",   emoji: "📸" },
-  { id: "coach",        name: "Coach",        desc: "Trust-building layout",     emoji: "🎯" },
-  { id: "brand",        name: "Brand",        desc: "Professional presence",     emoji: "🚀" },
-];
-
-/* ── Tiny phone template preview ── */
-function TemplatePhone({ t, userName = "Your Name" }: { t: typeof TEMPLATES[0]; userName?: string }) {
-  const LINKS = ["My Portfolio", "Latest Video", "Contact Me"];
+/* ── Neo-Brutalist Template Card ── */
+function TemplateCard({ t, active }: { t: typeof TEMPLATES[0]; active: boolean }) {
   return (
-    <div className="overflow-hidden rounded-[20px]" style={{ background: t.preview.cardBg, border: `2px solid ${t.accent}30` }}>
-      {/* Banner */}
-      <div className="h-14 relative" style={{ background: t.preview.banner }}>
-        <div className="absolute -bottom-6 left-3">
-          <div className="w-12 h-12 rounded-xl border-2 flex items-center justify-center text-sm font-black text-white"
-            style={{ borderColor: t.preview.cardBg, background: t.preview.banner, boxShadow: `0 0 0 2px ${t.accent}55` }}>
-            {userName[0]?.toUpperCase() || "?"}
-          </div>
+    <div className={`overflow-hidden rounded-[2rem] border-[4px] p-2 transition-all duration-300 ${active ? 'border-[#D2FF00] scale-[1.02] shadow-[0_0_30px_rgba(210,255,0,0.15)] bg-white/5' : 'border-white/5 hover:border-white/20 bg-black'}`}>
+      <div className="rounded-[1.5rem] overflow-hidden aspect-[4/5] relative" style={{ background: t.preview.cardBg }}>
+        {/* Banner */}
+        <div className="h-1/3 relative" style={{ background: t.preview.banner }} />
+        {/* Avatar */}
+        <div className="absolute top-[25%] left-1/2 -translate-x-1/2 w-12 h-12 rounded-2xl border-4" style={{ backgroundColor: '#444', borderColor: t.preview.cardBg }} />
+        
+        {/* Content */}
+        <div className="px-4 pt-10 pb-4 space-y-3 flex flex-col items-center">
+          <div className="w-20 h-2 rounded-full" style={{ background: t.preview.text, opacity: 0.8 }} />
+          <div className="w-16 h-1.5 rounded-full" style={{ background: t.preview.text, opacity: 0.4 }} />
+          
+          <div className="w-full h-8 rounded-xl mt-4 border border-white/5" style={{ background: t.preview.linkBg }} />
+          <div className="w-full h-8 rounded-xl border border-white/5" style={{ background: t.preview.linkBg }} />
         </div>
       </div>
-      {/* Content */}
-      <div className="px-3 pt-8 pb-3 space-y-1.5">
-        <p className="text-[9px] font-black" style={{ color: t.preview.text }}>{userName}</p>
-        <p className="text-[7px] opacity-50" style={{ color: t.preview.text }}>@username</p>
-        {LINKS.map((l, i) => (
-          <div key={i} className="flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[7px] font-bold text-white"
-            style={{ background: t.preview.linkBg, boxShadow: `0 2px 6px ${t.accent}40` }}>
-            {l}
-          </div>
-        ))}
+      <div className="mt-4 px-2 pb-2 text-center">
+         <h4 className="font-komi text-2xl text-white uppercase tracking-tighter">{t.name}</h4>
+         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D2FF00] mt-1">{t.category}</p>
       </div>
     </div>
   );
 }
 
-const CATEGORIES = ["All", "Minimal", "Dark", "Gradient", "Premium"];
-
 export default function AppearancePage() {
-  const [loading,         setLoading]         = useState(true);
-  const [saving,          setSaving]          = useState(false);
-  const [success,         setSuccess]         = useState(false);
-  const [activeCat,       setActiveCat]       = useState("All");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [form, setForm] = useState({
-    theme: "default", font: "Inter",
-    bgColor: "#ffffff", accentColor: "#6366f1", layoutStyle: "minimal",
+    activeTemplateId: "komi-neon", 
+    font: "Anton",
+    // Preserving legacy fields to avoid breaking old accounts
+    theme: "komi-neon", bgColor: "#050505", accentColor: "#D2FF00", layoutStyle: "minimal",
   });
 
   useEffect(() => {
     fetch("/api/profile").then(r => r.json()).then(d => {
       if (d.user?.profile) {
-        setForm({
-          theme:       d.user.profile.theme       || "default",
-          font:        d.user.profile.font        || "Inter",
-          bgColor:     d.user.profile.bgColor     || "#ffffff",
-          accentColor: d.user.profile.accentColor || "#6366f1",
-          layoutStyle: d.user.profile.layoutStyle || "minimal",
-        });
+        setForm(prev => ({
+          ...prev,
+          activeTemplateId: d.user.profile.activeTemplateId || "komi-neon",
+          font: d.user.profile.font || "Anton",
+        }));
       }
       setLoading(false);
     });
@@ -142,147 +82,121 @@ export default function AppearancePage() {
   async function handleSave() {
     setSaving(true);
     await fetch("/api/profile", {
-      method: "PUT", headers: { "Content-Type": "application/json" },
+      method: "PUT", 
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
     setSaving(false); setSuccess(true);
     setTimeout(() => setSuccess(false), 3000);
   }
 
-  function applyTemplate(t: typeof TEMPLATES[0]) {
-    setForm({ ...form, theme: t.id, bgColor: t.bg, accentColor: t.accent });
-  }
-
-  const filteredTemplates = activeCat === "All" ? TEMPLATES : TEMPLATES.filter(t => t.category === activeCat);
-  const activeTemplate    = TEMPLATES.find(t => t.id === form.theme) || TEMPLATES[0];
-
-  if (loading) return <div className="max-w-5xl space-y-6">{[1, 2, 3].map(i => <div key={i} className="h-40 animate-shimmer rounded-2xl" />)}</div>;
+  if (loading) return <div className="py-32 flex flex-col items-center justify-center text-white/50 gap-6">
+     <div className="w-16 h-16 border-[6px] border-white/10 border-t-[#D2FF00] rounded-full animate-spin" />
+     <p className="text-xs font-black uppercase tracking-[0.3em] text-[#D2FF00]">LOADING ENGINE...</p>
+  </div>;
 
   return (
-    <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-start justify-center gap-12 relative z-10 w-full">
+    <div className="max-w-6xl mx-auto flex flex-col xl:flex-row items-start gap-12 relative z-10 w-full animate-in fade-in slide-in-from-bottom-4 duration-700">
       
-      {/* Center/Left: Live big preview */}
-      <div className="lg:w-[320px] flex-shrink-0 flex items-start justify-center sticky top-12 lg:top-24 mt-8 lg:mt-0">
-        <div className="scale-[1.1] origin-top">
-          <TemplatePhone t={activeTemplate} />
+      {/* Editor Panel */}
+      <div className="flex-1 w-full space-y-12">
+        
+        <div className="bg-black border border-white/10 p-10 rounded-[3rem] shadow-2xl relative overflow-hidden">
+           <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#D2FF00]/10 blur-[100px] rounded-full -mr-20 -mt-20 pointer-events-none" />
+           <div className="relative z-10">
+             <div className="flex items-center gap-3 mb-6">
+                <Palette className="w-6 h-6 text-[#D2FF00]" />
+                <h1 className="font-komi text-5xl text-white uppercase tracking-tighter leading-none">Aesthetic Engine</h1>
+             </div>
+             <p className="text-white/50 text-sm font-medium">Deploy high-conversion visual templates to your public Link-in-Bio profile.</p>
+           </div>
         </div>
-      </div>
 
-      {/* Right: Settings */}
-      <div className="flex-1 w-full max-w-xl space-y-6">
-        <div className="mb-8 pt-8">
-          <h1 className="text-2xl font-black text-slate-900 drop-shadow-sm">Appearance</h1>
-          <p className="text-slate-500 text-sm mt-1">Choose a template and customize how your public profile looks</p>
-        </div>
-          <div className="dash-card">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="font-bold text-slate-900">Templates</h2>
-              <span className="text-xs text-slate-500">{TEMPLATES.length} designs</span>
-            </div>
-
-            {/* Category filter */}
-            <div className="flex gap-2 mb-5 flex-wrap">
-              {CATEGORIES.map(cat => (
-                <button key={cat} onClick={() => setActiveCat(cat)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${activeCat === cat ? "gradient-bg text-white shadow-md" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
-                  {cat}
-                </button>
-              ))}
-            </div>
-
-            {/* Template grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {filteredTemplates.map(t => (
-                <button
-                  key={t.id}
-                  onClick={() => applyTemplate(t)}
-                  className={`text-left transition-all hover:scale-[1.03] active:scale-[0.98] ${form.theme === t.id ? "ring-2 ring-indigo-500 ring-offset-2 rounded-[22px]" : ""}`}
-                >
-                  <TemplatePhone t={t} />
-                  <div className="mt-2 px-1 flex items-center justify-between">
-                    <p className="text-xs font-bold text-slate-800">{t.name}</p>
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
-                      style={{ background: t.id === form.theme ? "#6366f1" : "#f1f5f9", color: t.id === form.theme ? "#fff" : "#94a3b8" }}>
-                      {t.id === form.theme ? "Active" : t.category}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
+        {/* ── Temple Selector ── */}
+        <div className="bg-[#050505] border border-white/10 p-10 rounded-[3rem] shadow-2xl">
+          <div className="flex items-center gap-3 mb-8">
+            <Layout className="w-5 h-5 text-white/40" />
+            <h2 className="font-komi text-3xl text-white uppercase tracking-tight">Core Architecture</h2>
           </div>
 
-          {/* ── Custom Colors ── */}
-          <div className="dash-card">
-            <h2 className="font-bold text-slate-900 mb-5">Custom Colors</h2>
-            <div className="grid sm:grid-cols-2 gap-5">
-              {[
-                { key: "bgColor", label: "Background Color" },
-                { key: "accentColor", label: "Accent Color" },
-              ].map(({ key, label }) => (
-                <div key={key}>
-                  <label className="block text-xs font-bold text-slate-500 mb-2 uppercase tracking-wide">{label}</label>
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
-                      <input type="color" value={(form as any)[key]}
-                        onChange={e => setForm({ ...form, [key]: e.target.value })}
-                        className="sr-only" id={`color-${key}`} />
-                      <label htmlFor={`color-${key}`}
-                        className="w-11 h-11 rounded-xl border-2 border-white shadow-md cursor-pointer block hover:scale-110 transition-transform"
-                        style={{ background: (form as any)[key] }} />
-                    </div>
-                    <input type="text" value={(form as any)[key]}
-                      onChange={e => setForm({ ...form, [key]: e.target.value })}
-                      className="input-premium font-mono text-sm" placeholder="#6366f1" />
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {TEMPLATES.map(t => (
+              <button key={t.id} onClick={() => setForm({ ...form, activeTemplateId: t.id, theme: t.id, bgColor: t.bg, accentColor: t.accent })} className="text-left w-full focus:outline-none">
+                <TemplateCard t={t} active={form.activeTemplateId === t.id} />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Typography Override ── */}
+        <div className="bg-[#050505] border border-white/10 p-10 rounded-[3rem] shadow-2xl">
+          <div className="flex items-center gap-3 mb-8">
+            <h2 className="font-komi text-3xl text-white uppercase tracking-tight">Typography Override</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {FONTS.map(f => (
+              <button key={f.name} onClick={() => setForm({ ...form, font: f.name })}
+                className={`p-6 rounded-[1.5rem] border transition-all text-left ${form.font === f.name ? "bg-[#D2FF00] border-[#D2FF00] text-black shadow-[0_0_20px_rgba(210,255,0,0.2)]" : "bg-black border-white/10 text-white/50 hover:border-white/30"}`}>
+                <span className="font-black text-sm uppercase tracking-widest block mb-1">{f.name}</span>
+                <span className={`${f.name === 'Anton' ? 'font-komi text-2xl uppercase' : 'font-sans opacity-60'}`}>{f.sample}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Save Bar */}
+        <div className="flex items-center justify-between bg-black border border-white/10 p-6 rounded-[2rem] shadow-2xl sticky bottom-6 z-50">
+           <div className="hidden md:flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#D2FF00] animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">Ready to Deploy</span>
+           </div>
+           
+           <div className="flex items-center gap-4 w-full md:w-auto">
+             {success && (
+               <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#D2FF00] animate-fade-in">
+                 <CheckCircle2 className="w-4 h-4" /> Assets Deployed
+               </div>
+             )}
+             <button onClick={handleSave} disabled={saving} className="w-full md:w-auto bg-white hover:bg-[#D2FF00] text-black px-10 py-5 rounded-2xl font-komi text-2xl uppercase tracking-widest transition-all focus:outline-none flex justify-center items-center gap-3">
+               <Save className="w-5 h-5" />
+               {saving ? "Deploying..." : "Publish Changes"}
+             </button>
+           </div>
+        </div>
+
+      </div>
+
+      {/* Hardware Preview Phone */}
+      <div className="hidden xl:flex w-[400px] flex-col sticky top-12 items-center">
+         <div className="bg-white/5 px-6 py-2 rounded-full border border-white/10 mb-6 flex items-center gap-2">
+            <MonitorSmartphone className="w-4 h-4 text-[#D2FF00]" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Live Engine Preview</span>
+         </div>
+         
+         {/* Apple hardware mockup border */}
+         <div className="w-[380px] h-[780px] bg-black rounded-[3.5rem] border-[12px] border-[#111] shadow-2xl overflow-hidden relative ring-1 ring-white/10">
+            {/* Dynamic Island */}
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-black rounded-full z-50 flex items-center justify-between px-3">
+               <div className="w-3 h-3 rounded-full bg-[#111] border border-white/10" />
+               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/50" />
+            </div>
+
+            {/* Simulated iframe content of the *new* public profile engine */}
+            <div className="w-full h-full bg-[#050505] p-6 pt-20 flex flex-col items-center border-t border-white/5">
+                <div className="w-24 h-24 rounded-2xl bg-[#111] border border-white/10 mb-4" />
+                <h3 className="font-komi text-4xl text-white uppercase tracking-tighter">Your Name</h3>
+                <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.2em] mb-10">@username</p>
+                
+                <div className="w-full grid grid-cols-2 gap-3">
+                   <div className="col-span-2 aspect-[3/1] rounded-2xl bg-white/5 border border-white/10" />
+                   <div className="col-span-1 aspect-square rounded-2xl bg-white/5 border border-white/10" />
+                   <div className="col-span-1 aspect-square rounded-2xl bg-white/5 border border-white/10" />
+                   <div className="col-span-2 h-16 rounded-2xl bg-white/5 border border-white/10" />
                 </div>
-              ))}
             </div>
-          </div>
-
-          {/* ── Font ── */}
-          <div className="dash-card">
-            <h2 className="font-bold text-slate-900 mb-5">Typography</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {FONTS.map(f => (
-                <button key={f.name} onClick={() => setForm({ ...form, font: f.name })}
-                  className={`px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${form.font === f.name ? "gradient-bg text-white shadow-md shadow-indigo-200" : "border border-slate-200 text-slate-700 hover:border-indigo-300 hover:text-indigo-600 bg-white"}`}>
-                  <span style={{ fontFamily: f.name }}>{f.sample}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* ── Layout ── */}
-          <div className="dash-card">
-            <h2 className="font-bold text-slate-900 mb-5">Layout Style</h2>
-            <div className="grid sm:grid-cols-2 gap-3">
-              {LAYOUTS.map(l => (
-                <button key={l.id} onClick={() => setForm({ ...form, layoutStyle: l.id })}
-                  className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all text-left ${form.layoutStyle === l.id ? "border-2 border-indigo-500 bg-indigo-50" : "border border-slate-200 bg-white hover:border-indigo-200"}`}>
-                  <span className="text-2xl">{l.emoji}</span>
-                  <div>
-                    <p className={`text-sm font-bold ${form.layoutStyle === l.id ? "text-indigo-700" : "text-slate-800"}`}>{l.name}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">{l.desc}</p>
-                  </div>
-                  {form.layoutStyle === l.id && <CheckCircle2 className="w-4 h-4 text-indigo-500 ml-auto flex-shrink-0" />}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Save */}
-          <div className="flex items-center gap-4">
-            <button onClick={handleSave} disabled={saving} className="btn-primary px-8 py-3">
-              <Save className="w-4 h-4" />
-              {saving ? "Saving…" : "Save Appearance"}
-            </button>
-            {success && (
-              <div className="flex items-center gap-2 text-sm text-emerald-600 font-semibold animate-fade-in">
-                <CheckCircle2 className="w-4 h-4" /> Changes saved!
-              </div>
-            )}
-          </div>
+         </div>
       </div>
+
     </div>
   );
 }
