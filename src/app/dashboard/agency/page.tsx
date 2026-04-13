@@ -82,38 +82,41 @@ export default function AgencyCommandCenter() {
   if (!hasMounted) return null;
 
   if (loading) return (
-     <div className="py-20 flex flex-col items-center justify-center text-zinc-400 gap-4">
-        <Loader2 className="w-10 h-10 animate-spin text-indigo-500" />
-        <p className="text-sm font-black uppercase tracking-widest text-[#5E5CE6]">Booting Command Center...</p>
+     <div className="py-32 flex flex-col items-center justify-center text-white/50 gap-6">
+        <div className="w-16 h-16 border-[6px] border-white/10 border-t-[#D2FF00] rounded-full animate-spin" />
+        <p className="text-xs font-black uppercase tracking-[0.3em] text-[#D2FF00]">BOOTING COMMAND CENTER...</p>
      </div>
   );
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 animate-fade-in pb-20">
+    <div className="max-w-6xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20 font-sans selection:bg-[#D2FF00] selection:text-black">
+      
       {/* ── HEADER ── */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div>
-           <div className="flex items-center gap-3 mb-2">
-              <span className="bg-slate-900 text-white text-[10px] font-black px-2 py-1 rounded uppercase tracking-widest shadow-lg">Agency Master</span>
-              <span className="text-slate-400 text-xs font-bold uppercase tracking-widest">v4.0.2 Platform</span>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 bg-black rounded-[3rem] p-10 border border-white/10 shadow-2xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#D2FF00]/5 blur-[120px] rounded-full -mr-20 -mt-20 pointer-events-none" />
+
+        <div className="relative z-10">
+           <div className="flex items-center gap-3 mb-4">
+              <span className="bg-[#D2FF00] text-black text-[10px] font-black px-3 py-1.5 rounded uppercase tracking-[0.2em] shadow-[0_0_15px_rgba(210,255,0,0.4)]">AGENCY MASTER</span>
+              <span className="text-white/30 text-xs font-bold uppercase tracking-[0.2em]">V4.0.2 PLATFORM</span>
            </div>
-           <h1 className="text-5xl font-black text-slate-900 tracking-tighter leading-none uppercase italic">Command<span className="text-indigo-600">Center</span></h1>
-           <p className="text-slate-500 text-sm mt-4 font-medium max-w-xl">Centralized intelligence nexus for talent management and autonomous workforce orchestration.</p>
+           <h1 className="font-komi text-6xl text-white tracking-tighter leading-none uppercase">COMMAND<span className="text-[#D2FF00]">CENTER</span></h1>
+           <p className="text-white/50 text-base mt-2 font-medium max-w-xl">Centralized intelligence nexus for talent management and autonomous workforce orchestration.</p>
         </div>
-        <div className="flex items-center gap-4 bg-white p-2.5 rounded-2xl border border-slate-200">
-           <div className="px-6 text-center border-r border-slate-100">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Managed Talent</p>
-              <p className="text-2xl font-black text-slate-900">{creators?.length || 0}</p>
+        <div className="flex items-center gap-6 bg-white/5 p-4 rounded-3xl border border-white/10 relative z-10 backdrop-blur-md">
+           <div className="px-6 text-center border-r border-white/10">
+              <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-1">Managed Talent</p>
+              <p className="font-komi text-4xl text-white">{creators?.length || 0}</p>
            </div>
            <div className="px-6 text-center">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Workforce Load</p>
-              <p className="text-2xl font-black text-indigo-600">{(aiData?.agents?.length || 0)} Agents</p>
+              <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-1">Workforce Load</p>
+              <p className="font-komi text-4xl text-[#D2FF00]">{(aiData?.agents?.length || 0)} <span className="text-xl">AGENTS</span></p>
            </div>
         </div>
       </div>
 
       {/* ── TABS ── */}
-      <div className="flex items-center gap-6 border-b border-slate-200">
+      <div className="flex items-center gap-6 border-b border-white/10">
           {[
             { id: "roster", label: "Talent Roster", icon: Users },
             { id: "workforce", label: "Workforce Monitor", icon: Bot },
@@ -122,14 +125,14 @@ export default function AgencyCommandCenter() {
              <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 px-4 py-4 text-[11px] font-black uppercase tracking-widest transition-all relative ${
-                    activeTab === tab.id ? "text-indigo-600" : "text-slate-400 hover:text-slate-600"
+                className={`flex items-center gap-3 px-4 py-5 text-[11px] font-black uppercase tracking-[0.2em] transition-all relative ${
+                    activeTab === tab.id ? "text-[#D2FF00]" : "text-white/40 hover:text-white"
                 }`}
              >
-                <tab.icon className="w-4 h-4" />
+                <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? "text-[#D2FF00]" : "opacity-50"}`} />
                 {tab.label}
                 {activeTab === tab.id && (
-                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-indigo-600 rounded-t-full shadow-[0_0_12px_rgba(99,102,241,0.5)]" />
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#D2FF00] rounded-t-full shadow-[0_0_15px_#D2FF00]" />
                 )}
              </button>
           ))}
@@ -137,24 +140,25 @@ export default function AgencyCommandCenter() {
 
       {/* ── CONTENT ── */}
       {activeTab === "roster" && (
-         <div className="space-y-4">
+         <div className="space-y-6">
             {!creators || creators.length === 0 ? (
-               <div className="bg-white border-2 border-dashed border-slate-200 rounded-[2.5rem] p-24 flex flex-col items-center justify-center text-center">
-                  <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mb-6">
-                     <UserPlus className="w-8 h-8 text-slate-300" />
+               <div className="bg-[#050505] border border-dashed border-white/20 rounded-[3rem] p-32 flex flex-col items-center justify-center text-center">
+                  <div className="w-20 h-20 bg-white/5 border border-white/10 rounded-[1.5rem] flex items-center justify-center mb-8">
+                     <UserPlus className="w-8 h-8 text-white/30" />
                   </div>
-                  <h3 className="text-xl font-black text-slate-900 uppercase italic">Empty Roster</h3>
-                  <p className="text-slate-400 text-sm mt-3 max-w-sm">Recruit your first creators to begin brand management and analytics scaling.</p>
+                  <h3 className="font-komi text-4xl text-white uppercase tracking-tighter mb-4">EMPTY ROSTER</h3>
+                  <p className="text-white/40 text-base max-w-md">Initialize recruitment protocols. Secure creators to manage and scale their brand equity.</p>
                </div>
             ) : (
-               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+               <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                   {creators.map((creator) => (
-                    <div key={creator.id} className="bg-white rounded-[2.5rem] border border-slate-200 p-8 hover:shadow-3xl hover:shadow-indigo-100/30 transition-all group relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/50 rounded-full blur-3xl -mr-10 -mt-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div key={creator.id} className="bg-[#050505] rounded-[3rem] border border-white/10 p-10 hover:border-[#D2FF00]/40 transition-all group relative overflow-hidden flex flex-col justify-between shadow-2xl min-h-[300px]">
+                      {/* Glow overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-black via-transparent to-[#D2FF00]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                       
-                      <div className="flex items-start justify-between relative z-10">
-                        <div className="flex items-center gap-5">
-                          <div className="w-16 h-16 rounded-2xl bg-slate-900 flex items-center justify-center text-white text-2xl font-black shadow-xl ring-4 ring-offset-2 ring-indigo-50 group-hover:scale-110 transition-transform">
+                      <div className="flex items-start justify-between relative z-10 w-full">
+                        <div className="flex items-center gap-6">
+                          <div className="w-20 h-20 rounded-2xl bg-black border border-white/20 flex items-center justify-center text-white text-3xl font-komi shadow-2xl shadow-black group-hover:scale-105 transition-transform">
                             {creator.profile?.avatarUrl ? (
                                <img src={creator.profile.avatarUrl} className="w-full h-full object-cover rounded-2xl" />
                             ) : (
@@ -162,16 +166,17 @@ export default function AgencyCommandCenter() {
                             )}
                           </div>
                           <div>
-                            <h3 className="text-xl font-black text-slate-900 leading-tight tracking-tight uppercase italic">{creator.name}</h3>
-                            <p className="text-slate-400 text-sm font-bold tracking-tight">@{creator.username}</p>
-                            <div className="flex items-center gap-2 mt-2">
-                               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                               <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Profile Optimized</span>
+                            <h3 className="font-komi text-4xl text-white leading-none tracking-tight uppercase mb-1">{creator.name}</h3>
+                            <p className="text-[#D2FF00] text-sm font-black tracking-widest uppercase">@{creator.username}</p>
+                            <div className="flex items-center gap-2 mt-3 bg-white/5 px-2.5 py-1 rounded inline-flex">
+                               <span className="w-1.5 h-1.5 rounded-full bg-[#D2FF00] animate-pulse shadow-[0_0_8px_#D2FF00]" />
+                               <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/60">Node Active</span>
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Link href={`/${creator.username}`} target="_blank" className="p-3 rounded-xl bg-slate-50 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all border border-transparent hover:border-indigo-100">
+
+                        <div className="flex items-center gap-3 shrink-0">
+                          <Link href={`/${creator.username}`} target="_blank" className="w-12 h-12 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/10 transition-all">
                             <ArrowUpRight className="w-5 h-5" />
                           </Link>
                           <button 
@@ -183,24 +188,24 @@ export default function AgencyCommandCenter() {
                                });
                                if (res.ok) window.location.href = "/dashboard";
                             }}
-                            className="bg-slate-900 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition-all shadow-xl hover:shadow-indigo-200 active:scale-95">
-                            Manage Portfolio
+                            className="bg-white text-black h-12 px-6 rounded-xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#D2FF00] transition-colors shadow-lg active:scale-95 flex items-center">
+                            OVERRIDE
                           </button>
                         </div>
                       </div>
 
-                      <div className="mt-8 grid grid-cols-3 gap-8 border-t border-slate-50 pt-8">
+                      <div className="mt-10 grid grid-cols-3 gap-6 border-t border-white/5 pt-8 relative z-10">
                          <div>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 text-xs">Reach Potential</p>
-                            <p className="text-xl font-black text-slate-900 tracking-tight">{(creator.profile?.totalFollowers / 1000).toFixed(1)}K</p>
+                            <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-2">Reach</p>
+                            <p className="font-komi text-4xl text-white tracking-widest">{(creator.profile?.totalFollowers / 1000).toFixed(1)}K</p>
                          </div>
                          <div>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 text-xs">Content Count</p>
-                            <p className="text-xl font-black text-slate-900 tracking-tight">{creator._count?.links || 0} Links</p>
+                            <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-2">Assets</p>
+                            <p className="font-komi text-4xl text-white tracking-widest">{creator._count?.links || 0}</p>
                          </div>
                          <div>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 text-xs">AI Suggestions</p>
-                            <p className="text-xl font-black text-emerald-500 tracking-tight">4 Optims</p>
+                            <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-2">AI Audit</p>
+                            <p className="font-komi text-4xl text-[#D2FF00] tracking-widest">4 OPT</p>
                          </div>
                       </div>
                     </div>
@@ -210,69 +215,70 @@ export default function AgencyCommandCenter() {
          </div>
       )}
 
+      {/* ADDITIONAL TABS RESTYLED DIRECTLY INTO DARK NEO-BRUTALISM... */}
       {activeTab === "workforce" && (
          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-1 space-y-6">
-                <div className="flex items-center justify-between px-4">
-                   <h3 className="text-[11px] font-black uppercase tracking-widest text-slate-400">Active Workforce ({(aiData?.agents?.length || 0)})</h3>
+                <div className="flex items-center justify-between px-2">
+                   <h3 className="text-[12px] font-black uppercase tracking-[0.2em] text-white/50">ACTIVE AGENTS ({(aiData?.agents?.length || 0)})</h3>
                    <button 
                      onClick={async () => {
                        await fetch("/api/admin/ai-team/discovery", { method: "POST" });
                        window.location.reload();
                      }}
-                     className="text-[9px] font-black text-indigo-600 hover:text-indigo-400 p-1 flex items-center gap-1 uppercase tracking-tighter transition-colors">
-                      <Bot className="w-3 h-3" /> Proactive Suggestion
+                     className="text-[10px] font-black text-[#D2FF00] hover:text-white px-2 py-1 bg-white/5 rounded-md flex items-center gap-1.5 uppercase tracking-widest transition-colors border border-white/10">
+                      <Bot className="w-3 h-3" /> PING AGENT
                    </button>
                 </div>
-                <div className="grid gap-2">
+                <div className="grid gap-3">
                    {(aiData?.agents || []).map((agent: any) => (
-                      <div key={agent.id} className="bg-white border border-slate-200 p-5 rounded-[1.5rem] flex items-center gap-4 hover:border-indigo-400 hover:shadow-xl transition-all cursor-default group">
-                         <div className="w-12 h-12 rounded-xl bg-slate-900 flex items-center justify-center group-hover:bg-indigo-600 transition-colors shadow-lg">
-                            <Bot className="w-6 h-6 text-white" />
+                      <div key={agent.id} className="bg-black border border-white/10 p-5 rounded-2xl flex items-center gap-4 hover:border-[#D2FF00]/50 hover:bg-white/5 transition-all cursor-default group shadow-xl">
+                         <div className="w-14 h-14 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:bg-[#D2FF00] transition-colors shadow-black group-hover:text-black text-white">
+                            <Bot className="w-6 h-6" />
                          </div>
                          <div>
-                            <p className="text-[13px] font-black text-slate-900 leading-none truncate max-w-[120px]">{agent.name}</p>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase mt-1.5 tracking-tight">{agent.title}</p>
+                            <p className="text-[13px] font-black text-white leading-none truncate max-w-[120px] uppercase tracking-widest mb-1.5">{agent.name}</p>
+                            <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{agent.title}</p>
                          </div>
-                         <div className="ml-auto flex items-center gap-2 bg-slate-50 px-2.5 py-1 rounded-full">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-[9px] font-black text-emerald-600 uppercase">Idle</span>
+                         <div className="ml-auto flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full">
+                            <div className="w-2 h-2 rounded-full bg-[#D2FF00] animate-pulse" />
+                            <span className="text-[9px] font-black text-[#D2FF00] uppercase tracking-widest">IDLE</span>
                          </div>
                       </div>
                    ))}
                 </div>
             </div>
 
-            {/* Task Log */}
+            {/* Task Log border */}
             <div className="lg:col-span-2 space-y-6">
-               <h3 className="text-[11px] font-black uppercase tracking-widest text-slate-400 px-4">Decision & Execution Log</h3>
+               <h3 className="text-[12px] font-black uppercase tracking-[0.2em] text-white/50 px-2">DECISION LOG</h3>
                <div className="space-y-4">
                   {!aiData?.tasks || aiData.tasks.length === 0 ? (
-                     <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] p-20 text-center">
-                        <Activity className="w-10 h-10 text-slate-200 mx-auto mb-4" />
-                        <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No Active Missions</p>
+                     <div className="bg-[#050505] border border-dashed border-white/20 rounded-[3rem] p-24 text-center">
+                        <Activity className="w-12 h-12 text-white/20 mx-auto mb-6" />
+                        <p className="font-komi text-3xl uppercase tracking-widest text-white/40">NO MISSIONS CONFIGURED</p>
                      </div>
                   ) : (
                      aiData.tasks.map((task: any) => (
-                        <div key={task.id} className="bg-white border border-slate-200 p-8 rounded-[2rem] relative overflow-hidden group hover:border-indigo-200 transition-all shadow-sm">
-                           <div className="flex items-start justify-between relative z-10">
+                        <div key={task.id} className="bg-black border border-white/10 p-8 rounded-[2rem] relative overflow-hidden group shadow-2xl">
+                           <div className="flex items-start justify-between relative z-10 w-full">
                               <div className="flex-1">
-                                 <div className="flex items-center gap-3 mb-3">
-                                    <span className={`text-[10px] font-black uppercase px-3 py-1 rounded ring-1 ring-inset ${
-                                       task.status === "done" ? "bg-emerald-50 text-emerald-600 ring-emerald-500/20" :
-                                       task.status === "awaiting_approval" ? "bg-amber-50 text-amber-600 ring-amber-500/20 animate-pulse" :
-                                       "bg-indigo-50 text-indigo-600 ring-indigo-500/20"
-                                    }`}>{task.status || "Executing"}</span>
-                                    <span className="text-zinc-300 text-[10px] font-black">REF_ {task.id}</span>
+                                 <div className="flex items-center gap-3 mb-4">
+                                    <span className={`text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded bg-[#111] grid place-items-center border ${
+                                       task.status === "done" ? "text-emerald-400 border-emerald-400/30" :
+                                       task.status === "awaiting_approval" ? "text-amber-400 border-amber-400/30 animate-pulse" :
+                                       "text-[#D2FF00] border-[#D2FF00]/30"
+                                    }`}>{task.status || "EXECUTING"}</span>
+                                    <span className="text-white/30 text-[10px] font-black uppercase tracking-[0.2em]">REF_ {task.id.slice(0, 8)}</span>
                                  </div>
-                                 <h4 className="text-xl font-black text-slate-900 leading-none tracking-tight uppercase italic">{task.name}</h4>
+                                 <h4 className="font-komi text-4xl leading-none text-white tracking-widest uppercase mb-4">{task.name}</h4>
                                  <div className="flex items-center gap-6 mt-4">
-                                    <div className="flex items-center gap-2">
-                                       <div className="w-6 h-6 rounded bg-slate-900 text-white text-[10px] font-black flex items-center justify-center uppercase">{task.assignee?.[0]}</div>
-                                       <span className="text-xs font-bold text-slate-600 uppercase tracking-tight">{task.assignee}</span>
+                                    <div className="flex items-center gap-3 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
+                                       <div className="w-6 h-6 rounded bg-black text-white text-[10px] font-black flex items-center justify-center uppercase border border-white/10">{task.assignee?.[0]}</div>
+                                       <span className="text-xs font-bold text-white/60 uppercase tracking-[0.2em]">{task.assignee}</span>
                                     </div>
-                                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                                       <Layers className="w-3 h-3" /> System Integration
+                                    <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] flex items-center gap-2">
+                                       <Layers className="w-3.5 h-3.5" /> SYSTEM HOOK
                                     </div>
                                  </div>
                               </div>
@@ -281,12 +287,12 @@ export default function AgencyCommandCenter() {
                                  <div className="flex gap-2 shrink-0">
                                     <button 
                                       onClick={() => handleStatusUpdate(task.id, "approved")}
-                                      className="p-3.5 rounded-2xl bg-indigo-600 text-white shadow-xl shadow-indigo-100 hover:scale-110 active:scale-90 transition-all group/btn">
+                                      className="p-4 rounded-2xl bg-[#D2FF00] text-black shadow-xl hover:scale-110 active:scale-90 transition-all group/btn">
                                        <ShieldCheck className="w-6 h-6" />
                                     </button>
                                     <button 
                                       onClick={() => handleStatusUpdate(task.id, "rejected")}
-                                      className="p-3.5 rounded-2xl bg-slate-100 text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-all">
+                                      className="p-4 rounded-2xl bg-white/5 text-rose-500 hover:text-white hover:bg-rose-500 transition-all border border-white/10">
                                        <X className="w-6 h-6" />
                                     </button>
                                  </div>
@@ -294,8 +300,8 @@ export default function AgencyCommandCenter() {
                            </div>
                            
                            {/* Decorative progress line */}
-                           <div className="absolute bottom-0 left-0 h-1 bg-slate-50 w-full overflow-hidden">
-                              <div className={`h-full bg-indigo-500 transition-all duration-1000 ${task.status === "done" ? "w-full" : "w-1/3 animate-pulse"}`} />
+                           <div className="absolute bottom-0 left-0 h-1.5 bg-[#111] w-full overflow-hidden">
+                              <div className={`h-full bg-[#D2FF00] transition-all duration-1000 ${task.status === "done" ? "w-full shadow-[0_0_20px_#D2FF00]" : "w-1/3 animate-pulse shadow-[0_0_10px_#D2FF00]"}`} />
                            </div>
                         </div>
                      ))
@@ -306,70 +312,70 @@ export default function AgencyCommandCenter() {
       )}
 
       {activeTab === "terminal" && (
-         <div className="bg-slate-900 rounded-[3rem] p-12 shadow-3xl relative overflow-hidden border border-white/5 shadow-[0_40px_100px_rgba(0,0,0,0.1)]">
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/10 blur-[120px] rounded-full -mr-20 -mt-20" />
+         <div className="bg-[#050505] rounded-[3rem] p-12 relative overflow-hidden border border-white/10 shadow-2xl">
+            {/* Extremely dark stealth mode background */}
+            <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/5 via-black to-black opacity-40 pointer-events-none" />
             
-            <div className="relative z-10 max-w-3xl">
-               <div className="flex items-center gap-6 mb-12">
-                  <div className="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-[0_0_40px_rgba(99,102,241,0.3)]">
-                     <Terminal className="w-7 h-7" />
+            <div className="relative z-10 max-w-4xl mx-auto">
+               <div className="flex flex-col items-center gap-4 mb-16 text-center">
+                  <div className="w-20 h-20 rounded-3xl bg-black border border-[#D2FF00]/50 flex items-center justify-center text-[#D2FF00] shadow-[0_0_50px_rgba(210,255,0,0.2)]">
+                     <Terminal className="w-10 h-10" />
                   </div>
                   <div>
-                     <h3 className="text-3xl font-black text-white uppercase italic tracking-tighter leading-none">Objective Terminal</h3>
-                     <p className="text-indigo-300/40 text-[11px] font-black uppercase tracking-[0.4em] mt-2">Deploying Autonomous Directives</p>
+                     <h3 className="font-komi text-5xl text-white uppercase tracking-tighter leading-none mt-4">NEURAL DIRECTIVE</h3>
+                     <p className="text-white/40 text-[12px] font-black uppercase tracking-[0.4em] mt-4">Authorize AI Orchestration Override</p>
                   </div>
                </div>
 
-               <form onSubmit={handleAssignTask} className="space-y-8">
+               <form onSubmit={handleAssignTask} className="space-y-8 bg-black p-10 rounded-[2.5rem] border border-white/5">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                      <div className="space-y-3">
-                        <label className="text-[11px] font-black uppercase tracking-[0.2em] text-indigo-300/70 ml-2">Mission Identifier</label>
+                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50 ml-2">Mission Identifier</label>
                         <input 
                            type="text" 
                            value={taskName}
                            onChange={(e) => setTaskName(e.target.value)}
-                           className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 text-white placeholder:text-white/10 focus:border-indigo-500 focus:bg-white/10 outline-none transition-all font-bold text-lg"
-                           placeholder="Audit Creator Aesthetics"
+                           className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 text-white placeholder:text-white/20 focus:border-[#D2FF00] focus:ring-1 focus:ring-[#D2FF00] outline-none transition-all font-bold text-lg font-mono"
+                           placeholder="SYS_AUDIT_01"
                            required
                         />
                      </div>
                      <div className="space-y-3">
-                        <label className="text-[11px] font-black uppercase tracking-[0.2em] text-indigo-300/70 ml-2">Agent Assignment</label>
+                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50 ml-2">Assigned Node</label>
                         <div className="relative">
                            <select 
                               value={selectedAgent}
                               onChange={(e) => setSelectedAgent(e.target.value)}
-                              className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 text-white focus:border-indigo-500 focus:bg-white/10 outline-none transition-all font-bold text-lg appearance-none cursor-pointer"
+                              className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 text-white focus:border-[#D2FF00] focus:ring-1 focus:ring-[#D2FF00] outline-none transition-all font-bold text-lg font-mono appearance-none cursor-pointer"
                               required
                            >
                               {aiData?.agents?.map((agent: any) => (
-                                 <option key={agent.id} value={agent.id} className="bg-slate-900 text-white py-4">{agent.name} — {agent.title}</option>
+                                 <option key={agent.id} value={agent.id} className="bg-black text-white">{agent.name} :: {agent.title}</option>
                               ))}
                            </select>
-                           <Bot className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-400/50 pointer-events-none" />
+                           <Bot className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30 pointer-events-none" />
                         </div>
                      </div>
                   </div>
 
                   <div className="space-y-3">
-                     <label className="text-[11px] font-black uppercase tracking-[0.2em] text-indigo-300/70 ml-2">Operational Instructions</label>
+                     <label className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50 ml-2">Operational Parameters</label>
                      <textarea 
                         value={taskInstructions}
                         onChange={(e) => setTaskInstructions(e.target.value)}
-                        className="w-full h-44 bg-white/5 border border-white/10 rounded-[2.5rem] px-8 py-7 text-white placeholder:text-white/10 focus:border-indigo-500 focus:bg-white/10 outline-none transition-all font-medium text-lg resize-none custom-scrollbar"
-                        placeholder="Define the mission scope. Instruct the agent to analyze bento grids, optimize masonry layouts, or refine brand palette consistency..."
+                        className="w-full h-48 bg-white/5 border border-white/10 rounded-[2rem] px-8 py-7 text-white placeholder:text-white/20 focus:border-[#D2FF00] focus:ring-1 focus:ring-[#D2FF00] outline-none transition-all font-medium text-lg font-mono resize-none custom-scrollbar"
+                        placeholder="> Define constraint matrix and logic rules herein..."
                         required
                      />
                   </div>
 
-                  <div className="pt-4">
+                  <div className="pt-8">
                      <button 
                         disabled={submitting}
-                        className="w-full bg-indigo-600 hover:bg-indigo-500 py-6 rounded-[3rem] text-white text-sm font-black uppercase tracking-[0.4em] transition-all shadow-[0_20px_50px_rgba(99,102,241,0.3)] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-4 group">
+                        className="w-full bg-white hover:bg-[#D2FF00] py-6 rounded-[2rem] text-black text-sm font-black uppercase tracking-[0.4em] transition-all disabled:opacity-50 flex items-center justify-center gap-4 group">
                         {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Zap className="w-5 h-5 group-hover:scale-125 transition-transform" />}
-                        Initialize Neural Directive
+                        EXECUTE PROTOCOL
                      </button>
-                     <p className="text-center text-indigo-300/20 text-[9px] font-black uppercase tracking-widest mt-6">Secure Encrypted Execution Layer • AI Lifecycle v4.0</p>
                   </div>
                </form>
             </div>
