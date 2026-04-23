@@ -1,13 +1,14 @@
 // ═══════════════════════════════════════════════════
-// getprofile.link — Plan Guard (Stage 6)
+// getprofile.link — Plan Guard (Stage 6 + Phase 8)
 // Middleware for checking user plan status
 // ═══════════════════════════════════════════════════
 
-export type PlanStatus = "FREE" | "TRIAL" | "TRIAL_EXPIRED" | "PRO";
+export type PlanStatus = "FREE" | "TRIAL" | "TRIAL_EXPIRED" | "PRO" | "MAX";
 
 export interface PlanInfo {
   status: PlanStatus;
-  isPro: boolean;        // Has Pro features right now (TRIAL or PRO)
+  isPro: boolean;        // Has Pro features right now (TRIAL, PRO, or MAX)
+  isMax: boolean;        // Has MAX features (DM Automation, Channels, CRM)
   isTrialActive: boolean;
   trialDaysLeft: number;
   plan: string;
@@ -25,11 +26,24 @@ export function getUserPlanInfo(user: {
   const plan = user.plan || "FREE";
   const trialEnd = user.trialEndsAt ? new Date(user.trialEndsAt) : null;
 
+  // MAX plan — gets everything
+  if (plan === "MAX") {
+    return {
+      status: "MAX",
+      isPro: true,
+      isMax: true,
+      isTrialActive: false,
+      trialDaysLeft: 0,
+      plan: "MAX",
+    };
+  }
+
   // Already a paying Pro user
   if (plan === "PRO") {
     return {
       status: "PRO",
       isPro: true,
+      isMax: false,
       isTrialActive: false,
       trialDaysLeft: 0,
       plan: "PRO",
@@ -43,6 +57,7 @@ export function getUserPlanInfo(user: {
     return {
       status: "TRIAL",
       isPro: true, // Trial users get Pro features
+      isMax: false,
       isTrialActive: true,
       trialDaysLeft: daysLeft,
       plan: "TRIAL",
@@ -54,6 +69,7 @@ export function getUserPlanInfo(user: {
     return {
       status: "TRIAL_EXPIRED",
       isPro: false,
+      isMax: false,
       isTrialActive: false,
       trialDaysLeft: 0,
       plan: "FREE",
@@ -64,6 +80,7 @@ export function getUserPlanInfo(user: {
   return {
     status: "FREE",
     isPro: false,
+    isMax: false,
     isTrialActive: false,
     trialDaysLeft: 0,
     plan: "FREE",
@@ -78,7 +95,21 @@ export function canAccessFeature(
   feature: string,
   userProFeatures: string[]
 ): boolean {
-  // Pro users can access everything
+  // MAX-only features
+  const maxOnlyFeatures = [
+    "dm_automation",
+    "channels",
+    "crm",
+    "social_integrations",
+    "flow_builder",
+    "global_triggers",
+  ];
+
+  if (maxOnlyFeatures.includes(feature)) {
+    return planInfo.isMax;
+  }
+
+  // Pro users can access everything else
   if (planInfo.isPro) return true;
 
   // Free users can only access non-pro features
@@ -102,6 +133,7 @@ export function canAccessFeature(
     "event_hub",
     "store_product",
     "custom_themes",
+    "creator_credits",
   ];
 
   return !proOnlyFeatures.includes(feature);

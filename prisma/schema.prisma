@@ -71,6 +71,22 @@ model User {
   // ═══ NEW: Community & Memberships ═══
   broadcastMessages BroadcastMessage[]
   membershipTiers   MembershipTier[]
+
+  // ═══ Phase 8: Automation & CRM ═══
+  socialAccounts   SocialAccount[]
+  channels         Channel[]
+  autoDMCampaigns  AutoDMCampaign[]
+  autoDMLogs       AutoDMLog[]
+  dmFlows          DMFlow[]
+  globalTriggers   GlobalTrigger[]
+  leads            Lead[]
+
+  // ═══ Phase 9: Creator Credits ═══
+  creditConfig       CreditConfig?
+  creditBalance      CreditBalance?
+  creditPurchasesMade CreditPurchase[] @relation("CreditBuyer")
+  creditPurchasesRcvd CreditPurchase[] @relation("CreditReceiver")
+  creditRedemptions  CreditRedemption[]
 }
 
 model Agency {
@@ -419,4 +435,294 @@ model BroadcastMessage {
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ═══════════════════════════════════════════════════
+// Phase 8: Social Integrations
+// ═══════════════════════════════════════════════════
+
+model SocialAccount {
+  id                String   @id @default(cuid())
+  userId            String
+  platform          String   // "instagram" | "facebook" | "tiktok" | "twitter"
+  platformUserId    String?  // The user's ID on that platform
+  platformUsername  String?  // e.g. @username
+  accessToken       String?  // OAuth access token (encrypted in production)
+  refreshToken      String?  // OAuth refresh token
+  tokenExpiresAt    DateTime?
+  followerCount     Int?     @default(0)
+  isConnected       Boolean  @default(true)
+  scopes            String?  // JSON: ["instagram_manage_messages", ...]
+  metadata          String?  @default("{}") // JSON: extra platform-specific data
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, platform])
+}
+
+// ═══════════════════════════════════════════════════
+// Phase 8: Channels (WhatsApp Business / Telegram)
+// ═══════════════════════════════════════════════════
+
+model Channel {
+  id              String   @id @default(cuid())
+  userId          String
+  type            String   // "whatsapp" | "telegram"
+  name            String?  // Display name e.g. "My Business WhatsApp"
+  isActive        Boolean  @default(false)
+
+  // WhatsApp-specific
+  waPhoneNumber   String?  // +91XXXXXXXXXX
+  waBusinessId    String?  // WhatsApp Business Account ID
+  waApiToken      String?  // Cloud API token
+  waVerified      Boolean  @default(false)
+
+  // Telegram-specific
+  tgBotToken      String?  // Bot Father token
+  tgBotUsername   String?  // @YourBot
+  tgChatId        String?  // Channel/Group chat ID
+
+  // Auto-Reply Templates (JSON)
+  autoReplyTemplates String? @default("[]") // [{trigger, response}]
+  welcomeMessage     String?
+  broadcastEnabled   Boolean @default(false)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type])
+}
+
+// ═══════════════════════════════════════════════════
+// Phase 8: DM Automation Engine
+// ═══════════════════════════════════════════════════
+
+model AutoDMCampaign {
+  id              String   @id @default(cuid())
+  userId          String
+  name            String   // Campaign name
+  platform        String   @default("instagram") // "instagram" | "facebook"
+  triggerType     String   // "comment" | "story_reply" | "story_mention" | "dm_keyword" | "live_comment"
+  triggerSource   String?  // Post URL / Reel URL / "any_story" / "any_post"
+  keywords        String?  @default("[]") // JSON: ["LINK", "INFO", "PRICE"]
+  matchMode       String   @default("any") // "any" | "exact" | "contains"
+
+  // DM Message
+  dmMessage       String   // The auto-DM text body
+  dmButtonText    String?  // Optional CTA button label
+  dmButtonUrl     String?  // The link to deliver
+  dmImage         String?  // Optional image attachment
+
+  // Comment Reply (public reply on the comment)
+  commentReply    String?  // e.g. "Check your DMs! 📩"
+  commentReplyEnabled Boolean @default(true)
+
+  // Advanced Features
+  followGated     Boolean  @default(false)  // Must follow to receive DM
+  collectEmail    Boolean  @default(false)  // Ask for email before sending link
+  emailPrompt     String?  // e.g. "Drop your email to get the free guide"
+
+  // Flow reference (for multi-step)
+  flowId          String?  // Links to DMFlow for multi-step conversations
+
+  // Status
+  isActive        Boolean  @default(true)
+  isPaused        Boolean  @default(false)
+
+  // Stats (aggregated counters)
+  totalSent       Int      @default(0)
+  totalOpened     Int      @default(0)
+  totalClicked    Int      @default(0)
+  totalPurchased  Int      @default(0)
+  totalEmails     Int      @default(0)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs   AutoDMLog[]
+  flow   DMFlow?     @relation(fields: [flowId], references: [id])
+}
+
+model AutoDMLog {
+  id              String   @id @default(cuid())
+  userId          String
+  campaignId      String
+  platform        String   @default("instagram")
+  recipientId     String?  // Platform user ID of the recipient
+  recipientName   String?  // @username of the recipient
+  triggerComment  String?  // The comment text that triggered this
+  dmContent       String?  // The DM that was sent
+  status          String   @default("SENT") // SENT | OPENED | CLICKED | PURCHASED | FAILED
+  linkClicked     Boolean  @default(false)
+  emailCaptured   String?  // If email was collected
+  errorMessage    String?  // If FAILED
+  createdAt       DateTime @default(now())
+
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campaign AutoDMCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+}
+
+model DMFlow {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String   // e.g. "Welcome Lead Funnel"
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  steps     DMFlowStep[]
+  campaigns AutoDMCampaign[]
+}
+
+model DMFlowStep {
+  id          String   @id @default(cuid())
+  flowId      String
+  order       Int      @default(0)
+  type        String   // "message" | "question" | "condition" | "delay" | "collect_email" | "deliver_link"
+  content     String?  // The message text or question
+  options     String?  @default("[]") // JSON: for question type [{label, value, nextStepId}]
+  delayMs     Int?     // For delay type (milliseconds)
+  linkUrl     String?  // For deliver_link type
+  nextStepId  String?  // Default next step (linear flow)
+  metadata    String?  @default("{}") // JSON: extra config
+  createdAt   DateTime @default(now())
+
+  flow DMFlow @relation(fields: [flowId], references: [id], onDelete: Cascade)
+}
+
+model GlobalTrigger {
+  id          String   @id @default(cuid())
+  userId      String
+  keyword     String   // The trigger keyword
+  response    String   // The DM response text
+  linkUrl     String?  // Optional link to include
+  isActive    Boolean  @default(true)
+  usageCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, keyword])
+}
+
+// ═══════════════════════════════════════════════════
+// Phase 8: Mini CRM Pipeline
+// ═══════════════════════════════════════════════════
+
+model Lead {
+  id          String   @id @default(cuid())
+  userId      String   // The creator who owns this lead
+  name        String
+  email       String?
+  phone       String?
+  avatarUrl   String?
+  source      String   @default("manual") // "manual" | "dm_automation" | "ai_assistant" | "form" | "whatsapp" | "import"
+  stage       String   @default("new") // "new" | "contacted" | "qualified" | "won" | "lost"
+  temperature String   @default("warm") // "hot" | "warm" | "cold"
+  value       Float?   // Estimated deal value
+  tags        String?  @default("[]") // JSON: ["VIP", "Returning"]
+  notes       String?
+  lastContactAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activities LeadActivity[]
+}
+
+model LeadActivity {
+  id        String   @id @default(cuid())
+  leadId    String
+  type      String   // "note" | "email" | "call" | "whatsapp" | "dm" | "stage_change" | "tag_change"
+  content   String   // Description or note content
+  metadata  String?  @default("{}") // JSON: {from: "new", to: "contacted"} for stage changes
+  createdAt DateTime @default(now())
+
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+}
+
+// ═══════════════════════════════════════════════════
+// Phase 9: Creator Credits System
+// ═══════════════════════════════════════════════════
+
+model CreditConfig {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  isEnabled       Boolean  @default(true)
+  creditPrice     Float    @default(10)       // Price per credit in currency
+  currency        String   @default("INR")
+
+  // Tiered pack overrides (null = use defaults)
+  pack1Credits    Int      @default(5)
+  pack1Price      Float    @default(49)
+  pack2Credits    Int      @default(25)
+  pack2Price      Float    @default(199)
+  pack3Credits    Int      @default(100)
+  pack3Price      Float    @default(699)
+
+  // Perk configuration
+  perkDiscount    Int?     @default(10)       // % discount on products
+  perkContent     Boolean  @default(false)    // Access to gated content
+  perkEarlyAccess Boolean  @default(false)    // Early drops
+  perkCustom      String?                     // Custom perk text
+  perkMinCredits  Int      @default(1)        // Min credits to unlock perks
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model CreditPurchase {
+  id              String   @id @default(cuid())
+
+  buyerName       String
+  buyerEmail      String?
+  buyerId         String?
+  buyer           User?    @relation("CreditBuyer", fields: [buyerId], references: [id])
+
+  creatorId       String
+  creator         User     @relation("CreditReceiver", fields: [creatorId], references: [id], onDelete: Cascade)
+
+  creditCount     Int
+  amountPaid      Float
+  currency        String   @default("INR")
+  paymentId       String?                     // Razorpay/Stripe payment ID
+  paymentStatus   String   @default("completed") // pending | completed | failed | refunded
+
+  createdAt       DateTime @default(now())
+}
+
+model CreditBalance {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  totalCredits    Int      @default(0)
+  totalSupporters Int      @default(0)
+  totalRevenue    Float    @default(0)
+  pendingPayout   Float    @default(0)
+
+  updatedAt       DateTime @updatedAt
+}
+
+model CreditRedemption {
+  id              String   @id @default(cuid())
+
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  creatorId       String
+
+  creditsUsed     Int
+  redemptionType  String                      // "discount" | "content_access" | "early_access"
+  metadata        String   @default("{}")     // JSON
+
+  createdAt       DateTime @default(now())
 }

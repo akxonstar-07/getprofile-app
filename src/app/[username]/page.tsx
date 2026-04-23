@@ -62,6 +62,10 @@ export default async function PublicProfilePage({ params }: Props) {
         where: { enabled: true },
         orderBy: { date: "asc" },
       },
+      // Agency management display
+      agency: {
+        select: { id: true, name: true, owner: { select: { username: true, name: true } } },
+      },
     },
   });
 

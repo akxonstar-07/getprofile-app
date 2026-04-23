@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════
-// getprofile.link — Role → Sidebar Map (Stage 6)
+// getprofile.link — Role → Sidebar Map (Stage 6 + Phase 8)
 // Maps each profileRole to visible dashboard sections
 // ═══════════════════════════════════════════════════
 
@@ -9,6 +9,10 @@ export interface RoleSidebarConfig {
   showBookings: boolean;   // Bookings & Calls (Pro)
   showPromo: boolean;      // Discount Engine (Pro)
   showPortfolio: boolean;  // Portfolio/Gallery page
+  showAutoDM: boolean;     // DM Automation (MAX)
+  showChannels: boolean;   // Channels — WhatsApp/Telegram (MAX)
+  showCRM: boolean;        // Mini CRM Pipeline (MAX)
+  showCredits: boolean;    // Creator Credits (PRO) — Phase 9
   roleLabel: string;       // Display label for sidebar
 }
 
@@ -19,35 +23,35 @@ export interface RoleSidebarConfig {
 export function getSidebarConfigForRole(profileRole: string): RoleSidebarConfig {
   const configs: Record<string, RoleSidebarConfig> = {
     // ═══ SELL roles ═══
-    fitness_coach:     { showStore: true,  showEvents: true,  showBookings: true,  showPromo: true,  showPortfolio: false, roleLabel: "Fitness Coach" },
-    side_hustler:      { showStore: true,  showEvents: false, showBookings: false, showPromo: true,  showPortfolio: false, roleLabel: "Side-Hustler" },
-    store_manager:     { showStore: true,  showEvents: false, showBookings: false, showPromo: true,  showPortfolio: false, roleLabel: "Store Manager" },
-    artist:            { showStore: true,  showEvents: true,  showBookings: false, showPromo: false, showPortfolio: true,  roleLabel: "Artist / Musician" },
-    collector:         { showStore: true,  showEvents: false, showBookings: false, showPromo: true,  showPortfolio: true,  roleLabel: "Collector / Reseller" },
+    fitness_coach:     { showStore: true,  showEvents: true,  showBookings: true,  showPromo: true,  showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: true,  showCredits: true,  roleLabel: "Fitness Coach" },
+    side_hustler:      { showStore: true,  showEvents: false, showBookings: false, showPromo: true,  showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: false, showCredits: true,  roleLabel: "Side-Hustler" },
+    store_manager:     { showStore: true,  showEvents: false, showBookings: false, showPromo: true,  showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: false, showCredits: false, roleLabel: "Store Manager" },
+    artist:            { showStore: true,  showEvents: true,  showBookings: false, showPromo: false, showPortfolio: true,  showAutoDM: true,  showChannels: true,  showCRM: false, showCredits: true,  roleLabel: "Artist / Musician" },
+    collector:         { showStore: true,  showEvents: false, showBookings: false, showPromo: true,  showPortfolio: true,  showAutoDM: true,  showChannels: true,  showCRM: false, showCredits: true,  roleLabel: "Collector / Reseller" },
 
     // ═══ GET HIRED roles ═══
-    job_seeker:        { showStore: false, showEvents: false, showBookings: false, showPromo: false, showPortfolio: true,  roleLabel: "Job Seeker" },
-    student:           { showStore: false, showEvents: false, showBookings: false, showPromo: false, showPortfolio: true,  roleLabel: "Student / Intern" },
-    freelancer:        { showStore: true,  showEvents: false, showBookings: true,  showPromo: false, showPortfolio: true,  roleLabel: "Freelancer" },
-    video_editor:      { showStore: true,  showEvents: false, showBookings: true,  showPromo: false, showPortfolio: true,  roleLabel: "Video Editor / Designer" },
+    job_seeker:        { showStore: false, showEvents: false, showBookings: false, showPromo: false, showPortfolio: true,  showAutoDM: false, showChannels: false, showCRM: false, showCredits: false, roleLabel: "Job Seeker" },
+    student:           { showStore: false, showEvents: false, showBookings: false, showPromo: false, showPortfolio: true,  showAutoDM: false, showChannels: false, showCRM: false, showCredits: false, roleLabel: "Student / Intern" },
+    freelancer:        { showStore: true,  showEvents: false, showBookings: true,  showPromo: false, showPortfolio: true,  showAutoDM: true,  showChannels: true,  showCRM: true,  showCredits: true,  roleLabel: "Freelancer" },
+    video_editor:      { showStore: true,  showEvents: false, showBookings: true,  showPromo: false, showPortfolio: true,  showAutoDM: true,  showChannels: true,  showCRM: true,  showCredits: true,  roleLabel: "Video Editor / Designer" },
 
     // ═══ BUILD BRAND roles ═══
-    content_creator:   { showStore: true,  showEvents: true,  showBookings: false, showPromo: true,  showPortfolio: false, roleLabel: "Content Creator" },
-    high_ticket_coach: { showStore: true,  showEvents: true,  showBookings: true,  showPromo: true,  showPortfolio: false, roleLabel: "High-Ticket Coach" },
-    motivational_speaker: { showStore: true, showEvents: true, showBookings: true, showPromo: false, showPortfolio: false, roleLabel: "Speaker" },
-    stock_analyst:     { showStore: true,  showEvents: false, showBookings: false, showPromo: false, showPortfolio: false, roleLabel: "Stock Analyst" },
-    marketing_manager: { showStore: false, showEvents: false, showBookings: true,  showPromo: false, showPortfolio: true,  roleLabel: "Marketing Manager" },
-    sales_manager:     { showStore: true,  showEvents: false, showBookings: true,  showPromo: true,  showPortfolio: false, roleLabel: "Sales Manager" },
-    social_media_manager: { showStore: true, showEvents: false, showBookings: true, showPromo: false, showPortfolio: true, roleLabel: "Social Media Manager" },
+    content_creator:   { showStore: true,  showEvents: true,  showBookings: false, showPromo: true,  showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: false, showCredits: true,  roleLabel: "Content Creator" },
+    high_ticket_coach: { showStore: true,  showEvents: true,  showBookings: true,  showPromo: true,  showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: true,  showCredits: true,  roleLabel: "High-Ticket Coach" },
+    motivational_speaker: { showStore: true, showEvents: true, showBookings: true, showPromo: false, showPortfolio: false, showAutoDM: true, showChannels: true, showCRM: false, showCredits: true,  roleLabel: "Speaker" },
+    stock_analyst:     { showStore: true,  showEvents: false, showBookings: false, showPromo: false, showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: false, showCredits: true,  roleLabel: "Stock Analyst" },
+    marketing_manager: { showStore: false, showEvents: false, showBookings: true,  showPromo: false, showPortfolio: true,  showAutoDM: true,  showChannels: true,  showCRM: true,  showCredits: false, roleLabel: "Marketing Manager" },
+    sales_manager:     { showStore: true,  showEvents: false, showBookings: true,  showPromo: true,  showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: true,  showCredits: false, roleLabel: "Sales Manager" },
+    social_media_manager: { showStore: true, showEvents: false, showBookings: true, showPromo: false, showPortfolio: true, showAutoDM: true, showChannels: true, showCRM: true, showCredits: false, roleLabel: "Social Media Manager" },
 
     // ═══ SERVE COMMUNITY roles ═══
-    barber:            { showStore: true,  showEvents: false, showBookings: true,  showPromo: true,  showPortfolio: true,  roleLabel: "Local Service Pro" },
-    real_estate:       { showStore: true,  showEvents: true,  showBookings: true,  showPromo: false, showPortfolio: true,  roleLabel: "Real Estate" },
-    event_organizer:   { showStore: true,  showEvents: true,  showBookings: false, showPromo: true,  showPortfolio: true,  roleLabel: "Event Organizer" },
-    lawyer:            { showStore: true,  showEvents: false, showBookings: true,  showPromo: false, showPortfolio: false, roleLabel: "Lawyer" },
-    online_tutor:      { showStore: true,  showEvents: true,  showBookings: true,  showPromo: true,  showPortfolio: false, roleLabel: "Online Tutor" },
-    ngo_member:        { showStore: true,  showEvents: true,  showBookings: false, showPromo: false, showPortfolio: true,  roleLabel: "NGO / Charity" },
-    networker:         { showStore: false, showEvents: false, showBookings: true,  showPromo: false, showPortfolio: false, roleLabel: "Networker" },
+    barber:            { showStore: true,  showEvents: false, showBookings: true,  showPromo: true,  showPortfolio: true,  showAutoDM: true,  showChannels: true,  showCRM: true,  showCredits: false, roleLabel: "Local Service Pro" },
+    real_estate:       { showStore: true,  showEvents: true,  showBookings: true,  showPromo: false, showPortfolio: true,  showAutoDM: true,  showChannels: true,  showCRM: true,  showCredits: false, roleLabel: "Real Estate" },
+    event_organizer:   { showStore: true,  showEvents: true,  showBookings: false, showPromo: true,  showPortfolio: true,  showAutoDM: true,  showChannels: true,  showCRM: false, showCredits: false, roleLabel: "Event Organizer" },
+    lawyer:            { showStore: true,  showEvents: false, showBookings: true,  showPromo: false, showPortfolio: false, showAutoDM: true,  showChannels: false, showCRM: true,  showCredits: false, roleLabel: "Lawyer" },
+    online_tutor:      { showStore: true,  showEvents: true,  showBookings: true,  showPromo: true,  showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: false, showCredits: true,  roleLabel: "Online Tutor" },
+    ngo_member:        { showStore: true,  showEvents: true,  showBookings: false, showPromo: false, showPortfolio: true,  showAutoDM: true,  showChannels: true,  showCRM: false, showCredits: false, roleLabel: "NGO / Charity" },
+    networker:         { showStore: false, showEvents: false, showBookings: true,  showPromo: false, showPortfolio: false, showAutoDM: false, showChannels: false, showCRM: false, showCredits: false, roleLabel: "Networker" },
   };
 
   // Default: show everything (fallback for personal_brand or unknown roles)
@@ -57,6 +61,10 @@ export function getSidebarConfigForRole(profileRole: string): RoleSidebarConfig 
     showBookings: true,
     showPromo: true,
     showPortfolio: true,
+    showAutoDM: true,
+    showChannels: true,
+    showCRM: true,
+    showCredits: true,
     roleLabel: "Creator",
   };
 }
