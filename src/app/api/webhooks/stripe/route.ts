@@ -3,11 +3,10 @@ import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
 import { headers } from "next/headers";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: '2023-10-16' as any,
-});
-
 export async function POST(req: Request) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_mock", {
+    apiVersion: '2023-10-16' as any,
+  });
   const body = await req.text();
   const hdrs = await headers();
   const signature = hdrs.get("Stripe-Signature") as string;
