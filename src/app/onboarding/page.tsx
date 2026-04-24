@@ -641,9 +641,9 @@ export default function OnboardingWizard() {
                          style={{
                            backgroundColor: customConfig.colorScheme.card || "#f3f4f6",
                            color: customConfig.colorScheme.text || "#000",
-                           borderRadius: customConfig.buttonStyle === "pill" ? "9999px" : customConfig.buttonStyle === "rounded" ? "0.75rem" : "0",
-                           boxShadow: customConfig.buttonStyle === "shadow" ? "0 4px 6px -1px rgba(0,0,0,0.1)" : "none",
-                           border: customConfig.buttonStyle === "outline" ? `2px solid ${customConfig.colorScheme.text}` : "none",
+                           borderRadius: customConfig.buttonRadius || "12px",
+                           boxShadow: customConfig.buttonStyle === "ghost" ? "0 4px 6px -1px rgba(0,0,0,0.1)" : "none",
+                           border: customConfig.buttonStyle === "outlined" ? `2px solid ${customConfig.colorScheme.text}` : "none",
                          }}
                        >
                          Sample Link {i}
