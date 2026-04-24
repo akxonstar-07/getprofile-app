@@ -46,7 +46,7 @@ export default function OnboardingWizard() {
   const [username, setUsername] = useState("");
   const [dob, setDob] = useState("");
   const [city, setCity] = useState("");
-  const [countryCode, setCountryCode] = useState("+1");
+  const [countryCode, setCountryCode] = useState("+91");
   const [phone, setPhone] = useState("");
   const [usernameError, setUsernameError] = useState("");
 
@@ -127,30 +127,47 @@ export default function OnboardingWizard() {
     }
   };
 
+  // Map platform IDs to their branded SVG icons for the preview
+  const getPlatformIcon = (id: string) => {
+    const p = PLATFORMS.find(pl => pl.id === id);
+    return p ? p.icon : null;
+  };
+
   // Preview Phone Component for live visual
-  const LivePreview = () => (
-    <div className="hidden lg:flex w-full max-w-[340px] items-center justify-center p-8 bg-gray-50 rounded-3xl border border-gray-200">
-      <div className="w-full h-[600px] bg-white rounded-[2rem] border-8 border-gray-900 overflow-hidden relative shadow-2xl">
-         <div className="absolute top-0 w-full h-24 bg-gradient-to-b from-indigo-500/20 to-transparent"></div>
-         <div className="p-6 pt-12 flex flex-col items-center text-center relative z-10">
-            <div className="w-24 h-24 rounded-full bg-gray-200 border-4 border-white shadow-lg overflow-hidden mb-4">
-               <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" />
-            </div>
-            <h2 className="font-bold text-xl">{displayName || "Your Name"}</h2>
-            <p className="text-sm text-gray-500 mt-1">{selectedRole?.label || "Creator"}</p>
-            {city && <p className="text-xs text-gray-400 mt-2">📍 {city}</p>}
-            
-            <div className="w-full mt-8 space-y-3">
-              {Object.entries(urls).filter(([_, url]) => url).slice(0, 3).map(([id]) => (
-                <div key={id} className="w-full py-3 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center">
-                  <span className="text-sm font-medium capitalize text-gray-600">{id}</span>
+  const LivePreview = () => {
+    const filledPlatforms = Object.entries(urls).filter(([_, url]) => url && url.length > 0);
+    return (
+      <div className="hidden lg:flex w-full max-w-[340px] items-center justify-center p-8 bg-gray-50 rounded-3xl border border-gray-200">
+        <div className="w-full h-[600px] bg-white rounded-[2rem] border-8 border-gray-900 overflow-hidden relative shadow-2xl">
+           <div className="absolute top-0 w-full h-24 bg-gradient-to-b from-indigo-500/20 to-transparent"></div>
+           <div className="p-6 pt-12 flex flex-col items-center text-center relative z-10">
+              <div className="w-20 h-20 rounded-full bg-gray-200 border-4 border-white shadow-lg overflow-hidden mb-3">
+                 <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" alt="" />
+              </div>
+              <h2 className="font-bold text-lg">{displayName || "Your Name"}</h2>
+              {username && <p className="text-xs text-gray-400 mt-0.5">@{username}</p>}
+              <p className="text-sm text-gray-500 mt-1">{selectedRole?.label || "Creator"}</p>
+              {city && <p className="text-xs text-gray-400 mt-1">📍 {city}</p>}
+
+              {/* Social Icons Row — link.me style */}
+              {filledPlatforms.length > 0 && (
+                <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
+                  {filledPlatforms.map(([id]) => (
+                    <div key={id} className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center shadow-sm hover:scale-110 transition-transform cursor-pointer">
+                      {getPlatformIcon(id)}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-         </div>
+              )}
+
+              {filledPlatforms.length > 0 && (
+                <p className="text-[10px] text-gray-400 mt-3">{filledPlatforms.length} link{filledPlatforms.length > 1 ? 's' : ''} connected</p>
+              )}
+           </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#fafafa] flex flex-col font-sans">
@@ -322,14 +339,76 @@ export default function OnboardingWizard() {
                     <select
                       value={countryCode}
                       onChange={e => setCountryCode(e.target.value)}
-                      className="p-4 bg-white border border-gray-200 rounded-xl text-black text-lg focus:outline-none focus:ring-2 focus:ring-black transition-all shadow-sm"
+                      className="p-4 bg-white border border-gray-200 rounded-xl text-black text-sm focus:outline-none focus:ring-2 focus:ring-black transition-all shadow-sm min-w-[120px]"
                     >
-                      <option value="+1">🇺🇸 +1</option>
-                      <option value="+44">🇬🇧 +44</option>
-                      <option value="+91">🇮🇳 +91</option>
+                      <option value="+93">🇦🇫 +93</option>
+                      <option value="+355">🇦🇱 +355</option>
+                      <option value="+213">🇩🇿 +213</option>
+                      <option value="+54">🇦🇷 +54</option>
                       <option value="+61">🇦🇺 +61</option>
+                      <option value="+43">🇦🇹 +43</option>
+                      <option value="+973">🇧🇭 +973</option>
+                      <option value="+880">🇧🇩 +880</option>
+                      <option value="+32">🇧🇪 +32</option>
+                      <option value="+55">🇧🇷 +55</option>
+                      <option value="+1">🇨🇦 +1</option>
+                      <option value="+56">🇨🇱 +56</option>
+                      <option value="+86">🇨🇳 +86</option>
+                      <option value="+57">🇨🇴 +57</option>
+                      <option value="+45">🇩🇰 +45</option>
+                      <option value="+20">🇪🇬 +20</option>
+                      <option value="+358">🇫🇮 +358</option>
+                      <option value="+33">🇫🇷 +33</option>
+                      <option value="+49">🇩🇪 +49</option>
+                      <option value="+233">🇬🇭 +233</option>
+                      <option value="+30">🇬🇷 +30</option>
+                      <option value="+852">🇭🇰 +852</option>
+                      <option value="+36">🇭🇺 +36</option>
+                      <option value="+91" selected>🇮🇳 +91</option>
+                      <option value="+62">🇮🇩 +62</option>
+                      <option value="+98">🇮🇷 +98</option>
+                      <option value="+964">🇮🇶 +964</option>
+                      <option value="+353">🇮🇪 +353</option>
+                      <option value="+972">🇮🇱 +972</option>
+                      <option value="+39">🇮🇹 +39</option>
                       <option value="+81">🇯🇵 +81</option>
-                      {/* Can add more or use a library */}
+                      <option value="+962">🇯🇴 +962</option>
+                      <option value="+254">🇰🇪 +254</option>
+                      <option value="+965">🇰🇼 +965</option>
+                      <option value="+60">🇲🇾 +60</option>
+                      <option value="+52">🇲🇽 +52</option>
+                      <option value="+212">🇲🇦 +212</option>
+                      <option value="+95">🇲🇲 +95</option>
+                      <option value="+977">🇳🇵 +977</option>
+                      <option value="+31">🇳🇱 +31</option>
+                      <option value="+64">🇳🇿 +64</option>
+                      <option value="+234">🇳🇬 +234</option>
+                      <option value="+47">🇳🇴 +47</option>
+                      <option value="+968">🇴🇲 +968</option>
+                      <option value="+92">🇵🇰 +92</option>
+                      <option value="+51">🇵🇪 +51</option>
+                      <option value="+63">🇵🇭 +63</option>
+                      <option value="+48">🇵🇱 +48</option>
+                      <option value="+351">🇵🇹 +351</option>
+                      <option value="+974">🇶🇦 +974</option>
+                      <option value="+40">🇷🇴 +40</option>
+                      <option value="+7">🇷🇺 +7</option>
+                      <option value="+966">🇸🇦 +966</option>
+                      <option value="+65">🇸🇬 +65</option>
+                      <option value="+27">🇿🇦 +27</option>
+                      <option value="+82">🇰🇷 +82</option>
+                      <option value="+34">🇪🇸 +34</option>
+                      <option value="+94">🇱🇰 +94</option>
+                      <option value="+46">🇸🇪 +46</option>
+                      <option value="+41">🇨🇭 +41</option>
+                      <option value="+886">🇹🇼 +886</option>
+                      <option value="+66">🇹🇭 +66</option>
+                      <option value="+90">🇹🇷 +90</option>
+                      <option value="+971">🇦🇪 +971</option>
+                      <option value="+44">🇬🇧 +44</option>
+                      <option value="+1">🇺🇸 +1</option>
+                      <option value="+58">🇻🇪 +58</option>
+                      <option value="+84">🇻🇳 +84</option>
                     </select>
                     <input
                       type="tel"
@@ -396,6 +475,12 @@ export default function OnboardingWizard() {
                   Next
                 </button>
               </div>
+              <button
+                onClick={() => goStep(4)}
+                className="w-full mt-3 py-3 rounded-xl font-medium text-gray-500 hover:text-black hover:bg-gray-100 transition-all text-sm"
+              >
+                Skip for now — I&apos;ll add these later
+              </button>
             </div>
           )}
         </div>
