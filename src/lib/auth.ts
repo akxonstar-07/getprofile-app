@@ -46,6 +46,7 @@ export const authOptions: NextAuthOptions = {
   ],
   pages: {
     signIn: "/login",
+    newUser: "/onboarding", // Redirects new users to onboarding immediately
   },
   session: {
     strategy: "jwt",
