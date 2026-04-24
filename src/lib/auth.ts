@@ -70,13 +70,18 @@ export const authOptions: NextAuthOptions = {
       
       // 2. Dynamic Update Case: Fetch fresh data from DB if role is missing or manually trigger update
       if (token.sub && !token.role) {
-        const freshUser = await prisma.user.findUnique({
-          where: { id: token.sub as string },
-          select: { role: true, username: true }
-        });
-        if (freshUser) {
-          token.role = freshUser.role;
-          token.username = freshUser.username;
+        try {
+          const freshUser = await prisma.user.findUnique({
+            where: { id: token.sub as string },
+            select: { role: true, username: true }
+          });
+          if (freshUser) {
+            token.role = freshUser.role;
+            token.username = freshUser.username;
+          }
+        } catch (error) {
+          console.error("Failed to fetch fresh user role in JWT callback:", error);
+          // Don't crash the login flow if DB is temporarily unreachable
         }
       }
       return token;
