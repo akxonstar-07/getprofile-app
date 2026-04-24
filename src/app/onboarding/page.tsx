@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ChevronRight, ChevronLeft, Search, ArrowRight, LayoutTemplate, Palette, Type, MousePointerSquareDashed, MonitorSmartphone, Briefcase, Users } from "lucide-react";
-import { ROLES, getRolesByAccountType, type RoleDefinition } from "@/lib/roles";
+import { Check, ChevronLeft, Search, ArrowRight, LayoutTemplate, Palette, Type, MousePointerSquareDashed, MonitorSmartphone, Briefcase, Users, Sparkles } from "lucide-react";
+import { getRolesByAccountType, type RoleDefinition } from "@/lib/roles";
 import { TEMPLATES, TEMPLATE_CATEGORIES, HEADER_STYLES, COLOR_SCHEMES, FONT_OPTIONS, BUTTON_STYLES, getTemplatesByCategory, type TemplateConfig } from "@/lib/templates";
 
 /* ═══════════════════════════════════════════════════
@@ -439,8 +439,16 @@ export default function OnboardingWizard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredTemplates.map(t => (
                 <div key={t.id} className="group relative rounded-3xl overflow-hidden bg-white border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-                  <div className="aspect-[9/16] w-full bg-gray-100 relative">
-                    <img src={t.thumbnail} alt={t.name} className="w-full h-full object-cover" />
+                  <div className="aspect-[9/16] w-full relative" style={{ background: t.previewGradient }}>
+                    {/* Simulated Template Preview */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
+                      <div className="w-16 h-16 rounded-full mb-3" style={{ backgroundColor: t.colorScheme.accent + '33' }} />
+                      <div className="h-3 w-24 rounded-full mb-2" style={{ backgroundColor: t.colorScheme.text + '40' }} />
+                      <div className="h-2 w-16 rounded-full mb-6" style={{ backgroundColor: t.colorScheme.text + '20' }} />
+                      {[1, 2, 3].map(i => (
+                        <div key={i} className="w-full h-10 mb-2" style={{ backgroundColor: t.colorScheme.card, borderRadius: t.buttonRadius, border: `1px solid ${t.colorScheme.accent}33` }} />
+                      ))}
+                    </div>
                     
                     {/* Hover Overlay */}
                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-3 p-6">
@@ -460,13 +468,7 @@ export default function OnboardingWizard() {
                   </div>
                   <div className="p-4 border-t border-gray-100">
                     <h3 className="font-bold text-lg">{t.name}</h3>
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${
-                        t.tier === "FREE" ? "bg-gray-100 text-gray-600" : "bg-gradient-to-r from-amber-200 to-yellow-400 text-amber-900"
-                      }`}>
-                        {t.tier}
-                      </span>
-                    </div>
+                    <p className="text-xs text-gray-500 mt-1">{t.description}</p>
                   </div>
                 </div>
               ))}
@@ -532,13 +534,13 @@ export default function OnboardingWizard() {
                     {COLOR_SCHEMES.map(c => (
                       <button
                         key={c.id}
-                        onClick={() => setCustomConfig({ ...customConfig, colorScheme: c.id as any })}
+                        onClick={() => setCustomConfig({ ...customConfig, colorScheme: { bg: c.bg, card: c.card, text: c.text, accent: c.accent, secondary: c.secondary } })}
                         className={`aspect-square rounded-full border-2 transition-all flex items-center justify-center ${
-                          customConfig.colorScheme === c.id ? "border-black scale-110" : "border-transparent hover:scale-105"
+                          customConfig.colorScheme.bg === c.bg ? "border-black scale-110" : "border-transparent hover:scale-105"
                         }`}
                         style={{ backgroundColor: c.bg, color: c.accent }}
                       >
-                        {customConfig.colorScheme === c.id && <Check className="w-4 h-4" />}
+                        {customConfig.colorScheme.bg === c.bg && <Check className="w-4 h-4" />}
                       </button>
                     ))}
                   </div>
@@ -555,7 +557,7 @@ export default function OnboardingWizard() {
                         className={`p-3 rounded-xl border-2 text-sm font-medium transition-all ${
                           customConfig.font === f.id ? "border-black bg-white" : "border-gray-200 bg-transparent hover:border-gray-300"
                         }`}
-                        style={{ fontFamily: f.value }}
+                        style={{ fontFamily: f.id }}
                       >
                         {f.label}
                       </button>
@@ -600,33 +602,33 @@ export default function OnboardingWizard() {
                <div className="absolute inset-0 bg-grid-black/[0.02] bg-[size:20px_20px]"></div>
                <div className="w-[320px] h-[650px] bg-white rounded-[2.5rem] shadow-2xl border-[8px] border-gray-900 relative z-10 overflow-hidden"
                     style={{
-                      backgroundColor: COLOR_SCHEMES.find(c => c.id === customConfig.colorScheme)?.bg || "#ffffff",
-                      fontFamily: FONT_OPTIONS.find(f => f.id === customConfig.font)?.value || "Inter, sans-serif",
+                      backgroundColor: customConfig.colorScheme.bg || "#ffffff",
+                      fontFamily: customConfig.font || "Inter, sans-serif",
                     }}
                >
                   {/* Dynamic Preview Header based on selection */}
-                  {customConfig.headerStyle === "classic" && (
+                  {(customConfig.headerStyle === "full-bleed" || customConfig.headerStyle === "gradient-overlay") && (
                     <div className="pt-12 pb-6 px-6 flex flex-col items-center text-center border-b border-black/5">
                       <div className="w-24 h-24 rounded-full bg-gray-200 mb-4" />
-                      <h3 className="text-xl font-bold" style={{ color: COLOR_SCHEMES.find(c => c.id === customConfig.colorScheme)?.text || "#000" }}>{displayName || "Your Name"}</h3>
-                      <p className="text-sm opacity-60" style={{ color: COLOR_SCHEMES.find(c => c.id === customConfig.colorScheme)?.text || "#000" }}>{selectedRole?.label}</p>
+                      <h3 className="text-xl font-bold" style={{ color: customConfig.colorScheme.text || "#000" }}>{displayName || "Your Name"}</h3>
+                      <p className="text-sm opacity-60" style={{ color: customConfig.colorScheme.text || "#000" }}>{selectedRole?.label}</p>
                     </div>
                   )}
-                  {customConfig.headerStyle === "banner" && (
+                  {(customConfig.headerStyle === "split" || customConfig.headerStyle === "offset") && (
                     <div className="relative mb-12">
-                      <div className="h-32 w-full" style={{ backgroundColor: COLOR_SCHEMES.find(c => c.id === customConfig.colorScheme)?.accent || "#000" }} />
+                      <div className="h-32 w-full" style={{ backgroundColor: customConfig.colorScheme.accent || "#000" }} />
                       <div className="absolute -bottom-10 left-6 w-20 h-20 rounded-full bg-gray-200 border-4 border-white" />
                       <div className="mt-12 px-6">
-                        <h3 className="text-xl font-bold" style={{ color: COLOR_SCHEMES.find(c => c.id === customConfig.colorScheme)?.text || "#000" }}>{displayName || "Your Name"}</h3>
+                        <h3 className="text-xl font-bold" style={{ color: customConfig.colorScheme.text || "#000" }}>{displayName || "Your Name"}</h3>
                       </div>
                     </div>
                   )}
-                  {customConfig.headerStyle === "minimal" && (
+                  {customConfig.headerStyle === "minimal-avatar" && (
                     <div className="pt-12 pb-6 px-6 flex items-center gap-4">
                       <div className="w-16 h-16 rounded-full bg-gray-200" />
                       <div>
-                        <h3 className="text-xl font-bold" style={{ color: COLOR_SCHEMES.find(c => c.id === customConfig.colorScheme)?.text || "#000" }}>{displayName || "Your Name"}</h3>
-                        <p className="text-sm opacity-60" style={{ color: COLOR_SCHEMES.find(c => c.id === customConfig.colorScheme)?.text || "#000" }}>{selectedRole?.label}</p>
+                        <h3 className="text-xl font-bold" style={{ color: customConfig.colorScheme.text || "#000" }}>{displayName || "Your Name"}</h3>
+                        <p className="text-sm opacity-60" style={{ color: customConfig.colorScheme.text || "#000" }}>{selectedRole?.label}</p>
                       </div>
                     </div>
                   )}
@@ -637,11 +639,11 @@ export default function OnboardingWizard() {
                        <div key={i} 
                          className="w-full h-14 flex items-center justify-center font-medium"
                          style={{
-                           backgroundColor: COLOR_SCHEMES.find(c => c.id === customConfig.colorScheme)?.buttonBg || "#f3f4f6",
-                           color: COLOR_SCHEMES.find(c => c.id === customConfig.colorScheme)?.buttonText || "#000",
+                           backgroundColor: customConfig.colorScheme.card || "#f3f4f6",
+                           color: customConfig.colorScheme.text || "#000",
                            borderRadius: customConfig.buttonStyle === "pill" ? "9999px" : customConfig.buttonStyle === "rounded" ? "0.75rem" : "0",
                            boxShadow: customConfig.buttonStyle === "shadow" ? "0 4px 6px -1px rgba(0,0,0,0.1)" : "none",
-                           border: customConfig.buttonStyle === "outline" ? `2px solid ${COLOR_SCHEMES.find(c => c.id === customConfig.colorScheme)?.text}` : "none",
+                           border: customConfig.buttonStyle === "outline" ? `2px solid ${customConfig.colorScheme.text}` : "none",
                          }}
                        >
                          Sample Link {i}
