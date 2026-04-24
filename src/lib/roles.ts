@@ -14,6 +14,7 @@ export interface RoleDefinition {
   proFeatures: string[];
   price: number; // Monthly Pro price in USD
   gradient: string;
+  accountType: "CREATOR" | "BUSINESS" | "AGENCY" | "ALL";
 }
 
 export const ROLE_CATEGORIES = [
@@ -24,7 +25,7 @@ export const ROLE_CATEGORIES = [
 ] as const;
 
 export const ROLES: RoleDefinition[] = [
-  // ═══ SELL ═══
+  // ═══ CREATOR ROLES ═══
   {
     id: "fitness_coach",
     label: "Fitness Coach",
@@ -36,30 +37,7 @@ export const ROLES: RoleDefinition[] = [
     proFeatures: ["ai_assistant", "gated_content", "booking_scheduler", "discount_engine"],
     price: 9,
     gradient: "from-orange-500 to-red-500",
-  },
-  {
-    id: "side_hustler",
-    label: "Side-Hustler / Home Seller",
-    emoji: "🍰",
-    category: "sell",
-    categoryLabel: "I want to Sell",
-    description: "List products, take orders, look professional",
-    defaultBlocks: ["social-grid", "store-product", "testimonial", "link", "qr-code"],
-    proFeatures: ["ai_assistant", "discount_engine", "visitor_recognition"],
-    price: 9,
-    gradient: "from-pink-500 to-rose-500",
-  },
-  {
-    id: "store_manager",
-    label: "Store Manager",
-    emoji: "🏪",
-    category: "sell",
-    categoryLabel: "I want to Sell",
-    description: "Digital storefront with catalog, offers, and reviews",
-    defaultBlocks: ["store-product", "map", "pricing-table", "testimonial", "qr-code", "link"],
-    proFeatures: ["ai_assistant", "discount_engine", "review_collector"],
-    price: 9,
-    gradient: "from-emerald-500 to-teal-500",
+    accountType: "CREATOR"
   },
   {
     id: "artist",
@@ -72,6 +50,7 @@ export const ROLES: RoleDefinition[] = [
     proFeatures: ["ai_assistant", "gated_content", "fan_collection"],
     price: 9,
     gradient: "from-purple-500 to-fuchsia-500",
+    accountType: "CREATOR"
   },
   {
     id: "collector",
@@ -84,9 +63,8 @@ export const ROLES: RoleDefinition[] = [
     proFeatures: ["ai_assistant", "discount_engine"],
     price: 9,
     gradient: "from-amber-500 to-orange-500",
+    accountType: "CREATOR"
   },
-
-  // ═══ GET HIRED ═══
   {
     id: "job_seeker",
     label: "Job Seeker",
@@ -98,6 +76,7 @@ export const ROLES: RoleDefinition[] = [
     proFeatures: ["ai_assistant", "analytics", "pdf_export"],
     price: 5,
     gradient: "from-blue-500 to-indigo-500",
+    accountType: "CREATOR"
   },
   {
     id: "student",
@@ -110,6 +89,7 @@ export const ROLES: RoleDefinition[] = [
     proFeatures: ["custom_themes", "analytics"],
     price: 3,
     gradient: "from-cyan-500 to-blue-500",
+    accountType: "CREATOR"
   },
   {
     id: "freelancer",
@@ -122,6 +102,7 @@ export const ROLES: RoleDefinition[] = [
     proFeatures: ["ai_assistant", "store_product", "custom_domain"],
     price: 9,
     gradient: "from-violet-500 to-purple-500",
+    accountType: "CREATOR"
   },
   {
     id: "video_editor",
@@ -134,9 +115,8 @@ export const ROLES: RoleDefinition[] = [
     proFeatures: ["ai_assistant", "store_product", "custom_domain"],
     price: 9,
     gradient: "from-red-500 to-pink-500",
+    accountType: "CREATOR"
   },
-
-  // ═══ BUILD BRAND ═══
   {
     id: "content_creator",
     label: "Content Creator / Influencer",
@@ -148,18 +128,7 @@ export const ROLES: RoleDefinition[] = [
     proFeatures: ["ai_assistant", "gated_content", "discount_engine", "analytics"],
     price: 9,
     gradient: "from-pink-500 to-amber-400",
-  },
-  {
-    id: "high_ticket_coach",
-    label: "High-Ticket Coach / Consultant",
-    emoji: "💰",
-    category: "build_brand",
-    categoryLabel: "I want to Build My Brand",
-    description: "Look expensive, filter leads, book discovery calls",
-    defaultBlocks: ["testimonial", "image", "booking", "stats-counter", "social-grid", "link"],
-    proFeatures: ["ai_assistant", "gated_content", "booking_scheduler", "discount_engine", "lead_qualifier"],
-    price: 19,
-    gradient: "from-amber-400 to-yellow-500",
+    accountType: "CREATOR"
   },
   {
     id: "motivational_speaker",
@@ -172,104 +141,7 @@ export const ROLES: RoleDefinition[] = [
     proFeatures: ["ai_assistant", "gated_content", "fan_collection"],
     price: 9,
     gradient: "from-indigo-400 to-purple-500",
-  },
-  {
-    id: "stock_analyst",
-    label: "Stock Market Analyst",
-    emoji: "📈",
-    category: "build_brand",
-    categoryLabel: "I want to Build My Brand",
-    description: "Share insights, build credibility, sell premium analysis",
-    defaultBlocks: ["social-grid", "stats-counter", "store-product", "disclaimer", "link"],
-    proFeatures: ["ai_assistant", "gated_content", "fan_collection"],
-    price: 12,
-    gradient: "from-green-500 to-emerald-500",
-  },
-  {
-    id: "marketing_manager",
-    label: "Marketing Manager",
-    emoji: "📢",
-    category: "build_brand",
-    categoryLabel: "I want to Build My Brand",
-    description: "Professional brand, case studies, thought leadership",
-    defaultBlocks: ["image", "stats-counter", "testimonial", "social-grid", "form", "link"],
-    proFeatures: ["ai_assistant", "lead_capture", "analytics"],
-    price: 9,
-    gradient: "from-sky-500 to-blue-500",
-  },
-  {
-    id: "sales_manager",
-    label: "Sales Manager",
-    emoji: "🤑",
-    category: "build_brand",
-    categoryLabel: "I want to Build My Brand",
-    description: "Build trust, share catalogs, capture leads",
-    defaultBlocks: ["store-product", "testimonial", "booking", "form", "social-grid", "link"],
-    proFeatures: ["ai_assistant", "lead_capture", "discount_engine", "analytics"],
-    price: 9,
-    gradient: "from-emerald-500 to-cyan-500",
-  },
-  {
-    id: "social_media_manager",
-    label: "Social Media Manager",
-    emoji: "📱",
-    category: "build_brand",
-    categoryLabel: "I want to Build My Brand",
-    description: "Showcase managed accounts, display growth, get clients",
-    defaultBlocks: ["image", "stats-counter", "pricing-table", "testimonial", "form", "link"],
-    proFeatures: ["ai_assistant", "store_product", "lead_capture"],
-    price: 9,
-    gradient: "from-pink-500 to-violet-500",
-  },
-
-  // ═══ SERVE COMMUNITY ═══
-  {
-    id: "barber",
-    label: "Local Service (Barber, Plumber, Nail Tech)",
-    emoji: "💇",
-    category: "serve_community",
-    categoryLabel: "I want to Serve My Community",
-    description: "Show prices, take bookings, share location",
-    defaultBlocks: ["pricing-table", "image", "map", "booking", "testimonial", "qr-code", "link"],
-    proFeatures: ["ai_assistant", "booking_scheduler", "review_collector", "whatsapp"],
-    price: 7,
-    gradient: "from-teal-500 to-cyan-500",
-  },
-  {
-    id: "real_estate",
-    label: "Real Estate / Car Salesperson",
-    emoji: "🏡",
-    category: "serve_community",
-    categoryLabel: "I want to Serve My Community",
-    description: "Show listings, capture leads, host open houses",
-    defaultBlocks: ["image", "map", "event", "form", "social-grid", "link"],
-    proFeatures: ["ai_assistant", "event_hub", "lead_capture", "analytics"],
-    price: 12,
-    gradient: "from-rose-500 to-orange-500",
-  },
-  {
-    id: "event_organizer",
-    label: "Event Organizer",
-    emoji: "🎉",
-    category: "serve_community",
-    categoryLabel: "I want to Serve My Community",
-    description: "One link for RSVPs, location, schedule, and photos",
-    defaultBlocks: ["event", "map", "image", "social-grid", "link"],
-    proFeatures: ["ai_assistant", "guest_management"],
-    price: 9,
-    gradient: "from-yellow-500 to-pink-500",
-  },
-  {
-    id: "lawyer",
-    label: "Lawyer",
-    emoji: "⚖️",
-    category: "serve_community",
-    categoryLabel: "I want to Serve My Community",
-    description: "Build credibility, show expertise, capture inquiries",
-    defaultBlocks: ["social-grid", "testimonial", "booking", "disclaimer", "form", "link"],
-    proFeatures: ["ai_assistant", "booking_scheduler", "lead_qualifier"],
-    price: 12,
-    gradient: "from-slate-500 to-gray-600",
+    accountType: "CREATOR"
   },
   {
     id: "online_tutor",
@@ -282,18 +154,7 @@ export const ROLES: RoleDefinition[] = [
     proFeatures: ["ai_assistant", "gated_content", "booking_scheduler"],
     price: 7,
     gradient: "from-amber-500 to-orange-500",
-  },
-  {
-    id: "ngo_member",
-    label: "NGO / Charity Member",
-    emoji: "❤️",
-    category: "serve_community",
-    categoryLabel: "I want to Serve My Community",
-    description: "Tell your cause, collect donations, recruit volunteers",
-    defaultBlocks: ["image", "video", "event", "form", "social-grid", "link"],
-    proFeatures: ["ai_assistant", "donation_tracker", "event_hub"],
-    price: 7,
-    gradient: "from-red-500 to-rose-500",
+    accountType: "CREATOR"
   },
   {
     id: "networker",
@@ -306,7 +167,181 @@ export const ROLES: RoleDefinition[] = [
     proFeatures: ["ai_assistant", "scan_analytics"],
     price: 5,
     gradient: "from-indigo-500 to-blue-500",
+    accountType: "CREATOR"
   },
+
+  // ═══ BUSINESS ROLES ═══
+  {
+    id: "retail_store",
+    label: "Retail Store / Shop",
+    emoji: "🏪",
+    category: "sell",
+    categoryLabel: "I want to Sell",
+    description: "Digital storefront with catalog, offers, and reviews",
+    defaultBlocks: ["store-product", "map", "pricing-table", "testimonial", "qr-code", "link"],
+    proFeatures: ["ai_assistant", "discount_engine", "review_collector"],
+    price: 9,
+    gradient: "from-emerald-500 to-teal-500",
+    accountType: "BUSINESS"
+  },
+  {
+    id: "side_hustler",
+    label: "Side-Hustler / Home Seller",
+    emoji: "🍰",
+    category: "sell",
+    categoryLabel: "I want to Sell",
+    description: "List products, take orders, look professional",
+    defaultBlocks: ["social-grid", "store-product", "testimonial", "link", "qr-code"],
+    proFeatures: ["ai_assistant", "discount_engine", "visitor_recognition"],
+    price: 9,
+    gradient: "from-pink-500 to-rose-500",
+    accountType: "BUSINESS"
+  },
+  {
+    id: "local_business",
+    label: "Local Business (Cafe, Gym, Salon)",
+    emoji: "💇",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "Show prices, take bookings, share location",
+    defaultBlocks: ["pricing-table", "image", "map", "booking", "testimonial", "qr-code", "link"],
+    proFeatures: ["ai_assistant", "booking_scheduler", "review_collector", "whatsapp"],
+    price: 7,
+    gradient: "from-teal-500 to-cyan-500",
+    accountType: "BUSINESS"
+  },
+  {
+    id: "professional_service",
+    label: "Professional Services (Lawyer, Accountant)",
+    emoji: "⚖️",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "Build credibility, show expertise, capture inquiries",
+    defaultBlocks: ["social-grid", "testimonial", "booking", "disclaimer", "form", "link"],
+    proFeatures: ["ai_assistant", "booking_scheduler", "lead_qualifier"],
+    price: 12,
+    gradient: "from-slate-500 to-gray-600",
+    accountType: "BUSINESS"
+  },
+  {
+    id: "real_estate",
+    label: "Real Estate / Properties",
+    emoji: "🏡",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "Show listings, capture leads, host open houses",
+    defaultBlocks: ["image", "map", "event", "form", "social-grid", "link"],
+    proFeatures: ["ai_assistant", "event_hub", "lead_capture", "analytics"],
+    price: 12,
+    gradient: "from-rose-500 to-orange-500",
+    accountType: "BUSINESS"
+  },
+  {
+    id: "it_firm",
+    label: "IT Firm / Software Agency",
+    emoji: "💻",
+    category: "get_hired",
+    categoryLabel: "I want to Get Hired",
+    description: "Showcase case studies, technical stack, book consultations",
+    defaultBlocks: ["image", "testimonial", "stats-counter", "booking", "link"],
+    proFeatures: ["ai_assistant", "lead_qualifier", "analytics"],
+    price: 15,
+    gradient: "from-blue-600 to-indigo-600",
+    accountType: "BUSINESS"
+  },
+  {
+    id: "import_export",
+    label: "Import / Export Business",
+    emoji: "🚢",
+    category: "sell",
+    categoryLabel: "I want to Sell",
+    description: "Global trade, product catalogs, contact forms",
+    defaultBlocks: ["image", "store-product", "map", "form", "link"],
+    proFeatures: ["ai_assistant", "lead_capture", "custom_domain"],
+    price: 15,
+    gradient: "from-sky-500 to-blue-700",
+    accountType: "BUSINESS"
+  },
+  {
+    id: "ngo_member",
+    label: "NGO / Charity",
+    emoji: "❤️",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "Tell your cause, collect donations, recruit volunteers",
+    defaultBlocks: ["image", "video", "event", "form", "social-grid", "link"],
+    proFeatures: ["ai_assistant", "donation_tracker", "event_hub"],
+    price: 7,
+    gradient: "from-red-500 to-rose-500",
+    accountType: "BUSINESS"
+  },
+
+  // ═══ AGENCY ROLES ═══
+  {
+    id: "digital_marketing_agency",
+    label: "Digital Marketing Agency",
+    emoji: "📈",
+    category: "build_brand",
+    categoryLabel: "I want to Build My Brand",
+    description: "Professional brand, case studies, thought leadership",
+    defaultBlocks: ["image", "stats-counter", "testimonial", "social-grid", "form", "link"],
+    proFeatures: ["ai_assistant", "lead_capture", "analytics"],
+    price: 19,
+    gradient: "from-sky-500 to-blue-500",
+    accountType: "AGENCY"
+  },
+  {
+    id: "talent_agency",
+    label: "Talent / Casting Agency",
+    emoji: "🌟",
+    category: "get_hired",
+    categoryLabel: "I want to Get Hired",
+    description: "Manage talent rosters, show headshots, book talent",
+    defaultBlocks: ["image", "video", "social-grid", "booking", "form", "link"],
+    proFeatures: ["ai_assistant", "booking_scheduler", "custom_domain"],
+    price: 29,
+    gradient: "from-purple-500 to-pink-500",
+    accountType: "AGENCY"
+  },
+  {
+    id: "influencer_agency",
+    label: "Influencer Management Agency",
+    emoji: "📱",
+    category: "build_brand",
+    categoryLabel: "I want to Build My Brand",
+    description: "Showcase managed accounts, display growth, get clients",
+    defaultBlocks: ["image", "stats-counter", "pricing-table", "testimonial", "form", "link"],
+    proFeatures: ["ai_assistant", "store_product", "lead_capture"],
+    price: 29,
+    gradient: "from-pink-500 to-violet-500",
+    accountType: "AGENCY"
+  },
+  {
+    id: "travel_agency",
+    label: "Travel Agency",
+    emoji: "✈️",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "Showcase destinations, book trips, display reviews",
+    defaultBlocks: ["image", "video", "map", "booking", "testimonial", "link"],
+    proFeatures: ["ai_assistant", "booking_scheduler", "lead_capture"],
+    price: 19,
+    gradient: "from-cyan-400 to-blue-500",
+    accountType: "AGENCY"
+  },
+  {
+    id: "event_organizer",
+    label: "Event Management Agency",
+    emoji: "🎉",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "One link for RSVPs, location, schedule, and photos",
+    defaultBlocks: ["event", "map", "image", "social-grid", "link"],
+    proFeatures: ["ai_assistant", "guest_management"],
+    price: 19,
+    gradient: "from-yellow-500 to-pink-500",
+    accountType: "AGENCY"
+  }
 ];
 
 // ═══ Helper Functions ═══
@@ -316,6 +351,11 @@ export function getRoleById(id: string): RoleDefinition | undefined {
 
 export function getRolesByCategory(category: string): RoleDefinition[] {
   return ROLES.filter(r => r.category === category);
+}
+
+export function getRolesByAccountType(type: "CREATOR" | "BUSINESS" | "AGENCY" | "ALL"): RoleDefinition[] {
+  if (type === "ALL") return ROLES;
+  return ROLES.filter(r => r.accountType === type || r.accountType === "ALL");
 }
 
 export function getDefaultRole(): RoleDefinition {
@@ -330,5 +370,6 @@ export function getDefaultRole(): RoleDefinition {
     proFeatures: ["ai_assistant", "analytics"],
     price: 9,
     gradient: "from-indigo-500 to-cyan-500",
+    accountType: "CREATOR"
   };
 }

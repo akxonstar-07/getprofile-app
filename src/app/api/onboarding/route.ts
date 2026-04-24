@@ -6,7 +6,9 @@ import { prisma } from "@/lib/prisma";
 const SOCIAL_FIELDS = [
   "instagram", "tiktok", "youtube", "twitter", "spotify",
   "facebook", "snapchat", "linkedin", "github", "website",
-  "telegram", "whatsapp", "threads"
+  "telegram", "whatsapp", "threads", "twitch", "apple_music",
+  "tidal", "deezer", "discord", "pinterest", "reddit",
+  "substack", "clubhouse", "zillow"
 ];
 
 export async function POST(req: Request) {
@@ -18,7 +20,17 @@ export async function POST(req: Request) {
 
     const userId = (session.user as any).id;
     const body = await req.json();
-    const { category, profileRole, displayName, platforms, urls, activeTemplateId, themeConfig } = body;
+    const { accountType, profileRole, displayName, dob, city, phone, username, platforms, urls, activeTemplateId, themeConfig } = body;
+
+    // Optional Username Validation
+    if (username) {
+      const existingUser = await prisma.user.findUnique({
+        where: { username: username.toLowerCase() }
+      });
+      if (existingUser && existingUser.id !== userId) {
+        return NextResponse.json({ error: "Username is already taken" }, { status: 400 });
+      }
+    }
 
     // Build social fields to save on profile
     const socialData: Record<string, string> = {};
@@ -41,6 +53,10 @@ export async function POST(req: Request) {
                 snapchat: `https://snapchat.com/add/${handle}`,
                 linkedin: `https://linkedin.com/in/${handle}`,
                 github: `https://github.com/${handle}`,
+                twitch: `https://twitch.tv/${handle}`,
+                pinterest: `https://pinterest.com/${handle}`,
+                reddit: `https://reddit.com/user/${handle}`,
+                telegram: `https://t.me/${handle}`,
               };
               finalUrl = urlMap[fieldName] || `https://${finalUrl}`;
             }
@@ -55,12 +71,18 @@ export async function POST(req: Request) {
       update: {
         activeTemplateId,
         themeConfig,
+        dob,
+        location: city,
+        phone,
         ...socialData,
       },
       create: {
         userId,
         activeTemplateId,
         themeConfig,
+        dob,
+        location: city,
+        phone,
         ...socialData,
       }
     });
@@ -69,15 +91,26 @@ export async function POST(req: Request) {
     const trialEndsAt = new Date();
     trialEndsAt.setDate(trialEndsAt.getDate() + 14);
 
+    // Map accountType to Prisma Role if provided
+    let dbRole = "USER";
+    if (accountType === "AGENCY") dbRole = "AGENCY";
+
+    const updateData: any = {
+      name: displayName,
+      onboardingCompleted: true,
+      profileRole: profileRole || "personal_brand",
+      plan: "TRIAL",
+      trialEndsAt,
+      role: dbRole
+    };
+
+    if (username) {
+      updateData.username = username.toLowerCase();
+    }
+
     await (prisma as any).user.update({
       where: { id: userId },
-      data: {
-        name: displayName,
-        onboardingCompleted: true,
-        profileRole: profileRole || "personal_brand",
-        plan: "TRIAL",
-        trialEndsAt,
-      }
+      data: updateData
     });
 
     // Also create links for each social URL

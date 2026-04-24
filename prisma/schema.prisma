@@ -142,6 +142,8 @@ model Profile {
   avatarUrl   String?
   bannerUrl   String?
   location    String?
+  dob         String?
+  phone       String?
   theme       String  @default("default")
   font        String  @default("Inter")
   bgColor     String  @default("#ffffff")
@@ -176,6 +178,20 @@ model Profile {
   facebook       String?
   snapchat       String?
   spotify        String?
+  threads        String?
+  twitch         String?
+  whatsapp       String?
+  apple_music    String?
+  tidal          String?
+  deezer         String?
+  discord        String?
+  pinterest      String?
+  reddit         String?
+  telegram       String?
+  substack       String?
+  clubhouse      String?
+  zillow         String?
+
   totalFollowers Int?    @default(0)
 
   // Portfolio / Media Kit fields
