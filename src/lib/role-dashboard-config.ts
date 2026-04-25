@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════
-// getprofile.link — Role Dashboard Config (22 Roles)
+// getprofile.link — Role Dashboard Config (18 Creator + Business/Agency/Community)
 // Controls unique labels, stats, and quick actions per role
 // ═══════════════════════════════════════════════════
 
@@ -63,10 +63,10 @@ const DEFAULT_CONFIG: RoleDashboardConfig = {
 };
 
 const ROLE_CONFIGS: Record<string, Partial<RoleDashboardConfig>> = {
-  fitness_coach: {
+  fitness_trainer: {
     sidebar: { store: "Program Store", events: "Fitness Events", bookings: "Session Booker", promo: "Client Offers", assistant: "AI Fitness Advisor", analytics: "Client Insights" },
     overview: {
-      heroTitle: "Fitness Command Center",
+      heroTitle: "Fitness Hub",
       heroSubtitle: "Track clients, sessions, and revenue at a glance.",
       stats: [
         { label: "Active Clients", key: "clients", color: "orange" },
@@ -81,11 +81,11 @@ const ROLE_CONFIGS: Record<string, Partial<RoleDashboardConfig>> = {
       ],
     },
     pages: {
-      store: { title: "Program Store", subtitle: "Sell workout plans, meal guides, and fitness programs.", addLabel: "Add Workout Plan", emptyText: "No fitness programs yet. Add your first workout plan!" },
-      events: { title: "Fitness Events", subtitle: "Host bootcamps, workshops, and group training sessions.", addLabel: "Create Fitness Event", emptyText: "No fitness events scheduled." },
+      store: { title: "Program Store", subtitle: "Sell workout plans, meal guides, and fitness programs.", addLabel: "Add Workout Plan", emptyText: "No fitness programs yet." },
+      events: { title: "Fitness Events", subtitle: "Host bootcamps, workshops, and group training.", addLabel: "Create Fitness Event", emptyText: "No fitness events scheduled." },
       bookings: { title: "Session Booker", subtitle: "Manage personal training sessions and client calls.", addLabel: "Add Time Slot", emptyText: "No sessions booked yet." },
-      promo: { title: "Client Offers", subtitle: "Create discount codes for loyal clients and flash sales.", addLabel: "New Offer", emptyText: "No active offers." },
-      assistant: { title: "AI Fitness Advisor", subtitle: "AI answers client questions about workouts, pricing, and availability." },
+      promo: { title: "Client Offers", subtitle: "Create discount codes for loyal clients.", addLabel: "New Offer", emptyText: "No active offers." },
+      assistant: { title: "AI Fitness Advisor", subtitle: "AI answers client questions about workouts and pricing." },
       analytics: { title: "Client Insights", subtitle: "Track client engagement and program performance." },
     },
   },
@@ -195,6 +195,330 @@ const ROLE_CONFIGS: Record<string, Partial<RoleDashboardConfig>> = {
       promo: { title: "Flash Sale Engine", subtitle: "Create time-limited discounts to boost sales.", addLabel: "New Flash Sale", emptyText: "No flash sales active." },
       assistant: { title: "AI Fan Manager", subtitle: "AI engages fans, answers questions, and captures emails." },
       analytics: { title: "Creator Insights", subtitle: "Track fan engagement, link clicks, and revenue." },
+    },
+  },
+
+  designer: {
+    sidebar: { store: "Template Store", events: "Design Events", bookings: "Client Calls", promo: "Package Deals", assistant: "AI Client Manager", analytics: "Portfolio Insights" },
+    overview: {
+      heroTitle: "Design Studio",
+      heroSubtitle: "Showcase work, book clients, and sell templates.",
+      stats: [
+        { label: "Portfolio Views", key: "visitors", color: "violet" },
+        { label: "Client Inquiries", key: "leads", color: "blue" },
+        { label: "Template Sales", key: "sales", color: "emerald" },
+        { label: "Active Projects", key: "projects", color: "amber" },
+      ],
+      quickActions: [
+        { label: "Add to Portfolio", href: "/dashboard/links", desc: "Showcase a recent project" },
+        { label: "Sell Template", href: "/dashboard/store", desc: "List a design template" },
+        { label: "View Inquiries", href: "/dashboard/analytics", desc: "See client interest" },
+      ],
+    },
+    pages: {
+      store: { title: "Template Store", subtitle: "Sell design templates, UI kits, and resources.", addLabel: "Add Template", emptyText: "No templates listed." },
+      events: { title: "Design Events", subtitle: "Host design workshops and creative sessions.", addLabel: "Create Event", emptyText: "No events planned." },
+      bookings: { title: "Client Calls", subtitle: "Manage project kickoff calls and consultations.", addLabel: "Add Slot", emptyText: "No calls scheduled." },
+      promo: { title: "Package Deals", subtitle: "Offer bundle pricing and new client discounts.", addLabel: "New Deal", emptyText: "No deals active." },
+      assistant: { title: "AI Client Manager", subtitle: "AI answers pricing and availability queries." },
+      analytics: { title: "Portfolio Insights", subtitle: "Track portfolio views and inquiry conversion." },
+    },
+  },
+
+  vfx_artist: {
+    sidebar: { store: "Asset Store", events: "VFX Events", bookings: "Project Calls", promo: "Bundle Deals", assistant: "AI Project Manager", analytics: "Reel Analytics" },
+    overview: {
+      heroTitle: "VFX Lab",
+      heroSubtitle: "Showcase breakdowns, sell assets, and book projects.",
+      stats: [
+        { label: "Reel Views", key: "visitors", color: "cyan" },
+        { label: "Asset Sales", key: "sales", color: "emerald" },
+        { label: "Project Inquiries", key: "leads", color: "blue" },
+        { label: "Active Projects", key: "projects", color: "pink" },
+      ],
+      quickActions: [
+        { label: "Upload Reel", href: "/dashboard/links", desc: "Add your latest breakdown" },
+        { label: "Sell Asset Pack", href: "/dashboard/store", desc: "List a VFX asset pack" },
+        { label: "View Inquiries", href: "/dashboard/analytics", desc: "See project interest" },
+      ],
+    },
+    pages: {
+      store: { title: "Asset Store", subtitle: "Sell VFX templates, 3D models, and asset packs.", addLabel: "Add Asset Pack", emptyText: "No assets listed." },
+      events: { title: "VFX Events", subtitle: "Host workshops and masterclasses.", addLabel: "Create Event", emptyText: "No events planned." },
+      bookings: { title: "Project Calls", subtitle: "Manage project kickoff and revision calls.", addLabel: "Add Slot", emptyText: "No calls scheduled." },
+      promo: { title: "Bundle Deals", subtitle: "Offer asset bundles and new client discounts.", addLabel: "New Bundle", emptyText: "No bundles active." },
+      assistant: { title: "AI Project Manager", subtitle: "AI handles project queries and pricing questions." },
+      analytics: { title: "Reel Analytics", subtitle: "Track reel views, asset sales, and inquiries." },
+    },
+  },
+
+  public_speaker: {
+    sidebar: { store: "Books & Courses", events: "Speaking Calendar", bookings: "Event Bookings", promo: "Special Offers", assistant: "AI Booking Agent", analytics: "Speaker Insights" },
+    overview: {
+      heroTitle: "Speaker Hub",
+      heroSubtitle: "Book speaking gigs and grow your audience.",
+      stats: [
+        { label: "Booking Requests", key: "bookings", color: "amber" },
+        { label: "Upcoming Events", key: "events", color: "blue" },
+        { label: "Course Sales", key: "sales", color: "emerald" },
+        { label: "Profile Views", key: "visitors", color: "purple" },
+      ],
+      quickActions: [
+        { label: "Add Talk/Course", href: "/dashboard/store", desc: "Upload teachings or books" },
+        { label: "Schedule Event", href: "/dashboard/events", desc: "Plan a speaking engagement" },
+        { label: "View Bookings", href: "/dashboard/bookings", desc: "See booking requests" },
+      ],
+    },
+    pages: {
+      store: { title: "Books & Courses", subtitle: "Sell books, courses, and premium content.", addLabel: "Add Product", emptyText: "No products listed." },
+      events: { title: "Speaking Calendar", subtitle: "Announce upcoming talks and workshops.", addLabel: "Add Event", emptyText: "No events on calendar." },
+      bookings: { title: "Event Bookings", subtitle: "Manage speaking engagement requests.", addLabel: "Add Availability", emptyText: "No booking requests." },
+      promo: { title: "Special Offers", subtitle: "Offer early-bird pricing on events.", addLabel: "New Offer", emptyText: "No offers active." },
+      assistant: { title: "AI Booking Agent", subtitle: "AI handles speaking inquiries and booking requests." },
+      analytics: { title: "Speaker Insights", subtitle: "Track audience reach and booking conversion." },
+    },
+  },
+
+  educator: {
+    sidebar: { store: "Course Store", events: "Class Schedule", bookings: "Lesson Scheduler", promo: "Student Offers", assistant: "AI Tutor Helper", analytics: "Student Analytics" },
+    overview: {
+      heroTitle: "Teaching Hub",
+      heroSubtitle: "Manage lessons, students, and course sales.",
+      stats: [
+        { label: "Active Students", key: "clients", color: "amber" },
+        { label: "Lessons Booked", key: "bookings", color: "blue" },
+        { label: "Courses Sold", key: "sales", color: "emerald" },
+        { label: "Student Reviews", key: "reviews", color: "purple" },
+      ],
+      quickActions: [
+        { label: "Add Course", href: "/dashboard/store", desc: "Upload study material" },
+        { label: "Schedule Lesson", href: "/dashboard/bookings", desc: "Add available time slots" },
+        { label: "View Students", href: "/dashboard/analytics", desc: "Track student engagement" },
+      ],
+    },
+    pages: {
+      store: { title: "Course Store", subtitle: "Sell courses, study guides, and materials.", addLabel: "Add Course", emptyText: "No courses listed." },
+      events: { title: "Class Schedule", subtitle: "Announce group classes and workshops.", addLabel: "Add Class", emptyText: "No classes scheduled." },
+      bookings: { title: "Lesson Scheduler", subtitle: "Let students book 1-on-1 lessons.", addLabel: "Add Slot", emptyText: "No lessons scheduled." },
+      promo: { title: "Student Offers", subtitle: "Offer trial lessons and package discounts.", addLabel: "New Offer", emptyText: "No offers active." },
+      assistant: { title: "AI Tutor Helper", subtitle: "AI answers subject and pricing queries." },
+      analytics: { title: "Student Analytics", subtitle: "Track student inquiries and lesson performance." },
+    },
+  },
+
+  coach_mentor: {
+    sidebar: { store: "Coaching Programs", events: "Masterclasses", bookings: "Discovery Calls", promo: "VIP Offers", assistant: "AI Lead Qualifier", analytics: "Pipeline Analytics" },
+    overview: {
+      heroTitle: "Coaching Hub",
+      heroSubtitle: "Qualify leads, book calls, and track your pipeline.",
+      stats: [
+        { label: "Active Clients", key: "clients", color: "emerald" },
+        { label: "Discovery Calls", key: "bookings", color: "blue" },
+        { label: "Revenue", key: "revenue", color: "amber" },
+        { label: "Conversion Rate", key: "conversion", color: "purple" },
+      ],
+      quickActions: [
+        { label: "Add Program", href: "/dashboard/store", desc: "Create a coaching package" },
+        { label: "View Leads", href: "/dashboard/assistant", desc: "See qualified prospects" },
+        { label: "Schedule Masterclass", href: "/dashboard/events", desc: "Plan a webinar" },
+      ],
+    },
+    pages: {
+      store: { title: "Coaching Programs", subtitle: "Sell coaching packages and courses.", addLabel: "Add Program", emptyText: "No programs listed." },
+      events: { title: "Masterclasses", subtitle: "Host webinars and group coaching.", addLabel: "Create Masterclass", emptyText: "No masterclasses scheduled." },
+      bookings: { title: "Discovery Calls", subtitle: "Manage calls with qualified prospects.", addLabel: "Add Slot", emptyText: "No calls scheduled." },
+      promo: { title: "VIP Offers", subtitle: "Create exclusive offers for prospects.", addLabel: "New VIP Offer", emptyText: "No VIP offers active." },
+      assistant: { title: "AI Lead Qualifier", subtitle: "AI filters serious inquiries automatically." },
+      analytics: { title: "Pipeline Analytics", subtitle: "Track lead quality and close rates." },
+    },
+  },
+
+  entertainer: {
+    sidebar: { store: "Merch Store", events: "Show Calendar", bookings: "Booking Requests", promo: "Fan Deals", assistant: "AI Booking Agent", analytics: "Fan Analytics" },
+    overview: {
+      heroTitle: "Stage Hub",
+      heroSubtitle: "Manage shows, merch, and fan engagement.",
+      stats: [
+        { label: "Fan Visits", key: "visitors", color: "yellow" },
+        { label: "Upcoming Shows", key: "events", color: "blue" },
+        { label: "Merch Sales", key: "sales", color: "emerald" },
+        { label: "Booking Requests", key: "bookings", color: "pink" },
+      ],
+      quickActions: [
+        { label: "Add Show", href: "/dashboard/events", desc: "Schedule a performance" },
+        { label: "Sell Merch", href: "/dashboard/store", desc: "List fan merchandise" },
+        { label: "View Fans", href: "/dashboard/analytics", desc: "See fan activity" },
+      ],
+    },
+    pages: {
+      store: { title: "Merch Store", subtitle: "Sell merchandise and fan items.", addLabel: "Add Merch", emptyText: "No merch listed." },
+      events: { title: "Show Calendar", subtitle: "Announce performances and sell tickets.", addLabel: "Add Show", emptyText: "No upcoming shows." },
+      bookings: { title: "Booking Requests", subtitle: "Manage event booking requests.", addLabel: "Add Availability", emptyText: "No booking requests." },
+      promo: { title: "Fan Deals", subtitle: "Offer fan-exclusive discounts.", addLabel: "New Deal", emptyText: "No active fan deals." },
+      assistant: { title: "AI Booking Agent", subtitle: "AI handles venue inquiries and bookings." },
+      analytics: { title: "Fan Analytics", subtitle: "Track fan engagement and merch interest." },
+    },
+  },
+
+  writer_publisher: {
+    sidebar: { store: "Book Store", events: "Book Events", bookings: "Consultations", promo: "Reader Deals", assistant: "AI Author Agent", analytics: "Reader Insights" },
+    overview: {
+      heroTitle: "Writer's Desk",
+      heroSubtitle: "Sell books, grow readership, and publish.",
+      stats: [
+        { label: "Books Sold", key: "sales", color: "slate" },
+        { label: "Newsletter Subs", key: "subscribers", color: "blue" },
+        { label: "Profile Views", key: "visitors", color: "emerald" },
+        { label: "Event Signups", key: "events", color: "amber" },
+      ],
+      quickActions: [
+        { label: "Add Book", href: "/dashboard/store", desc: "List a new publication" },
+        { label: "Plan Launch", href: "/dashboard/events", desc: "Schedule a book launch" },
+        { label: "View Readers", href: "/dashboard/analytics", desc: "Track readership" },
+      ],
+    },
+    pages: {
+      store: { title: "Book Store", subtitle: "Sell books, ebooks, and publications.", addLabel: "Add Book", emptyText: "No books listed." },
+      events: { title: "Book Events", subtitle: "Host book launches and readings.", addLabel: "Create Event", emptyText: "No events planned." },
+      bookings: { title: "Consultations", subtitle: "Offer writing consultations.", addLabel: "Add Slot", emptyText: "No consultations scheduled." },
+      promo: { title: "Reader Deals", subtitle: "Offer launch discounts and bundles.", addLabel: "New Deal", emptyText: "No deals active." },
+      assistant: { title: "AI Author Agent", subtitle: "AI shares your work and answers reader queries." },
+      analytics: { title: "Reader Insights", subtitle: "Track book sales and reader engagement." },
+    },
+  },
+
+  gamer: {
+    sidebar: { store: "Merch Store", events: "Gaming Events", bookings: "Coaching Sessions", promo: "Fan Deals", assistant: "AI Stream Bot", analytics: "Stream Analytics" },
+    overview: {
+      heroTitle: "Gaming Hub",
+      heroSubtitle: "Your streams, clips, merch, and community.",
+      stats: [
+        { label: "Profile Views", key: "visitors", color: "green" },
+        { label: "Merch Sales", key: "sales", color: "emerald" },
+        { label: "Upcoming Events", key: "events", color: "blue" },
+        { label: "Fan Growth", key: "subscribers", color: "purple" },
+      ],
+      quickActions: [
+        { label: "Add Merch", href: "/dashboard/store", desc: "List gaming merchandise" },
+        { label: "Plan Event", href: "/dashboard/events", desc: "Schedule a gaming event" },
+        { label: "View Stats", href: "/dashboard/analytics", desc: "Check fan activity" },
+      ],
+    },
+    pages: {
+      store: { title: "Merch Store", subtitle: "Sell gaming merch and digital items.", addLabel: "Add Item", emptyText: "No items listed." },
+      events: { title: "Gaming Events", subtitle: "Host tournaments and community events.", addLabel: "Create Event", emptyText: "No events planned." },
+      bookings: { title: "Coaching Sessions", subtitle: "Offer paid gaming coaching.", addLabel: "Add Slot", emptyText: "No sessions scheduled." },
+      promo: { title: "Fan Deals", subtitle: "Offer subscriber discounts.", addLabel: "New Deal", emptyText: "No deals active." },
+      assistant: { title: "AI Stream Bot", subtitle: "AI engages viewers and answers community questions." },
+      analytics: { title: "Stream Analytics", subtitle: "Track viewer engagement and merch sales." },
+    },
+  },
+
+  realtor: {
+    sidebar: { store: "Listings", events: "Open Houses", bookings: "Property Viewings", promo: "Offers", assistant: "AI Property Guide", analytics: "Lead Tracker" },
+    overview: {
+      heroTitle: "Realty Hub",
+      heroSubtitle: "Manage listings, viewings, and lead capture.",
+      stats: [
+        { label: "Active Listings", key: "products", color: "rose" },
+        { label: "Viewing Requests", key: "bookings", color: "blue" },
+        { label: "Leads Captured", key: "leads", color: "emerald" },
+        { label: "Open Houses", key: "events", color: "amber" },
+      ],
+      quickActions: [
+        { label: "Add Listing", href: "/dashboard/store", desc: "Post a new property" },
+        { label: "Schedule Open House", href: "/dashboard/events", desc: "Plan a property tour" },
+        { label: "View Leads", href: "/dashboard/analytics", desc: "See interested buyers" },
+      ],
+    },
+    pages: {
+      store: { title: "Property Listings", subtitle: "Showcase properties with photos and pricing.", addLabel: "Add Listing", emptyText: "No listings yet." },
+      events: { title: "Open Houses", subtitle: "Schedule open house events.", addLabel: "Schedule Open House", emptyText: "No open houses planned." },
+      bookings: { title: "Property Viewings", subtitle: "Manage viewing appointments.", addLabel: "Add Slot", emptyText: "No viewings scheduled." },
+      promo: { title: "Special Offers", subtitle: "Create offers on featured properties.", addLabel: "New Offer", emptyText: "No offers active." },
+      assistant: { title: "AI Property Guide", subtitle: "AI answers property questions at scale." },
+      analytics: { title: "Lead Tracker", subtitle: "Track property views and lead quality." },
+    },
+  },
+
+  sound_editor: {
+    sidebar: { store: "Sample Store", events: "Audio Events", bookings: "Project Calls", promo: "Bundle Deals", assistant: "AI Audio Agent", analytics: "Portfolio Analytics" },
+    overview: {
+      heroTitle: "Sound Lab",
+      heroSubtitle: "Your audio portfolio and client booking system.",
+      stats: [
+        { label: "Portfolio Plays", key: "visitors", color: "sky" },
+        { label: "Sample Sales", key: "sales", color: "emerald" },
+        { label: "Project Inquiries", key: "leads", color: "blue" },
+        { label: "Active Clients", key: "clients", color: "amber" },
+      ],
+      quickActions: [
+        { label: "Sell Sample Pack", href: "/dashboard/store", desc: "List an audio sample pack" },
+        { label: "Upload Portfolio", href: "/dashboard/links", desc: "Add audio samples" },
+        { label: "View Inquiries", href: "/dashboard/analytics", desc: "See client interest" },
+      ],
+    },
+    pages: {
+      store: { title: "Sample Store", subtitle: "Sell sample packs, presets, and audio tools.", addLabel: "Add Sample Pack", emptyText: "No samples listed." },
+      events: { title: "Audio Events", subtitle: "Host mixing workshops and masterclasses.", addLabel: "Create Event", emptyText: "No events planned." },
+      bookings: { title: "Project Calls", subtitle: "Manage project kickoff and revision calls.", addLabel: "Add Slot", emptyText: "No calls scheduled." },
+      promo: { title: "Bundle Deals", subtitle: "Offer sample bundle discounts.", addLabel: "New Bundle", emptyText: "No bundles active." },
+      assistant: { title: "AI Audio Agent", subtitle: "AI answers project queries and pricing." },
+      analytics: { title: "Portfolio Analytics", subtitle: "Track portfolio plays and sales conversion." },
+    },
+  },
+
+  yoga_trainer: {
+    sidebar: { store: "Program Store", events: "Class Schedule", bookings: "Session Booker", promo: "Wellness Offers", assistant: "AI Wellness Guide", analytics: "Student Insights" },
+    overview: {
+      heroTitle: "Wellness Hub",
+      heroSubtitle: "Manage classes, programs, and student growth.",
+      stats: [
+        { label: "Active Students", key: "clients", color: "teal" },
+        { label: "Classes Booked", key: "bookings", color: "blue" },
+        { label: "Programs Sold", key: "sales", color: "emerald" },
+        { label: "Revenue", key: "revenue", color: "amber" },
+      ],
+      quickActions: [
+        { label: "Add Program", href: "/dashboard/store", desc: "Create a yoga program" },
+        { label: "Schedule Class", href: "/dashboard/bookings", desc: "Add class time slots" },
+        { label: "Plan Retreat", href: "/dashboard/events", desc: "Organize a wellness retreat" },
+      ],
+    },
+    pages: {
+      store: { title: "Program Store", subtitle: "Sell yoga programs and wellness courses.", addLabel: "Add Program", emptyText: "No programs listed." },
+      events: { title: "Class Schedule", subtitle: "Announce classes and retreats.", addLabel: "Add Class", emptyText: "No classes scheduled." },
+      bookings: { title: "Session Booker", subtitle: "Let students book private sessions.", addLabel: "Add Slot", emptyText: "No sessions booked." },
+      promo: { title: "Wellness Offers", subtitle: "Offer trial classes and package discounts.", addLabel: "New Offer", emptyText: "No offers active." },
+      assistant: { title: "AI Wellness Guide", subtitle: "AI answers class and scheduling queries." },
+      analytics: { title: "Student Insights", subtitle: "Track student engagement and retention." },
+    },
+  },
+
+  podcast_host: {
+    sidebar: { store: "Merch Store", events: "Live Events", bookings: "Guest Booking", promo: "Listener Deals", assistant: "AI Show Manager", analytics: "Podcast Analytics" },
+    overview: {
+      heroTitle: "Podcast Studio",
+      heroSubtitle: "Episodes, guest booking, merch, and growth.",
+      stats: [
+        { label: "Total Listens", key: "visitors", color: "violet" },
+        { label: "Merch Sales", key: "sales", color: "emerald" },
+        { label: "Subscriber Growth", key: "subscribers", color: "blue" },
+        { label: "Guest Inquiries", key: "leads", color: "amber" },
+      ],
+      quickActions: [
+        { label: "Sell Merch", href: "/dashboard/store", desc: "List podcast merchandise" },
+        { label: "Book Guest", href: "/dashboard/bookings", desc: "Schedule a guest appearance" },
+        { label: "Plan Live Event", href: "/dashboard/events", desc: "Host a live recording" },
+      ],
+    },
+    pages: {
+      store: { title: "Merch Store", subtitle: "Sell podcast merch and premium content.", addLabel: "Add Item", emptyText: "No items listed." },
+      events: { title: "Live Events", subtitle: "Host live recordings and meetups.", addLabel: "Create Event", emptyText: "No events planned." },
+      bookings: { title: "Guest Booking", subtitle: "Manage guest appearances and interviews.", addLabel: "Add Slot", emptyText: "No guests booked." },
+      promo: { title: "Listener Deals", subtitle: "Offer subscriber discounts.", addLabel: "New Deal", emptyText: "No deals active." },
+      assistant: { title: "AI Show Manager", subtitle: "AI handles listener queries and guest applications." },
+      analytics: { title: "Podcast Analytics", subtitle: "Track episode performance and growth." },
     },
   },
 
