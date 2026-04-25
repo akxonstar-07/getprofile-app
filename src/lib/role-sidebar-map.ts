@@ -32,7 +32,7 @@ export function getSidebarConfigForRole(profileRole: string): RoleSidebarConfig 
     coach_mentor:      { showStore: true,  showEvents: true,  showBookings: true,  showPromo: true,  showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: true,  showCredits: true,  roleLabel: "Coach / Mentor" },
     entertainer:       { showStore: true,  showEvents: true,  showBookings: true,  showPromo: false, showPortfolio: true,  showAutoDM: false, showChannels: true,  showCRM: true,  showCredits: true,  roleLabel: "Entertainer" },
     writer_publisher:  { showStore: true,  showEvents: true,  showBookings: false, showPromo: true,  showPortfolio: true,  showAutoDM: false, showChannels: false, showCRM: true,  showCredits: true,  roleLabel: "Writer / Publisher" },
-    networker:         { showStore: false, showEvents: true,  showBookings: false, showPromo: false, showPortfolio: false, showAutoDM: false, showChannels: false, showCRM: true,  showCredits: false, roleLabel: "Networker" },
+    networker:         { showStore: false, showEvents: true,  showBookings: false, showPromo: false, showPortfolio: false, showAutoDM: false, showChannels: false, showCRM: true,  showCredits: true,  roleLabel: "Networker" },
     gamer:             { showStore: true,  showEvents: true,  showBookings: false, showPromo: true,  showPortfolio: true,  showAutoDM: true,  showChannels: true,  showCRM: true,  showCredits: true,  roleLabel: "Gamer" },
     realtor:           { showStore: false, showEvents: true,  showBookings: true,  showPromo: false, showPortfolio: true,  showAutoDM: false, showChannels: true,  showCRM: true,  showCredits: false, roleLabel: "Realtor" },
     fitness_trainer:   { showStore: true,  showEvents: true,  showBookings: true,  showPromo: true,  showPortfolio: false, showAutoDM: false, showChannels: true,  showCRM: true,  showCredits: true,  roleLabel: "Fitness Trainer" },
@@ -43,7 +43,7 @@ export function getSidebarConfigForRole(profileRole: string): RoleSidebarConfig 
 
     // ═══ BUSINESS ROLES ═══
     retail_store:         { showStore: true,  showEvents: false, showBookings: false, showPromo: true,  showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: false, showCredits: false, roleLabel: "Retail Store" },
-    side_hustler:         { showStore: true,  showEvents: false, showBookings: false, showPromo: true,  showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: false, showCredits: true,  roleLabel: "Side-Hustler" },
+    side_hustler:         { showStore: true,  showEvents: false, showBookings: false, showPromo: true,  showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: false, showCredits: false, roleLabel: "Side-Hustler" },
     local_business:       { showStore: true,  showEvents: false, showBookings: true,  showPromo: true,  showPortfolio: true,  showAutoDM: true,  showChannels: true,  showCRM: true,  showCredits: false, roleLabel: "Local Business" },
     professional_service: { showStore: true,  showEvents: false, showBookings: true,  showPromo: false, showPortfolio: false, showAutoDM: true,  showChannels: false, showCRM: true,  showCredits: false, roleLabel: "Professional" },
     real_estate:          { showStore: true,  showEvents: true,  showBookings: true,  showPromo: false, showPortfolio: true,  showAutoDM: true,  showChannels: true,  showCRM: true,  showCredits: false, roleLabel: "Real Estate" },
@@ -59,12 +59,12 @@ export function getSidebarConfigForRole(profileRole: string): RoleSidebarConfig 
     event_organizer:          { showStore: true,  showEvents: true,  showBookings: false, showPromo: true,  showPortfolio: true,  showAutoDM: true,  showChannels: true,  showCRM: false, showCredits: false, roleLabel: "Event Organizer" },
 
     // ═══ COMMUNITY ROLES ═══
-    discord_admin:            { showStore: false, showEvents: true,  showBookings: false, showPromo: false, showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: true,  showCredits: false, roleLabel: "Discord Admin" },
-    facebook_group_admin:     { showStore: false, showEvents: true,  showBookings: false, showPromo: false, showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: true,  showCredits: false, roleLabel: "FB Group Admin" },
-    subreddit_mod:            { showStore: false, showEvents: false, showBookings: false, showPromo: false, showPortfolio: false, showAutoDM: false, showChannels: false, showCRM: true,  showCredits: false, roleLabel: "Reddit Mod" },
-    online_community_manager: { showStore: false, showEvents: true,  showBookings: false, showPromo: false, showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: true,  showCredits: false, roleLabel: "Community Manager" },
-    local_community_leader:   { showStore: false, showEvents: true,  showBookings: false, showPromo: false, showPortfolio: false, showAutoDM: false, showChannels: true,  showCRM: true,  showCredits: false, roleLabel: "Community Leader" },
-    social_media_page_admin:  { showStore: false, showEvents: false, showBookings: false, showPromo: false, showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: false, showCredits: false, roleLabel: "Page Admin" },
+    discord_admin:            { showStore: false, showEvents: true,  showBookings: false, showPromo: false, showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: true,  showCredits: true,  roleLabel: "Discord Admin" },
+    facebook_group_admin:     { showStore: false, showEvents: true,  showBookings: false, showPromo: false, showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: true,  showCredits: true,  roleLabel: "FB Group Admin" },
+    subreddit_mod:            { showStore: false, showEvents: false, showBookings: false, showPromo: false, showPortfolio: false, showAutoDM: false, showChannels: false, showCRM: true,  showCredits: true,  roleLabel: "Reddit Mod" },
+    online_community_manager: { showStore: false, showEvents: true,  showBookings: false, showPromo: false, showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: true,  showCredits: true,  roleLabel: "Community Manager" },
+    local_community_leader:   { showStore: false, showEvents: true,  showBookings: false, showPromo: false, showPortfolio: false, showAutoDM: false, showChannels: true,  showCRM: true,  showCredits: true,  roleLabel: "Community Leader" },
+    social_media_page_admin:  { showStore: false, showEvents: false, showBookings: false, showPromo: false, showPortfolio: false, showAutoDM: true,  showChannels: true,  showCRM: false, showCredits: true,  roleLabel: "Page Admin" },
   };
 
   // Default: show everything (fallback for personal_brand or unknown roles)

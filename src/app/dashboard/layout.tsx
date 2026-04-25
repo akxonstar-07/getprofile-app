@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useSession, signOut } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
@@ -32,7 +32,7 @@ const creatorItems = [
 const automationItems = [
   { href: "/dashboard/automations",   icon: Zap,            label: "DM Automation",   group: "automation", roles: ["USER"] },
   { href: "/dashboard/channels",      icon: MessageSquare,  label: "Channels",        group: "automation", roles: ["USER"] },
-  { href: "/dashboard/crm",           icon: Users,          label: "CRM Pipeline",    group: "automation", roles: ["USER"] },
+  { href: "/dashboard/crm",           icon: Users,          label: "CRM Pipeline",    group: "automation", roles: ["USER"], creatorLabel: "Audience Manager" },
   { href: "/dashboard/integrations",  icon: Link2,          label: "Integrations",    group: "automation", roles: ["USER"] },
 ];
 
@@ -56,6 +56,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [previewMode, setPreviewMode] = useState<"mobile" | "desktop">("mobile");
+
+  // Determine account type from role definition to control Web/Mobile preview
+  const accountType = useMemo(() => {
+    const creatorRoles = ["content_creator","artist","designer","video_editor","vfx_artist","public_speaker","educator","coach_mentor","entertainer","writer_publisher","networker","gamer","realtor","fitness_trainer","sound_editor","yoga_trainer","podcast_host","student"];
+    const communityRoles = ["discord_admin","facebook_group_admin","subreddit_mod","online_community_manager","local_community_leader","social_media_page_admin"];
+    const pr = userProfile?.profileRole || "";
+    if (creatorRoles.includes(pr)) return "CREATOR";
+    if (communityRoles.includes(pr)) return "COMMUNITY";
+    if (userProfile?.role === "AGENCY") return "AGENCY";
+    return "BUSINESS";
+  }, [userProfile?.profileRole, userProfile?.role]);
+
+  // Only Business + Agency get Web Page preview
+  const showWebPreview = accountType === "BUSINESS" || accountType === "AGENCY";
   
   useEffect(() => {
     if (status === "unauthenticated") router.push("/login");
@@ -224,7 +238,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           isActive ? "bg-blue-50 text-blue-700 font-semibold" : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                         }`}>
                         <item.icon className={`w-4 h-4 flex-shrink-0 ${isActive ? "text-blue-600" : "text-gray-400"}`} />
-                        <span className="flex-1 truncate">{item.label}</span>
+                        <span className="flex-1 truncate">{(item as any).creatorLabel && (accountType === "CREATOR" || accountType === "COMMUNITY") ? (item as any).creatorLabel : item.label}</span>
                       </Link>
                     );
                   })}
@@ -337,13 +351,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                        }`}>
                        Mobile
                      </button>
-                     <button 
+                      {showWebPreview && (<button 
                        onClick={() => setPreviewMode("desktop")}
                        className={`px-6 py-2 rounded-full text-xs font-bold transition-all ${
                          previewMode === "desktop" ? "bg-blue-600 text-white shadow-md" : "text-gray-500 hover:text-gray-900"
                        }`}>
                        Web Page
-                     </button>
+                      </button>)}
                   </div>
 
                   {/* iFrame Renderer */}
