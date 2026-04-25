@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ChevronLeft, Search, ArrowRight, LayoutTemplate, Palette, Type, MousePointerSquareDashed, MonitorSmartphone, Briefcase, Users, Sparkles } from "lucide-react";
+import { Check, ChevronLeft, Search, ArrowRight, LayoutTemplate, Palette, Type, MousePointerSquareDashed, MonitorSmartphone, Briefcase, Users, Sparkles, Camera, Globe2 } from "lucide-react";
 import { getRolesByAccountType, type RoleDefinition } from "@/lib/roles";
 import { TEMPLATES, TEMPLATE_CATEGORIES, HEADER_STYLES, COLOR_SCHEMES, FONT_OPTIONS, BUTTON_STYLES, getTemplatesByCategory, type TemplateConfig } from "@/lib/templates";
 
@@ -36,7 +36,7 @@ export default function OnboardingWizard() {
   const [animating, setAnimating] = useState(false);
 
   // Step 1: Account Type & Role
-  type AccountType = "CREATOR" | "BUSINESS" | "AGENCY";
+  type AccountType = "CREATOR" | "BUSINESS" | "AGENCY" | "COMMUNITY";
   const [accountType, setAccountType] = useState<AccountType | null>(null);
   const [selectedRole, setSelectedRole] = useState<RoleDefinition | null>(null);
   const [roleSearch, setRoleSearch] = useState("");
@@ -49,6 +49,8 @@ export default function OnboardingWizard() {
   const [countryCode, setCountryCode] = useState("+91");
   const [phone, setPhone] = useState("");
   const [usernameError, setUsernameError] = useState("");
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   // Step 3: Platforms (Direct Input)
   const [urls, setUrls] = useState<Record<string, string>>({});
@@ -133,21 +135,35 @@ export default function OnboardingWizard() {
     return p ? p.icon : null;
   };
 
-  // Preview Phone Component for live visual
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setAvatarPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Preview Phone Component — link.me style
   const LivePreview = () => {
-    const filledPlatforms = Object.entries(urls).filter(([_, url]) => url && url.length > 0);
+    const filledPlatforms = Object.entries(urls).filter(([, url]) => url && url.length > 0);
     return (
       <div className="hidden lg:flex w-full max-w-[340px] items-center justify-center p-8 bg-gray-50 rounded-3xl border border-gray-200">
         <div className="w-full h-[600px] bg-white rounded-[2rem] border-8 border-gray-900 overflow-hidden relative shadow-2xl">
            <div className="absolute top-0 w-full h-24 bg-gradient-to-b from-indigo-500/20 to-transparent"></div>
            <div className="p-6 pt-12 flex flex-col items-center text-center relative z-10">
               <div className="w-20 h-20 rounded-full bg-gray-200 border-4 border-white shadow-lg overflow-hidden mb-3">
-                 <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200" className="w-full h-full object-cover" alt="" />
+                 {avatarPreview ? (
+                   <img src={avatarPreview} className="w-full h-full object-cover" alt="" />
+                 ) : (
+                   <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                     <Camera className="w-6 h-6 text-gray-400" />
+                   </div>
+                 )}
               </div>
               <h2 className="font-bold text-lg">{displayName || "Your Name"}</h2>
               {username && <p className="text-xs text-gray-400 mt-0.5">@{username}</p>}
-              <p className="text-sm text-gray-500 mt-1">{selectedRole?.label || "Creator"}</p>
-              {city && <p className="text-xs text-gray-400 mt-1">📍 {city}</p>}
 
               {/* Social Icons Row — link.me style */}
               {filledPlatforms.length > 0 && (
@@ -198,7 +214,7 @@ export default function OnboardingWizard() {
                   <h1 className="text-4xl sm:text-5xl font-black text-black mb-3 tracking-tight">Account Type</h1>
                   <p className="text-gray-500 mb-8 text-lg">Select how you plan to use GetProfile.</p>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     <button onClick={() => setAccountType("CREATOR")} className="p-6 rounded-2xl border-2 border-gray-100 bg-white hover:border-indigo-500 hover:shadow-lg transition-all text-left group">
                       <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         <MonitorSmartphone className="w-6 h-6 text-indigo-500" />
@@ -210,7 +226,7 @@ export default function OnboardingWizard() {
                       <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         <Briefcase className="w-6 h-6 text-emerald-500" />
                       </div>
-                      <h3 className="font-bold text-lg mb-2">Business</h3>
+                      <h3 className="font-bold text-lg mb-2">Business Owner</h3>
                       <p className="text-sm text-gray-500">Sell products, accept bookings, and manage local services.</p>
                     </button>
                     <button onClick={() => setAccountType("AGENCY")} className="p-6 rounded-2xl border-2 border-gray-100 bg-white hover:border-purple-500 hover:shadow-lg transition-all text-left group">
@@ -219,6 +235,13 @@ export default function OnboardingWizard() {
                       </div>
                       <h3 className="font-bold text-lg mb-2">Agency</h3>
                       <p className="text-sm text-gray-500">Manage multiple talent profiles, influencers, or client portfolios.</p>
+                    </button>
+                    <button onClick={() => setAccountType("COMMUNITY")} className="p-6 rounded-2xl border-2 border-gray-100 bg-white hover:border-teal-500 hover:shadow-lg transition-all text-left group">
+                      <div className="w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <Globe2 className="w-6 h-6 text-teal-500" />
+                      </div>
+                      <h3 className="font-bold text-lg mb-2">Community Admin</h3>
+                      <p className="text-sm text-gray-500">Manage online or local communities, groups, and social pages.</p>
                     </button>
                   </div>
                 </>
@@ -274,8 +297,28 @@ export default function OnboardingWizard() {
           {/* ═══ STEP 2: Extended Details ═══ */}
           {step === 2 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pr-0 lg:pr-12">
-              <h1 className="text-4xl sm:text-5xl font-black text-black mb-3 tracking-tight">Customize your Profile Details</h1>
-              <p className="text-gray-500 mb-8 text-lg">Enter your display name and basic information.</p>
+              <h1 className="text-4xl sm:text-5xl font-black text-black mb-3 tracking-tight">Customize your Profile</h1>
+              <p className="text-gray-500 mb-8 text-lg">Upload a photo and enter your details.</p>
+
+              {/* Avatar Upload */}
+              <div className="flex justify-center mb-8">
+                <label className="relative cursor-pointer group">
+                  <div className="w-28 h-28 rounded-full bg-gray-100 border-4 border-gray-200 overflow-hidden flex items-center justify-center group-hover:border-blue-400 transition-all shadow-lg">
+                    {avatarPreview ? (
+                      <img src={avatarPreview} className="w-full h-full object-cover" alt="Profile" />
+                    ) : (
+                      <div className="flex flex-col items-center">
+                        <Camera className="w-8 h-8 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                        <span className="text-[10px] text-gray-400 mt-1 font-medium">Upload</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="absolute bottom-0 right-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center border-2 border-white shadow-md group-hover:scale-110 transition-transform">
+                    <Camera className="w-4 h-4 text-white" />
+                  </div>
+                  <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+                </label>
+              </div>
 
               <div className="space-y-6 mb-8">
                 <div>

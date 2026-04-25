@@ -14,7 +14,7 @@ export interface RoleDefinition {
   proFeatures: string[];
   price: number; // Monthly Pro price in USD
   gradient: string;
-  accountType: "CREATOR" | "BUSINESS" | "AGENCY" | "ALL";
+  accountType: "CREATOR" | "BUSINESS" | "AGENCY" | "COMMUNITY" | "ALL";
 }
 
 export const ROLE_CATEGORIES = [
@@ -341,6 +341,86 @@ export const ROLES: RoleDefinition[] = [
     price: 19,
     gradient: "from-yellow-500 to-pink-500",
     accountType: "AGENCY"
+  },
+
+  // ═══ COMMUNITY ROLES ═══
+  {
+    id: "discord_admin",
+    label: "Discord Community Admin",
+    emoji: "🎮",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "Manage Discord servers, engage members, and grow your community",
+    defaultBlocks: ["social-grid", "link", "event", "form"],
+    proFeatures: ["ai_assistant", "dm_automation", "community_analytics"],
+    price: 9,
+    gradient: "from-indigo-500 to-purple-600",
+    accountType: "COMMUNITY"
+  },
+  {
+    id: "facebook_group_admin",
+    label: "Facebook Group Admin",
+    emoji: "👥",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "Run Facebook groups, organize events, and connect members",
+    defaultBlocks: ["social-grid", "link", "event", "form"],
+    proFeatures: ["ai_assistant", "dm_automation", "community_analytics"],
+    price: 9,
+    gradient: "from-blue-500 to-blue-700",
+    accountType: "COMMUNITY"
+  },
+  {
+    id: "subreddit_mod",
+    label: "Subreddit Moderator",
+    emoji: "📡",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "Moderate subreddits and build engaged Reddit communities",
+    defaultBlocks: ["social-grid", "link", "form"],
+    proFeatures: ["ai_assistant", "community_analytics"],
+    price: 9,
+    gradient: "from-orange-500 to-red-600",
+    accountType: "COMMUNITY"
+  },
+  {
+    id: "online_community_manager",
+    label: "Online Community Manager",
+    emoji: "🌐",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "Build and manage online communities across any platform",
+    defaultBlocks: ["social-grid", "link", "event", "video", "form"],
+    proFeatures: ["ai_assistant", "dm_automation", "crm", "community_analytics"],
+    price: 9,
+    gradient: "from-teal-500 to-cyan-500",
+    accountType: "COMMUNITY"
+  },
+  {
+    id: "local_community_leader",
+    label: "Local Community Leader",
+    emoji: "🏘️",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "Lead neighborhood groups, local events, and civic initiatives",
+    defaultBlocks: ["social-grid", "link", "event", "form", "map"],
+    proFeatures: ["ai_assistant", "event_management"],
+    price: 9,
+    gradient: "from-green-500 to-emerald-600",
+    accountType: "COMMUNITY"
+  },
+  {
+    id: "social_media_page_admin",
+    label: "Social Media Page Admin",
+    emoji: "📱",
+    category: "serve_community",
+    categoryLabel: "I want to Serve My Community",
+    description: "Manage brand pages, fan pages, and social media accounts",
+    defaultBlocks: ["social-grid", "link", "image", "video"],
+    proFeatures: ["ai_assistant", "dm_automation", "analytics"],
+    price: 9,
+    gradient: "from-pink-500 to-rose-600",
+    accountType: "COMMUNITY"
   }
 ];
 
@@ -353,7 +433,7 @@ export function getRolesByCategory(category: string): RoleDefinition[] {
   return ROLES.filter(r => r.category === category);
 }
 
-export function getRolesByAccountType(type: "CREATOR" | "BUSINESS" | "AGENCY" | "ALL"): RoleDefinition[] {
+export function getRolesByAccountType(type: "CREATOR" | "BUSINESS" | "AGENCY" | "COMMUNITY" | "ALL"): RoleDefinition[] {
   if (type === "ALL") return ROLES;
   return ROLES.filter(r => r.accountType === type || r.accountType === "ALL");
 }
